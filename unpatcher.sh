@@ -12,8 +12,13 @@ cd ../../frameworks/base
 git reset --hard
 git clean -f -d
 
+# packages/apps/Settings:
+cd ../../packages/apps/Settings
+git reset --hard
+git clean -f -d
+
 # packages/apps/Trebuchet:
-cd ../../packages/apps/Trebuchet
+cd ../../../packages/apps/Trebuchet
 git reset --hard
 git clean -f -d
 
@@ -21,3 +26,4 @@ git clean -f -d
 cd ../../../system/core
 git reset --hard
 git clean -f -d
+cd ../..
