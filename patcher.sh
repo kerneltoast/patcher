@@ -14,6 +14,7 @@ git reset --hard
 wget https://github.com/CyanogenMod/android_frameworks_base/commit/b68ae542f9999a6314e3bc6a13db800e18d14fe5.patch && patch -p1 < b68ae542f9999a6314e3bc6a13db800e18d14fe5.patch
 wget https://github.com/CyanogenMod/android_frameworks_base/commit/cc9ef392e40226cab2ee89a87e8af4ef4b1ba979.patch && patch -p1 < cc9ef392e40226cab2ee89a87e8af4ef4b1ba979.patch
 wget https://github.com/CyanogenMod/android_frameworks_base/commit/e75f59e7fd349dd1fa5d452086c795f693776d89.patch && patch -p1 < e75f59e7fd349dd1fa5d452086c795f693776d89.patch
+wget https://github.com/CyanogenMod/android_frameworks_base/commit/a4c16c1998a4528ac395cd0a8a15d4b1f7b76eb0.patch && patch -p1 < a4c16c1998a4528ac395cd0a8a15d4b1f7b76eb0.patch
 git clean -f -d
 
 # packages/apps/Settings:
