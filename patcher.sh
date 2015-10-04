@@ -18,7 +18,7 @@ git clean -f -d
 # packages/apps/Trebuchet:
 cd ../../packages/apps/Trebuchet
 git reset --hard
-wget https://github.com/sultanxda/android_packages_apps_Trebuchet/commit/cb8b36c7d9f0cff549b0322eabedea6820d9b52c.patch && patch -p1 < cb8b36c7d9f0cff549b0322eabedea6820d9b52c.patch
+wget https://github.com/sultanxda/android_packages_apps_Trebuchet/commit/0dee750cfe9c9c705fc1d1000106ac75910434c4.patch && patch -p1 < 0dee750cfe9c9c705fc1d1000106ac75910434c4.patch
 git clean -f -d
 
 # system/core:
