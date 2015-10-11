@@ -13,6 +13,7 @@ cd ../../frameworks/base
 git reset --hard
 wget https://github.com/CyanogenMod/android_frameworks_base/commit/b68ae542f9999a6314e3bc6a13db800e18d14fe5.patch && patch -p1 < b68ae542f9999a6314e3bc6a13db800e18d14fe5.patch
 wget https://github.com/CyanogenMod/android_frameworks_base/commit/e75f59e7fd349dd1fa5d452086c795f693776d89.patch && patch -p1 < e75f59e7fd349dd1fa5d452086c795f693776d89.patch
+wget https://github.com/sultanxda/android_frameworks_base/commit/996ac1d760f6736b913f9a062d1748e5bb6ff534.patch && patch -p1 < 996ac1d760f6736b913f9a062d1748e5bb6ff534.patch
 git clean -f -d
 
 # packages/apps/Trebuchet:
