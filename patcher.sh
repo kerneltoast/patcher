@@ -18,6 +18,8 @@ wget https://github.com/CyanogenMod/android_frameworks_base/commit/e75f59e7fd349
 patch -p1 < e75f59e7fd349dd1fa5d452086c795f693776d89.patch
 wget https://github.com/sultanxda/android_frameworks_base/commit/0cbd4a88767d78640b7dd391674575f7d5e517e6.patch
 patch -p1 < 0cbd4a88767d78640b7dd391674575f7d5e517e6.patch
+wget https://github.com/CyanogenMod/android_frameworks_base/commit/06c39e200cd5edfb6019cd725343654e1d9a8fe3.patch
+patch -p1 < 06c39e200cd5edfb6019cd725343654e1d9a8fe3.patch
 git clean -f -d
 
 # frameworks/opt/telephony:
