@@ -12,8 +12,13 @@ cd ../../frameworks/base
 git reset --hard
 git clean -f -d
 
+# frameworks/opt/telephony:
+cd ../../frameworks/opt/telephony
+git reset --hard
+git clean -f -d
+
 # packages/apps/Trebuchet:
-cd ../../packages/apps/Trebuchet
+cd ../../../packages/apps/Trebuchet
 git reset --hard
 git clean -f -d
 

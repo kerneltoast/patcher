@@ -20,8 +20,15 @@ wget https://github.com/sultanxda/android_frameworks_base/commit/0cbd4a88767d786
 patch -p1 < 0cbd4a88767d78640b7dd391674575f7d5e517e6.patch
 git clean -f -d
 
+# frameworks/opt/telephony:
+cd ../../frameworks/opt/telephony
+git reset --hard
+wget https://github.com/sultanxda/android_frameworks_opt_telephony/commit/279bcac13acffa186483aff97f359597a8875b18.patch
+patch -p1 < 279bcac13acffa186483aff97f359597a8875b18.patch
+git clean -f -d
+
 # packages/apps/Trebuchet:
-cd ../../packages/apps/Trebuchet
+cd ../../../packages/apps/Trebuchet
 git reset --hard
 wget https://github.com/sultanxda/android_packages_apps_Trebuchet/commit/85657ceea63d4e85b1115679afe08ca0759f832d.patch
 patch -p1 < 85657ceea63d4e85b1115679afe08ca0759f832d.patch
