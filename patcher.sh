@@ -2,51 +2,27 @@
 
 # Apply these patches before compilation:
 
-# frameworks/av:
-cd frameworks/av
+# device/oppo/common:
+cd device/oppo/common
 git reset --hard
-wget https://github.com/CyanogenMod/android_frameworks_av/commit/df31a3368272dcf5671a1ca569d4769c205debad.patch
-patch -p1 < df31a3368272dcf5671a1ca569d4769c205debad.patch
+wget https://github.com/CyanogenMod/android_device_oppo_common/commit/8387050e2d7de340394ffce6da60cc2a735539f5.patch
+patch -p1 < 8387050e2d7de340394ffce6da60cc2a735539f5.patch
+wget https://github.com/CyanogenMod/android_device_oppo_common/commit/30e63437f17c6cb75581f3bd80470f050c169bd5.patch
+patch -p1 < 30e63437f17c6cb75581f3bd80470f050c169bd5.patch
 git clean -f -d
 
-# frameworks/base:
-cd ../../frameworks/base
+# device/qcom/common:
+cd ../../../device/qcom/common
 git reset --hard
-wget https://github.com/CyanogenMod/android_frameworks_base/commit/b68ae542f9999a6314e3bc6a13db800e18d14fe5.patch
-patch -p1 < b68ae542f9999a6314e3bc6a13db800e18d14fe5.patch
-wget https://github.com/CyanogenMod/android_frameworks_base/commit/e75f59e7fd349dd1fa5d452086c795f693776d89.patch
-patch -p1 < e75f59e7fd349dd1fa5d452086c795f693776d89.patch
-wget https://github.com/sultanxda/android_frameworks_base/commit/0cbd4a88767d78640b7dd391674575f7d5e517e6.patch
-patch -p1 < 0cbd4a88767d78640b7dd391674575f7d5e517e6.patch
-wget https://github.com/CyanogenMod/android_frameworks_base/commit/06c39e200cd5edfb6019cd725343654e1d9a8fe3.patch
-patch -p1 < 06c39e200cd5edfb6019cd725343654e1d9a8fe3.patch
+wget https://github.com/sultanxda/android_device_qcom_common/commit/480037b5f22278db54f52c3806ca0277a0a76ad9.patch
+patch -p1 < 480037b5f22278db54f52c3806ca0277a0a76ad9.patch
 git clean -f -d
 
-# frameworks/opt/net/wifi:
-cd ../../frameworks/opt/net/wifi
+# vendor/cm:
+cd ../../../vendor/cm
 git reset --hard
-wget https://github.com/sultanxda/android_frameworks_opt_net_wifi/commit/fd779363dc10cf3e4b178c2ce5d3b1e84f46d378.patch
-patch -p1 < fd779363dc10cf3e4b178c2ce5d3b1e84f46d378.patch
+wget https://github.com/CyanogenMod/android_vendor_cm/commit/3ed1a3dd83c8bc1d81f8beeb09f2f4a3c1401ba6.patch
+patch -p1 < 3ed1a3dd83c8bc1d81f8beeb09f2f4a3c1401ba6.patch
 git clean -f -d
 
-# frameworks/opt/telephony:
-cd ../../../../frameworks/opt/telephony
-git reset --hard
-wget https://github.com/sultanxda/android_frameworks_opt_telephony/commit/279bcac13acffa186483aff97f359597a8875b18.patch
-patch -p1 < 279bcac13acffa186483aff97f359597a8875b18.patch
-git clean -f -d
-
-# packages/apps/Trebuchet:
-cd ../../../packages/apps/Trebuchet
-git reset --hard
-wget https://github.com/sultanxda/android_packages_apps_Trebuchet/commit/85657ceea63d4e85b1115679afe08ca0759f832d.patch
-patch -p1 < 85657ceea63d4e85b1115679afe08ca0759f832d.patch
-git clean -f -d
-
-# system/core:
-cd ../../../system/core
-git reset --hard
-wget https://github.com/sultanxda/android_system_core/commit/c407c8a2299183ce0fd0e7f7b1c026a66b5adb8d.patch
-patch -p1 < c407c8a2299183ce0fd0e7f7b1c026a66b5adb8d.patch
-git clean -f -d
 cd ../..
