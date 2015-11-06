@@ -2,18 +2,28 @@
 
 # Remove previously-applied patches
 
-# device/oppo/common:
-cd device/oppo/common
+# frameworks/av:
+cd frameworks/av
 git reset --hard
 git clean -f -d
 
-# device/qcom/common:
-cd ../../../device/qcom/common
+# frameworks/base:
+cd ../../frameworks/base
+git reset --hard
+git clean -f -d
+
+# packages/apps/Trebuchet:
+cd ../../packages/apps/Trebuchet
+git reset --hard
+git clean -f -d
+
+# system/core:
+cd ../../../system/core
 git reset --hard
 git clean -f -d
 
 # vendor/cm:
-cd ../../../vendor/cm
+cd ../../vendor/cm
 git reset --hard
 git clean -f -d
 
