@@ -27,9 +27,4 @@ cd ../../../system/core
 git reset --hard
 git clean -f -d
 
-# vendor/cm:
-cd ../../vendor/cm
-git reset --hard
-git clean -f -d
-
 cd ../..
