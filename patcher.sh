@@ -22,15 +22,8 @@ wget https://github.com/CyanogenMod/android_frameworks_base/commit/06c39e200cd5e
 patch -p1 < 06c39e200cd5edfb6019cd725343654e1d9a8fe3.patch
 git clean -f -d
 
-# frameworks/opt/net/wifi:
-cd ../../frameworks/opt/net/wifi
-git reset --hard
-wget https://github.com/sultanxda/android_frameworks_opt_net_wifi/commit/fd779363dc10cf3e4b178c2ce5d3b1e84f46d378.patch
-patch -p1 < fd779363dc10cf3e4b178c2ce5d3b1e84f46d378.patch
-git clean -f -d
-
 # frameworks/opt/telephony:
-cd ../../../../frameworks/opt/telephony
+cd ../../frameworks/opt/telephony
 git reset --hard
 wget https://github.com/sultanxda/android_frameworks_opt_telephony/commit/279bcac13acffa186483aff97f359597a8875b18.patch
 patch -p1 < 279bcac13acffa186483aff97f359597a8875b18.patch
@@ -39,8 +32,8 @@ git clean -f -d
 # packages/apps/Trebuchet:
 cd ../../../packages/apps/Trebuchet
 git reset --hard
-wget https://github.com/sultanxda/android_packages_apps_Trebuchet/commit/85657ceea63d4e85b1115679afe08ca0759f832d.patch
-patch -p1 < 85657ceea63d4e85b1115679afe08ca0759f832d.patch
+wget https://github.com/sultanxda/android_packages_apps_Trebuchet/commit/5cbf273ce872ed51887e90cd54ef0283ac2987b6.patch
+patch -p1 < 5cbf273ce872ed51887e90cd54ef0283ac2987b6.patch
 git clean -f -d
 
 # system/core:

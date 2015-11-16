@@ -12,13 +12,8 @@ cd ../../frameworks/base
 git reset --hard
 git clean -f -d
 
-# frameworks/opt/net/wifi:
-cd ../../frameworks/opt/net/wifi
-git reset --hard
-git clean -f -d
-
 # frameworks/opt/telephony:
-cd ../../../../frameworks/opt/telephony
+cd ../../frameworks/opt/telephony
 git reset --hard
 git clean -f -d
 
