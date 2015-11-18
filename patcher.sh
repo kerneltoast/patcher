@@ -25,6 +25,8 @@ cd ../../packages/apps/Settings
 git reset --hard
 wget https://github.com/sultanxda/android_packages_apps_Settings/commit/afb73252dd27e7a725ae823101fd47aa0938d3d9.patch
 patch -p1 < afb73252dd27e7a725ae823101fd47aa0938d3d9.patch
+wget https://github.com/CyanogenMod/android_packages_apps_Settings/commit/7960e7e18e070a64343d5020e8bf852886ef46ae.patch
+patch -p1 < 7960e7e18e070a64343d5020e8bf852886ef46ae.patch
 git clean -f -d
 
 # packages/apps/Trebuchet:
