@@ -2,13 +2,8 @@
 
 # Remove previously-applied patches
 
-# build:
-cd build
-git reset --hard
-git clean -f -d
-
 # frameworks/av:
-cd ../frameworks/av
+cd frameworks/av
 git reset --hard
 git clean -f -d
 
