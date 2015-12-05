@@ -5,8 +5,6 @@
 # frameworks/av:
 cd frameworks/av
 git reset --hard
-wget https://github.com/sultanxda/android_frameworks_av/commit/9bba479d69ed42b7a88df68974df49734e361a9b.patch
-patch -p1 < 9bba479d69ed42b7a88df68974df49734e361a9b.patch
 wget https://github.com/sultanxda/android_frameworks_av/commit/44b8ecca7a07b05c71e595c03750a9f5915bce35.patch
 patch -p1 < 44b8ecca7a07b05c71e595c03750a9f5915bce35.patch
 git clean -f -d
@@ -30,6 +28,8 @@ cd ../../packages/apps/Settings
 git reset --hard
 wget https://github.com/CyanogenMod/android_packages_apps_Settings/commit/b00d8f5cf7ff99b2393146380532067d1e4c5aa1.patch
 patch -p1 < b00d8f5cf7ff99b2393146380532067d1e4c5aa1.patch
+wget https://github.com/sultanxda/android_packages_apps_Settings/commit/f1b285669dc43ac8f321233ed9f480a6963a79d7.patch
+patch -p1 < f1b285669dc43ac8f321233ed9f480a6963a79d7.patch
 git clean -f -d
 
 # packages/apps/Trebuchet:
