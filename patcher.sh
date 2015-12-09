@@ -25,8 +25,6 @@ git clean -f -d
 # packages/apps/Settings:
 cd ../../packages/apps/Settings
 git reset --hard
-wget https://github.com/CyanogenMod/android_packages_apps_Settings/commit/b00d8f5cf7ff99b2393146380532067d1e4c5aa1.patch
-patch -p1 < b00d8f5cf7ff99b2393146380532067d1e4c5aa1.patch
 wget https://github.com/sultanxda/android_packages_apps_Settings/commit/f1b285669dc43ac8f321233ed9f480a6963a79d7.patch
 patch -p1 < f1b285669dc43ac8f321233ed9f480a6963a79d7.patch
 git clean -f -d
