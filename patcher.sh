@@ -22,15 +22,8 @@ wget https://github.com/sultanxda/android_frameworks_base/commit/7cd529d08fe2087
 patch -p1 < 7cd529d08fe2087006c5aa5c47dc730ff0ad4022.patch
 git clean -f -d
 
-# packages/apps/Settings:
-cd ../../packages/apps/Settings
-git reset --hard
-wget https://github.com/sultanxda/android_packages_apps_Settings/commit/f1b285669dc43ac8f321233ed9f480a6963a79d7.patch
-patch -p1 < f1b285669dc43ac8f321233ed9f480a6963a79d7.patch
-git clean -f -d
-
 # packages/apps/Trebuchet:
-cd ../../../packages/apps/Trebuchet
+cd ../../packages/apps/Trebuchet
 git reset --hard
 wget https://github.com/sultanxda/android_packages_apps_Trebuchet/commit/5cbf273ce872ed51887e90cd54ef0283ac2987b6.patch
 patch -p1 < 5cbf273ce872ed51887e90cd54ef0283ac2987b6.patch
