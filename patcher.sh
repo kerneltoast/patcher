@@ -36,4 +36,11 @@ wget https://github.com/sultanxda/android_system_core/commit/a1702ced972dff3608d
 patch -p1 < a1702ced972dff3608d3808cfe61b524af887804.patch
 git clean -f -d
 
+# vendor/cm:
+cd ../../vendor/cm
+git reset --hard
+wget https://github.com/CyanogenMod/android_vendor_cm/commit/9d78806a29f49b58c1aeed93e530184b49eb56e5.patch
+patch -p1 < 9d78806a29f49b58c1aeed93e530184b49eb56e5.patch
+git clean -f -d
+
 cd ../..
