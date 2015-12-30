@@ -41,6 +41,6 @@ cd ../../vendor/cm
 git reset --hard
 wget https://github.com/CyanogenMod/android_vendor_cm/commit/9d78806a29f49b58c1aeed93e530184b49eb56e5.patch
 patch -p1 < 9d78806a29f49b58c1aeed93e530184b49eb56e5.patch
-git clean -f -d
+rm -f 9d78806a29f49b58c1aeed93e530184b49eb56e5.patch
 
 cd ../..
