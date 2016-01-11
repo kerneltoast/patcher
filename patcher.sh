@@ -2,8 +2,15 @@
 
 # Apply these patches before compilation:
 
+# build:
+cd build
+git reset --hard && git clean -f -d
+wget -q https://github.com/CyanogenMod/android_build/commit/c1b06c9b6c7b8ed684033894059a2a859f85e708.patch
+patch -p1 -s < c1b06c9b6c7b8ed684033894059a2a859f85e708.patch
+git clean -f -d
+
 # frameworks/av:
-cd frameworks/av
+cd ../frameworks/av
 git reset --hard && git clean -f -d
 wget -q https://github.com/sultanxda/android_frameworks_av/commit/44b8ecca7a07b05c71e595c03750a9f5915bce35.patch
 patch -p1 -s < 44b8ecca7a07b05c71e595c03750a9f5915bce35.patch
