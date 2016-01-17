@@ -36,13 +36,8 @@ wget -q https://github.com/sultanxda/android_packages_apps_Trebuchet/commit/5cbf
 patch -p1 -s < 5cbf273ce872ed51887e90cd54ef0283ac2987b6.patch
 git clean -f -d
 
-# system/bt:
-cd ../../../system/bt
-git reset --hard && git clean -f -d
-git revert --no-edit adb5875f49e25873c6f81f931313bca6d442863b
-
 # system/core:
-cd ../../system/core
+cd ../../../system/core
 git reset --hard && git clean -f -d
 wget -q https://github.com/sultanxda/android_system_core/commit/a1702ced972dff3608d3808cfe61b524af887804.patch
 patch -p1 -s < a1702ced972dff3608d3808cfe61b524af887804.patch
