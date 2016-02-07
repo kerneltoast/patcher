@@ -31,6 +31,13 @@ wget https://github.com/sultanxda/android_frameworks_opt_telephony/commit/279bca
 patch -p1 < 279bcac13acffa186483aff97f359597a8875b18.patch
 git clean -f -d
 
+# packages/apps/LockClock:
+cd ../../../packages/apps/LockClock
+git reset --hard
+wget https://github.com/sultanxda/android_packages_apps_LockClock/commit/201e3f432b9266dc7cb3d35a909e7710f9017ceb.patch
+patch -p1 < 201e3f432b9266dc7cb3d35a909e7710f9017ceb.patch
+git clean -f -d
+
 # packages/apps/Trebuchet:
 cd ../../../packages/apps/Trebuchet
 git reset --hard
