@@ -32,8 +32,8 @@ git clean -f -d
 # packages/apps/LockClock:
 cd ../../packages/apps/LockClock
 git reset --hard && git clean -f -d
-wget -q https://github.com/sultanxda/android_packages_apps_LockClock/commit/201e3f432b9266dc7cb3d35a909e7710f9017ceb.patch
-patch -p1 -s < 201e3f432b9266dc7cb3d35a909e7710f9017ceb.patch
+wget -q https://github.com/sultanxda/android_packages_apps_LockClock/commit/87427a68afeef2d2ab13750b24c88db6b88786dd.patch
+patch -p1 -s < 87427a68afeef2d2ab13750b24c88db6b88786dd.patch
 git clean -f -d
 
 # packages/apps/Trebuchet:
