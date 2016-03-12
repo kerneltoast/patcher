@@ -17,8 +17,8 @@ cd ../../frameworks/opt/telephony
 git reset --hard
 git clean -f -d
 
-# packages/apps/LockClock:
-cd ../../../packages/apps/LockClock
+# packages/apps/ContactsCommon:
+cd ../../../packages/apps/ContactsCommon
 git reset --hard
 git clean -f -d
 

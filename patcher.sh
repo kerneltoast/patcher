@@ -31,11 +31,11 @@ wget -q https://github.com/sultanxda/android_frameworks_opt_telephony/commit/279
 patch -p1 -s < 279bcac13acffa186483aff97f359597a8875b18.patch
 git clean -f -d
 
-# packages/apps/LockClock:
-cd ../../../packages/apps/LockClock
+# packages/apps/ContactsCommon:
+cd ../../../packages/apps/ContactsCommon
 git reset --hard && git clean -f -d
-wget -q https://github.com/sultanxda/android_packages_apps_LockClock/commit/201e3f432b9266dc7cb3d35a909e7710f9017ceb.patch
-patch -p1 -s < 201e3f432b9266dc7cb3d35a909e7710f9017ceb.patch
+wget -q https://github.com/CyanogenMod/android_packages_apps_ContactsCommon/commit/f1501f5dd9e704380242e19a6a3d288344c92941.patch
+patch -p1 -s < f1501f5dd9e704380242e19a6a3d288344c92941.patch
 git clean -f -d
 
 # packages/apps/Trebuchet:
