@@ -34,8 +34,8 @@ git clean -f -d
 # packages/apps/Settings:
 cd ../../packages/apps/Settings
 git reset --hard && git clean -f -d
-wget -q https://github.com/sultanxda/android_packages_apps_Settings/commit/061afea48e657bbc8e71cdb82668e6fb4f3868c9.patch
-patch -p1 -s < 061afea48e657bbc8e71cdb82668e6fb4f3868c9.patch
+wget -q https://github.com/TonySuperPony/android_packages_apps_Settings/commit/aaa4ef84ed921a9fbf60cc79534d366f30d7a678.patch
+patch -p1 -s < aaa4ef84ed921a9fbf60cc79534d366f30d7a678.patch
 git clean -f -d
 
 # packages/apps/Trebuchet:
