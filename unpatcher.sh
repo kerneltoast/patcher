@@ -32,4 +32,9 @@ cd ../../../system/core
 git reset --hard
 git clean -f -d
 
+# kernel/oneplus/msm8974
+cd ../../kernel/oneplus/msm8974
+git reset --hard
+git clean -f -d
+
 cd ../..

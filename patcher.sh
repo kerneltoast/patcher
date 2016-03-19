@@ -52,4 +52,10 @@ wget -q https://github.com/sultanxda/android_system_core/commit/a1702ced972dff36
 patch -p1 -s < a1702ced972dff3608d3808cfe61b524af887804.patch
 git clean -f -d
 
+# kernel/oneplus/msm8974
+cd ../../kernel/oneplus/msm8974
+git reset --hard && git clean -f -d
+wget -q -O - https://android-review.googlesource.com/changes/208731/revisions/f7ebfe91b806501808413c8473a300dff58ddbb5/patch?download | base64 -d | patch -p1 -s
+git clean -f -d
+
 cd ../..
