@@ -25,6 +25,10 @@ wget -q https://github.com/CyanogenMod/android_frameworks_base/commit/c783d6643e
 patch -p1 -s < c783d6643ecc607e917e27091bb4d6b126c470d4.patch
 wget -q https://github.com/sultanxda/android_frameworks_base/commit/1849d8f5b274a69bd3b11566005659e6f94ec25b.patch
 patch -p1 -s < 1849d8f5b274a69bd3b11566005659e6f94ec25b.patch
+wget -q https://github.com/CyanogenMod/android_frameworks_base/commit/6929ea6c4fdbd80ec50bc21a6bc41155bbcc3626.patch
+patch -p1 -s < 6929ea6c4fdbd80ec50bc21a6bc41155bbcc3626.patch
+wget -q https://github.com/CyanogenMod/android_frameworks_base/commit/1bbe8064a8c1a7b320aaf6d7df900d210d38c2f2.patch
+patch -p1 -s < 1bbe8064a8c1a7b320aaf6d7df900d210d38c2f2.patch
 git clean -f -d
 
 # system/core:
