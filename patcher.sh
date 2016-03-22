@@ -38,4 +38,9 @@ wget -q https://github.com/sultanxda/android_system_core/commit/a1702ced972dff36
 patch -p1 -s < a1702ced972dff3608d3808cfe61b524af887804.patch
 git clean -f -d
 
-cd ../..
+# vendor/cm:
+cd ../../vendor/cm/prebuilt/common/etc
+rm apns-conf.xml
+wget -q https://raw.githubusercontent.com/CyanogenMod/android_vendor_cm/cm-13.0/prebuilt/common/etc/apns-conf.xml
+
+cd ../../../../..
