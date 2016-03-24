@@ -32,6 +32,8 @@ cd ../../system/core
 git reset --hard && git clean -f -d
 wget -q https://github.com/sultanxda/android_system_core/commit/a1702ced972dff3608d3808cfe61b524af887804.patch
 patch -p1 -s < a1702ced972dff3608d3808cfe61b524af887804.patch
+wget -q https://github.com/sultanxda/android_system_core/commit/c520a4af51d1011644541a53925c77d9addedf32.patch
+patch -p1 -s < c520a4af51d1011644541a53925c77d9addedf32.patch
 git clean -f -d
 
 cd ../..
