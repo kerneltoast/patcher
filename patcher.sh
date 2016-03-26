@@ -45,4 +45,11 @@ cd ../../vendor/cm/prebuilt/common/etc
 rm apns-conf.xml
 wget -q https://raw.githubusercontent.com/CyanogenMod/android_vendor_cm/cm-13.0/prebuilt/common/etc/apns-conf.xml
 
-cd ../../../../..
+# vendor/cmsdk:
+cd ../../../../../vendor/cmsdk
+git reset --hard && git clean -f -d
+wget -q https://github.com/sultanxda/cm_platform_sdk/commit/2d9efe7427cf3d8a8134a5652192b5266a7335d1.patch
+patch -p1 -s < 2d9efe7427cf3d8a8134a5652192b5266a7335d1.patch
+git clean -f -d
+
+cd ../..
