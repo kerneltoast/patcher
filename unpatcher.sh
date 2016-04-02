@@ -17,8 +17,13 @@ cd ../../frameworks/base
 git reset --hard
 git clean -f -d
 
+# packages/apps/LockClock:
+cd ../../packages/apps/LockClock
+git reset --hard
+git clean -f -d
+
 # system/core:
-cd ../../system/core
+cd ../../../system/core
 git reset --hard
 git clean -f -d
 
