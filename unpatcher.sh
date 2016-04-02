@@ -22,6 +22,11 @@ cd ../../packages/apps/LockClock
 git reset --hard
 git clean -f -d
 
+# packages/services/Telecomm:
+cd ../../../packages/services/Telecomm
+git reset --hard
+git clean -f -d
+
 # system/core:
 cd ../../../system/core
 git reset --hard
