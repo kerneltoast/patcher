@@ -35,6 +35,13 @@ wget -q https://github.com/sultanxda/android_packages_apps_LockClock/commit/8742
 patch -p1 -s < 87427a68afeef2d2ab13750b24c88db6b88786dd.patch
 git clean -f -d
 
+# packages/apps/Settings:
+cd ../../../packages/apps/Settings
+git reset --hard && git clean -f -d
+wget -q https://github.com/sultanxda/android_packages_apps_Settings/commit/24e39943c5734192722aa0745213e14708a24225.patch
+patch -p1 -s < 24e39943c5734192722aa0745213e14708a24225.patch
+git clean -f -d
+
 # packages/services/Telecomm:
 cd ../../../packages/services/Telecomm
 git reset --hard && git clean -f -d
