@@ -49,6 +49,11 @@ wget -q https://github.com/sultanxda/android_packages_services_Telecomm/commit/f
 patch -p1 < f3af3472207d481d8636a17d8f49c3ebf5e814d6.patch
 git clean -f -d
 
+# packages/services/Telephony:
+cd ../../../packages/services/Telephony
+git reset --hard && git clean -f -d
+git revert --no-edit 8716894d9affebf418a37db3583a60a66b706e5d
+
 # prebuilts/cmsdk:
 cd ../../../prebuilts/cmsdk
 git reset --hard && git clean -f -d
