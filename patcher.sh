@@ -40,6 +40,8 @@ cd ../../../packages/apps/Settings
 git reset --hard && git clean -f -d
 wget -q https://github.com/sultanxda/android_packages_apps_Settings/commit/24e39943c5734192722aa0745213e14708a24225.patch
 patch -p1 -s < 24e39943c5734192722aa0745213e14708a24225.patch
+wget -q https://github.com/sultanxda/android_packages_apps_Settings/commit/730f2ec307f43cc26c0d176ddffb8947edf6782c.patch
+patch -p1 -s < 730f2ec307f43cc26c0d176ddffb8947edf6782c.patch
 git clean -f -d
 
 # packages/services/Telecomm:
