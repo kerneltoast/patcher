@@ -46,10 +46,8 @@ git clean -f -d
 
 # packages/services/Telecomm:
 cd ../../../packages/services/Telecomm
-git reset --hard && git clean -f -d
-wget -q https://github.com/sultanxda/android_packages_services_Telecomm/commit/f3af3472207d481d8636a17d8f49c3ebf5e814d6.patch
-patch -p1 < f3af3472207d481d8636a17d8f49c3ebf5e814d6.patch
-git clean -f -d
+git reset --hard
+git revert --no-edit 81999fd5012a33fd2e0c91ade9e3be63cdc8de7f
 
 # packages/services/Telephony:
 cd ../../../packages/services/Telephony
