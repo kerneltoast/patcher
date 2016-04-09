@@ -27,8 +27,15 @@ wget -q https://github.com/sultanxda/android_frameworks_base/commit/1849d8f5b274
 patch -p1 -s < 1849d8f5b274a69bd3b11566005659e6f94ec25b.patch
 git clean -f -d
 
+# packages/apps/Settings:
+cd ../../packages/apps/Settings
+git reset --hard && git clean -f -d
+wget -q https://github.com/sultanxda/android_packages_apps_Settings/commit/730f2ec307f43cc26c0d176ddffb8947edf6782c.patch
+patch -p1 -s < 730f2ec307f43cc26c0d176ddffb8947edf6782c.patch
+git clean -f -d
+
 # system/core:
-cd ../../system/core
+cd ../../../system/core
 git reset --hard && git clean -f -d
 wget -q https://github.com/sultanxda/android_system_core/commit/a1702ced972dff3608d3808cfe61b524af887804.patch
 patch -p1 -s < a1702ced972dff3608d3808cfe61b524af887804.patch
