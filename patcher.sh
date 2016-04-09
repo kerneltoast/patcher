@@ -19,6 +19,10 @@ git clean -f -d
 # frameworks/base:
 cd ../../frameworks/base
 git reset --hard && git clean -f -d
+git revert --no-edit 6bc2110a11f537fffc7f66adc30e947fecad9232
+git revert --no-edit 4b23c79c976ed2363181b59b68b980a3498c0c7b
+git revert --no-edit f84124c6ed8960a70e73955031c24bd493d7eaa1
+git revert --no-edit 0a30b12934662757a4035f9cce448a1b506f0f0d
 git revert --no-edit 9a8df5bc8488c19dc0a1951cad44956894a75a09
 wget -q https://github.com/sultanxda/android_frameworks_base/commit/2002fc9e3233171e2cd821728f3c98c945ce00c6.patch
 patch -p1 -s < 2002fc9e3233171e2cd821728f3c98c945ce00c6.patch
