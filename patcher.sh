@@ -43,6 +43,13 @@ wget -q https://github.com/sultanxda/android_system_core/commit/c520a4af51d10116
 patch -p1 -s < c520a4af51d1011644541a53925c77d9addedf32.patch
 git clean -f -d
 
+# vendor/cm:
+cd ../../vendor/cm
+git reset --hard && git clean -f -d
+wget -q https://github.com/sultanxda/android_vendor_cm/commit/c32045e4a52723c3ccfd59266bd35fab6a4c0468.patch
+patch -p1 < c32045e4a52723c3ccfd59266bd35fab6a4c0468.patch
+git clean -f -d
+
 # vendor/cmsdk:
 cd ../../vendor/cmsdk
 git reset --hard && git clean -f -d
