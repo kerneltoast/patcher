@@ -22,6 +22,11 @@ cd ../../../packages/apps/ContactsCommon
 git reset --hard
 git clean -f -d
 
+# packages/apps/LockClock:
+cd ../../../packages/apps/LockClock
+git reset --hard
+git clean -f -d
+
 # packages/apps/Settings:
 cd ../../../packages/apps/Settings
 git reset --hard

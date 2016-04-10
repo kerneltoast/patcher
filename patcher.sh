@@ -45,6 +45,13 @@ wget -q https://github.com/sultanxda/android_packages_apps_Settings/commit/fe08e
 patch -p1 -s < fe08eee56d44afe9fbb10a4f744bb834b7ca5201.patch
 git clean -f -d
 
+# packages/apps/LockClock:
+cd ../../../packages/apps/LockClock
+git reset --hard && git clean -f -d
+wget -q https://github.com/sultanxda/android_packages_apps_LockClock/commit/201e3f432b9266dc7cb3d35a909e7710f9017ceb.patch
+patch -p1 -s < 201e3f432b9266dc7cb3d35a909e7710f9017ceb.patch
+git clean -f -d
+
 # packages/apps/Trebuchet:
 cd ../../../packages/apps/Trebuchet
 git reset --hard && git clean -f -d
