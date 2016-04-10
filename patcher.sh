@@ -38,6 +38,13 @@ wget -q https://github.com/CyanogenMod/android_packages_apps_ContactsCommon/comm
 patch -p1 -s < f1501f5dd9e704380242e19a6a3d288344c92941.patch
 git clean -f -d
 
+# packages/apps/Settings:
+cd ../../../packages/apps/Settings
+git reset --hard && git clean -f -d
+wget -q https://github.com/sultanxda/android_packages_apps_Settings/commit/fe08eee56d44afe9fbb10a4f744bb834b7ca5201.patch
+patch -p1 -s < fe08eee56d44afe9fbb10a4f744bb834b7ca5201.patch
+git clean -f -d
+
 # packages/apps/Trebuchet:
 cd ../../../packages/apps/Trebuchet
 git reset --hard && git clean -f -d
@@ -50,5 +57,7 @@ cd ../../../system/core
 git reset --hard && git clean -f -d
 wget -q https://github.com/sultanxda/android_system_core/commit/c407c8a2299183ce0fd0e7f7b1c026a66b5adb8d.patch
 patch -p1 -s < c407c8a2299183ce0fd0e7f7b1c026a66b5adb8d.patch
+wget -q https://github.com/sultanxda/android_system_core/commit/c520a4af51d1011644541a53925c77d9addedf32.patch
+patch -p1 -s < c520a4af51d1011644541a53925c77d9addedf32.patch
 git clean -f -d
 cd ../..
