@@ -53,11 +53,6 @@ cd ../../../packages/services/Telecomm
 git reset --hard
 git revert --no-edit 81999fd5012a33fd2e0c91ade9e3be63cdc8de7f
 
-# packages/services/Telephony:
-cd ../../../packages/services/Telephony
-git reset --hard && git clean -f -d
-git revert --no-edit 8716894d9affebf418a37db3583a60a66b706e5d
-
 # prebuilts/cmsdk:
 cd ../../../prebuilts/cmsdk
 git reset --hard && git clean -f -d
