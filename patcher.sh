@@ -19,6 +19,13 @@ git clean -f -d
 # frameworks/base:
 cd ../../frameworks/base
 git reset --hard && git clean -f -d
+git revert --no-edit dead12819777607772b6e03e9752368553ad0ff2
+git revert --no-edit 3fc6e6e9a2bbd5aca0399f6f53684b8509759fd3
+git revert --no-edit c64e702fa936a062f32980b9788ecb6efe24c304
+git revert --no-edit 128babae32990b0baf5294837ba93a292718daa5
+git revert --no-edit 850e18bec0b7582640ea4d48a9e9bd2bdf3662cf
+git revert --no-edit ec7119b0a4ecb6fb8f5bcab57dfbbb2386ad2475
+git revert --no-edit e5f2945ca7fa723f4e5b90bbb6eae85bb4176720
 git revert --no-edit 6bc2110a11f537fffc7f66adc30e947fecad9232
 git revert --no-edit 4b23c79c976ed2363181b59b68b980a3498c0c7b
 git revert --no-edit f84124c6ed8960a70e73955031c24bd493d7eaa1
@@ -56,6 +63,7 @@ git revert --no-edit 81999fd5012a33fd2e0c91ade9e3be63cdc8de7f
 # prebuilts/cmsdk:
 cd ../../../prebuilts/cmsdk
 git reset --hard && git clean -f -d
+git revert --no-edit 5c129188fa5b0f4a924b6eab6a6a8fd3d261bffd
 git revert --no-edit 154fdff15315ae83ac31ef359f41a36c9e7b8180
 
 # system/core:
@@ -80,6 +88,7 @@ git clean -f -d
 # vendor/cmsdk:
 cd ../../vendor/cmsdk
 git reset --hard && git clean -f -d
+git revert --no-edit 647aa9c7eff9343a90a86f7376302092d35b60aa
 git revert --no-edit d549053b2df52f27e43c43c2dca939b5428c322e
 wget -q https://github.com/sultanxda/cm_platform_sdk/commit/2d9efe7427cf3d8a8134a5652192b5266a7335d1.patch
 patch -p1 -s < 2d9efe7427cf3d8a8134a5652192b5266a7335d1.patch
