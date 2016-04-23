@@ -32,13 +32,8 @@ cd ../../../packages/services/Telecomm
 git reset --hard
 git clean -f -d
 
-# prebuilts/cmsdk:
-cd ../../../prebuilts/cmsdk
-git reset --hard
-git clean -f -d
-
 # system/core:
-cd ../../system/core
+cd ../../../system/core
 git reset --hard
 git clean -f -d
 
