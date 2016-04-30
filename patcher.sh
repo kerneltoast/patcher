@@ -31,7 +31,7 @@ git clean -f -d
 cd ../../packages/apps/Messaging
 git reset --hard && git clean -f -d
 wget -q https://github.com/CyanogenMod/android_packages_apps_Messaging/commit/33e931646d82761758478375d13b27d9cd0c3302.patch
-patch -p1 -s < 33e931646d82761758478375d13b27d9cd0c3302.patch
+git am 33e931646d82761758478375d13b27d9cd0c3302.patch
 git clean -f -d
 
 # packages/apps/Settings:
