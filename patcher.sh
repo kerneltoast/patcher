@@ -27,15 +27,8 @@ wget -q https://github.com/sultanxda/android_frameworks_base/commit/1849d8f5b274
 patch -p1 -s < 1849d8f5b274a69bd3b11566005659e6f94ec25b.patch
 git clean -f -d
 
-# packages/apps/LockClock:
-cd ../../packages/apps/LockClock
-git reset --hard && git clean -f -d
-wget -q https://github.com/sultanxda/android_packages_apps_LockClock/commit/87427a68afeef2d2ab13750b24c88db6b88786dd.patch
-patch -p1 -s < 87427a68afeef2d2ab13750b24c88db6b88786dd.patch
-git clean -f -d
-
 # packages/apps/Messaging:
-cd ../../../packages/apps/Messaging
+cd ../../packages/apps/Messaging
 git reset --hard && git clean -f -d
 wget -q https://github.com/CyanogenMod/android_packages_apps_Messaging/commit/33e931646d82761758478375d13b27d9cd0c3302.patch
 patch -p1 -s < 33e931646d82761758478375d13b27d9cd0c3302.patch
