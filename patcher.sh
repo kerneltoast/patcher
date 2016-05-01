@@ -5,6 +5,7 @@
 # build:
 cd build
 git reset --hard && git clean -f -d
+git revert --no-edit f994a23561991d5b315d1fed08553b58af29330f
 wget -q https://github.com/CyanogenMod/android_build/commit/c1b06c9b6c7b8ed684033894059a2a859f85e708.patch
 patch -p1 -s < c1b06c9b6c7b8ed684033894059a2a859f85e708.patch
 git clean -f -d
