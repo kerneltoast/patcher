@@ -60,11 +60,6 @@ wget -q https://github.com/sultanxda/android_packages_apps_Settings/commit/730f2
 patch -p1 -s < 730f2ec307f43cc26c0d176ddffb8947edf6782c.patch
 git clean -f -d
 
-# packages/services/Telecomm:
-cd ../../../packages/services/Telecomm
-git reset --hard
-git revert --no-edit 81999fd5012a33fd2e0c91ade9e3be63cdc8de7f
-
 # prebuilts/cmsdk:
 cd ../../../prebuilts/cmsdk
 git reset --hard && git clean -f -d
