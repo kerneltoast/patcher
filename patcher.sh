@@ -5,6 +5,7 @@
 # build:
 cd build
 git reset --hard && git clean -f -d
+##releasetools: [WIP] Add support for LZMA in blockimgdiff
 wget -q https://github.com/CyanogenMod/android_build/commit/c1b06c9b6c7b8ed684033894059a2a859f85e708.patch
 patch -p1 -s < c1b06c9b6c7b8ed684033894059a2a859f85e708.patch
 git clean -f -d
@@ -12,6 +13,7 @@ git clean -f -d
 # frameworks/av:
 cd ../frameworks/av
 git reset --hard && git clean -f -d
+##libmedia: Add 1440p camcorder quality
 wget -q https://github.com/sultanxda/android_frameworks_av/commit/44b8ecca7a07b05c71e595c03750a9f5915bce35.patch
 patch -p1 -s < 44b8ecca7a07b05c71e595c03750a9f5915bce35.patch
 git clean -f -d
@@ -19,6 +21,7 @@ git clean -f -d
 # frameworks/base:
 cd ../../frameworks/base
 git reset --hard && git clean -f -d
+##Reverts for lockscreen
 git revert --no-edit a27bbd6bc3ebf846f7ea79231deb1725e13f2fa5
 git revert --no-edit a6b9073ab99233d6c2b22c2c86f8d418c802c0bb
 git revert --no-edit d03fb3dd21f972c6e0ee75ca4daca8f79d088f05
@@ -39,10 +42,13 @@ git revert --no-edit 4b23c79c976ed2363181b59b68b980a3498c0c7b
 git revert --no-edit f84124c6ed8960a70e73955031c24bd493d7eaa1
 git revert --no-edit 0a30b12934662757a4035f9cce448a1b506f0f0d
 git revert --no-edit 9a8df5bc8488c19dc0a1951cad44956894a75a09
+##CamcorderProfile: Add 1440p camcorder profile
 wget -q https://github.com/sultanxda/android_frameworks_base/commit/2002fc9e3233171e2cd821728f3c98c945ce00c6.patch
 patch -p1 -s < 2002fc9e3233171e2cd821728f3c98c945ce00c6.patch
+##StrictMode: Disable all strict mode functions when disable prop is set
 wget -q https://github.com/CyanogenMod/android_frameworks_base/commit/c783d6643ecc607e917e27091bb4d6b126c470d4.patch
 patch -p1 -s < c783d6643ecc607e917e27091bb4d6b126c470d4.patch
+##telephony: Hack GSM and LTE signal strength
 wget -q https://github.com/sultanxda/android_frameworks_base/commit/1849d8f5b274a69bd3b11566005659e6f94ec25b.patch
 patch -p1 -s < 1849d8f5b274a69bd3b11566005659e6f94ec25b.patch
 git clean -f -d
@@ -50,6 +56,7 @@ git clean -f -d
 # packages/apps/Messaging:
 cd ../../packages/apps/Messaging
 git reset --hard && git clean -f -d
+##Bring back original color
 wget -q https://github.com/CyanogenMod/android_packages_apps_Messaging/commit/33e931646d82761758478375d13b27d9cd0c3302.patch
 git am 33e931646d82761758478375d13b27d9cd0c3302.patch
 git clean -f -d
@@ -57,8 +64,10 @@ git clean -f -d
 # packages/apps/Settings:
 cd ../../../packages/apps/Settings
 git reset --hard && git clean -f -d
+##Settings: Remove incomplete LLS feature
 wget -q https://github.com/sultanxda/android_packages_apps_Settings/commit/8c98db9d683bf57bb6cb035e5f6bf3576eea508a.patch
 patch -p1 -s < 8c98db9d683bf57bb6cb035e5f6bf3576eea508a.patch
+##Settings: Remove 'Update Cyanogen recovery' preference
 wget -q https://github.com/sultanxda/android_packages_apps_Settings/commit/730f2ec307f43cc26c0d176ddffb8947edf6782c.patch
 patch -p1 -s < 730f2ec307f43cc26c0d176ddffb8947edf6782c.patch
 git clean -f -d
@@ -72,8 +81,10 @@ git revert --no-edit 154fdff15315ae83ac31ef359f41a36c9e7b8180
 # system/core:
 cd ../../system/core
 git reset --hard && git clean -f -d
+##liblog: Silence spammy logs from camera blobs (AEC_PORT and mm-camera)
 wget -q https://github.com/sultanxda/android_system_core/commit/a1702ced972dff3608d3808cfe61b524af887804.patch
 patch -p1 -s < a1702ced972dff3608d3808cfe61b524af887804.patch
+##init: Never install Cyanogen recovery
 wget -q https://github.com/sultanxda/android_system_core/commit/c520a4af51d1011644541a53925c77d9addedf32.patch
 patch -p1 -s < c520a4af51d1011644541a53925c77d9addedf32.patch
 git clean -f -d
@@ -84,6 +95,7 @@ git reset --hard && git clean -f -d
 rm apns-conf.xml
 wget -q https://raw.githubusercontent.com/CyanogenMod/android_vendor_cm/cm-13.0/prebuilt/common/etc/apns-conf.xml
 cd ../../..
+##apns: Fix protocol for T-Mobile US
 wget -q https://github.com/sultanxda/android_vendor_cm/commit/c32045e4a52723c3ccfd59266bd35fab6a4c0468.patch
 patch -p1 < c32045e4a52723c3ccfd59266bd35fab6a4c0468.patch
 git clean -f -d
@@ -93,6 +105,7 @@ cd ../../vendor/cmsdk
 git reset --hard && git clean -f -d
 git revert --no-edit 647aa9c7eff9343a90a86f7376302092d35b60aa
 git revert --no-edit d549053b2df52f27e43c43c2dca939b5428c322e
+##cmsdk: Remove unsupported performance profiles
 wget -q https://github.com/sultanxda/cm_platform_sdk/commit/2d9efe7427cf3d8a8134a5652192b5266a7335d1.patch
 patch -p1 -s < 2d9efe7427cf3d8a8134a5652192b5266a7335d1.patch
 git clean -f -d
