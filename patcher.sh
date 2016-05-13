@@ -19,6 +19,8 @@ git clean -f -d
 # frameworks/base:
 cd ../../frameworks/base
 git reset --hard && git clean -f -d
+git revert --no-edit 158ce3487e6d3c15136570b9c5485f53641ff04a
+git revert --no-edit 5083441c926f6e2df5974d3fd84941f3ea500077
 git revert --no-edit a27bbd6bc3ebf846f7ea79231deb1725e13f2fa5
 git revert --no-edit a6b9073ab99233d6c2b22c2c86f8d418c802c0bb
 git revert --no-edit d03fb3dd21f972c6e0ee75ca4daca8f79d088f05
