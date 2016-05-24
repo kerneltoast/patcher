@@ -37,6 +37,8 @@ git clean -f -d
 # packages/apps/Settings:
 cd ../../../packages/apps/Settings
 git reset --hard && git clean -f -d
+wget -q https://github.com/sultanxda/android_packages_apps_Settings/commit/7500d5f8e57ee0a6dcf62eb25d3e4b2b06a527ad.patch
+patch -p1 -s < 7500d5f8e57ee0a6dcf62eb25d3e4b2b06a527ad.patch
 wget -q https://github.com/sultanxda/android_packages_apps_Settings/commit/8c98db9d683bf57bb6cb035e5f6bf3576eea508a.patch
 patch -p1 -s < 8c98db9d683bf57bb6cb035e5f6bf3576eea508a.patch
 wget -q https://github.com/sultanxda/android_packages_apps_Settings/commit/730f2ec307f43cc26c0d176ddffb8947edf6782c.patch
