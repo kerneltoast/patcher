@@ -37,9 +37,4 @@ cd ../../vendor/cm
 git reset --hard
 git clean -f -d
 
-# vendor/cmsdk:
-cd ../../vendor/cmsdk
-git reset --hard
-git clean -f -d
-
 cd ../..
