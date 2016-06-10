@@ -25,6 +25,8 @@ wget -q https://github.com/CyanogenMod/android_frameworks_base/commit/c783d6643e
 patch -p1 -s < c783d6643ecc607e917e27091bb4d6b126c470d4.patch
 wget -q https://github.com/sultanxda/android_frameworks_base/commit/1849d8f5b274a69bd3b11566005659e6f94ec25b.patch
 patch -p1 -s < 1849d8f5b274a69bd3b11566005659e6f94ec25b.patch
+wget -q https://github.com/sultanxda/android_frameworks_base/commit/d1ca594271e8017d2301f8702362217e8ac136ba.patch
+patch -p1 -s < d1ca594271e8017d2301f8702362217e8ac136ba.patch
 git clean -f -d
 
 # packages/apps/Messaging:
