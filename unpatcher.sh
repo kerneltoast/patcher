@@ -22,6 +22,11 @@ cd ../../packages/apps/Messaging
 git reset --hard
 git clean -f -d
 
+# packages/apps/Nfc:
+cd ../../../packages/apps/Nfc
+git reset --hard
+git clean -f -d
+
 # packages/apps/Settings:
 cd ../../../packages/apps/Settings
 git reset --hard

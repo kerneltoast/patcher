@@ -36,6 +36,13 @@ wget -q https://github.com/CyanogenMod/android_packages_apps_Messaging/commit/33
 git am 33e931646d82761758478375d13b27d9cd0c3302.patch
 git clean -f -d
 
+# packages/apps/Nfc:
+cd ../../../packages/apps/Nfc
+git reset --hard && git clean -f -d
+wget -q https://github.com/CyanogenMod/android_packages_apps_Nfc/commit/018ec89d460f8b6389b4ffe787d293090dcc0bdd.patch
+patch -p1 -s < 018ec89d460f8b6389b4ffe787d293090dcc0bdd.patch
+git clean -f -d
+
 # packages/apps/Settings:
 cd ../../../packages/apps/Settings
 git reset --hard && git clean -f -d
