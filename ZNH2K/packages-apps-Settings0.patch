@@ -1,0 +1,445 @@
+From 1fa30c0f696ec0b0ed5c1c3e81272a1456029a1f Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Thu, 28 Jul 2016 13:40:32 -0700
+Subject: [PATCH] Squashed commit of the following:
+
+commit 69e674601bfb80fc1102c7e5d0234ae80f58beac
+Author: Venkatraman Nerellapalli <venkataraman.nerellapalli@codeaurora.org>
+Date:   Sat Jan 9 17:20:00 2016 +0530
+
+    Telephony(MSIM): Fix ANR on SIM deactivation
+
+    Dismiss dialog box on confirmation.
+    SIM activation & deactivation in background thread.
+
+    Change-Id: I0268a710f35e30b2abec3dd671942b52fc0e0b46
+    CRs-Fixed: 957308
+
+commit f79f08e7d5fd82c28eb8e2828315d100c0a79397
+Author: Ravindra <c_rthat@codeaurora.org>
+Date:   Tue Mar 22 14:11:51 2016 +0530
+
+    Fix to enable data for non-dds sub.
+
+    When data is enabled\disabled on non-dds sub do not update the data base
+    directly instead call TelephonyManager api to do the same.
+
+    CRs-Fixed: 992072
+
+    Change-Id: I53b5ed2f4d6afcb05b09d65fd3d9843829cff995
+
+commit b3906b40e5d00a3a308d4c6a847898ef498331cc
+Author: Benergy Meenan Ravuri <bravuri@codeaurora.org>
+Date:   Mon Feb 15 17:56:10 2016 +0530
+
+    IMS: Set Wifi calling preference to Wifi preferred by default
+
+    Set Wifi calling preference to Wifi preferred by default instead
+    of Wifi only
+
+    Change-Id: I480db3d211566d0cb414ea50275b554c755b0a03
+    CRs-Fixed: 977149
+
+commit 0dbd029bacc6ed4fe9c1b332ab2fe06c5c74866a
+Author: Nalla Kartheek <karthe@codeaurora.org>
+Date:   Fri Nov 20 13:32:41 2015 +0530
+
+    Wi-Fi: Do not display the not scanned saved networks forever
+
+    A flag is introduced to signify it these saved profiles were scanned or
+    not and this commit shall ensure that such entries are displayed only
+    when the flag indicates to have scanned.
+
+    Change-Id: I0c525a493caa39c3bed5149898160dd4662dd0c8
+    CRs-Fixed: 940917
+
+commit 403f50c7cda2d5f214600978fdd920cf2d98131b
+Author: venkata Jagadeesh <vjagad@codeaurora.org>
+Date:   Wed Nov 4 11:29:47 2015 +0530
+
+    Don't start auto scan if screen recovers from frozen state
+
+    Use case:Inquiry initiated from UI after connecting with blackberryZ30
+
+    Failure: Inquiry initiated from UI automatically after connecting with
+             blackberryZ30,which is not expected
+
+    Test steps:
+    1. Go to BT settings page.
+    2. Initiate pair and connect remote device from the available devices list
+
+    Root cause:mInitialScanStarted set always to false and for every
+    onActivityCreated,scan will be triggered from UI
+
+    Fix: mInitialScanStarted set to false only for new instance,if any screen
+    recover case,it should not be set as its not a new instance.
+
+    Change-Id: Ia38323d5136857e6fe8fa69ed6336d889e29287b
+
+commit d0f59be8d45b830d23ba3dfaa56417ed94767352
+Author: Susheel nyamala <snyamala@codeaurora.org>
+Date:   Wed Oct 28 19:05:21 2015 +0530
+
+    Fix mcc-mnc population issue in apn editor
+
+    When creating a new apn in LTE mode, mcc-mnc values populated on
+    apn editor are wrong if uicc card is used.
+    Replace getSimOperator with getIccOperatorNumericForData method,
+    which returns mcc-mnc values based on PS RAT registered.
+
+    Change-Id: I263848bfbeabd4636dccd203c366ab00858ceaaf
+    CRs-Fixed: 931556
+
+commit 7975c8e51e3647c053fd7451e67e1a7b177984fd
+Author: Sridhar Dubbaka <sdubbaka@codeaurora.org>
+Date:   Mon Oct 19 01:56:10 2015 +0530
+
+    Update OperatorInfo in Simstatus settings for correct subid
+
+    Update OperatorInfo in Simstatus settings for
+    correct subid, on which Channel 50 CB message is received.
+
+    Change-Id: I0876c94d53f2b4eef8571037c9a0e7d880bc043f
+    CRs-Fixed: 906537
+
+commit 6b63386dad80cc03c4d8a674d66840b8c4468d6b
+Author: Ruthwar Kumar Ambeer <ruthwar@codeaurora.org>
+Date:   Thu Oct 15 19:39:05 2015 +0530
+
+    Grey out PIN1 enable/disable option when SUB is not ready
+
+    Since it is not possible to interact with UICC card for
+    PIN1 enable/Disable when SIM is deactivated, PIN1 option
+    is Disabled in UI.
+
+    Change-Id: I64d2ad3a85c15c4ea8936987e384ffd013c1f533
+    CRs-Fixed: 662114
+
+commit d7d6c6db1f432d7c465d631a5155c80eb45594a2
+Author: Sravan Kumar V <sravankumar@codeaurora.org>
+Date:   Mon Aug 31 10:12:04 2015 +0530
+
+    Bluetooth : Handle SQL memory situation during OPP.
+
+    Use case :
+    1) Use Any tool to Fill memory
+    2) When available memory is very low, enter
+     settings-Bluetooth
+
+    Failure :
+    "Unfortunately, Bluetooth share has stopped" error comes.
+    Root Cause :
+    Because of Memory Issue application was unable to perform any SQL
+    operations.
+
+    Fix :
+    Catch SQLite FullException and SQlite Exception in bluetooth
+    settings to avoid crash in this use case.
+
+    Change-Id: I621816ef6214eead49ba9f5a98a4152572fb1379
+
+Change-Id: If093ec029d8169ee33cb749713aeafaf4b620a84
+---
+ src/com/android/settings/ApnEditor.java            |  4 +-
+ src/com/android/settings/DataUsageSummary.java     |  9 +---
+ src/com/android/settings/IccLockSettings.java      | 16 +++++--
+ src/com/android/settings/WifiCallingSettings.java  |  2 +-
+ .../settings/bluetooth/BluetoothSettings.java      |  3 +-
+ src/com/android/settings/deviceinfo/SimStatus.java |  9 ++++
+ src/com/android/settings/search/Index.java         | 27 +++++++++---
+ src/com/android/settings/sim/SimSettings.java      | 50 +++++++++++++++-------
+ src/com/android/settings/wifi/WifiSettings.java    |  4 ++
+ 9 files changed, 87 insertions(+), 37 deletions(-)
+
+diff --git a/src/com/android/settings/ApnEditor.java b/src/com/android/settings/ApnEditor.java
+index 2ed7438..3d744d6 100644
+--- a/src/com/android/settings/ApnEditor.java
++++ b/src/com/android/settings/ApnEditor.java
+@@ -281,7 +281,7 @@ public class ApnEditor extends InstrumentedPreferenceActivity
+     private void fillUi() {
+         if (mFirstTime) {
+             mFirstTime = false;
+-            String numeric = mTelephonyManager.getSimOperator(mSubId);
++            String numeric = mTelephonyManager.getIccOperatorNumericForData(mSubId);
+             // Fill in all the values from the db in both text editor and summary
+             mName.setText(mCursor.getString(NAME_INDEX));
+             mApn.setText(mCursor.getString(APN_INDEX));
+@@ -489,7 +489,7 @@ public class ApnEditor extends InstrumentedPreferenceActivity
+                 if (values[mvnoIndex].equals("SPN")) {
+                     mMvnoMatchData.setText(mTelephonyManager.getSimOperatorName());
+                 } else if (values[mvnoIndex].equals("IMSI")) {
+-                    String numeric = mTelephonyManager.getSimOperator(mSubId);
++                    String numeric = mTelephonyManager.getIccOperatorNumericForData(mSubId);
+                     mMvnoMatchData.setText(numeric + "x");
+                 } else if (values[mvnoIndex].equals("GID")) {
+                     mMvnoMatchData.setText(mTelephonyManager.getGroupIdLevel1());
+diff --git a/src/com/android/settings/DataUsageSummary.java b/src/com/android/settings/DataUsageSummary.java
+index 22a9994..8bfff58 100644
+--- a/src/com/android/settings/DataUsageSummary.java
++++ b/src/com/android/settings/DataUsageSummary.java
+@@ -1199,14 +1199,7 @@ public class DataUsageSummary extends HighlightingFragment implements Indexable
+     private void setMobileDataEnabled(int subId, boolean enabled) {
+         if (LOGD) Log.d(TAG, "setMobileDataEnabled: subId = " + subId + " enabled = " + enabled);
+         int dataSubId = mSubscriptionManager.getDefaultDataSubId();
+-        if (subId == dataSubId || TelephonyManager.getDefault().getSimCount() == 1) {
+-            mTelephonyManager.setDataEnabled(subId, enabled);
+-        } else {
+-            // Update mobile data status of a non DDS sub in provider
+-            final Context context = getActivity();
+-            android.provider.Settings.Global.putInt(context.getContentResolver(),
+-                    android.provider.Settings.Global.MOBILE_DATA + subId, enabled ? 1 : 0);
+-        }
++        mTelephonyManager.setDataEnabled(subId, enabled);
+         mMobileDataEnabled.put(String.valueOf(subId), enabled);
+         updatePolicy(false);
+     }
+diff --git a/src/com/android/settings/IccLockSettings.java b/src/com/android/settings/IccLockSettings.java
+index ff7c2bd..f4daceb 100644
+--- a/src/com/android/settings/IccLockSettings.java
++++ b/src/com/android/settings/IccLockSettings.java
+@@ -40,6 +40,7 @@ import android.widget.ListView;
+ import android.widget.Toast;
+ 
+ import com.android.internal.logging.MetricsLogger;
++import com.android.internal.telephony.IccCardConstants.State;
+ import com.android.internal.telephony.Phone;
+ import com.android.internal.telephony.PhoneFactory;
+ import com.android.internal.telephony.TelephonyIntents;
+@@ -222,11 +223,20 @@ public class IccLockSettings extends InstrumentedPreferenceActivity
+ 
+ 
+     private void updatePreferences() {
+-        mPinDialog.setEnabled(mPhone != null);
+-        mPinToggle.setEnabled(mPhone != null);
+-
+         if (mPhone != null) {
++            if (mPhone.getIccCard().getState() != State.READY) {
++                // if SIM State is NOT READY, it is not possible to interact with UICC app
++                // for enabling/disabling PIN so disable PIN options.
++                mPinToggle.setEnabled(false);
++                mPinDialog.setEnabled(false);
++            } else {
++                mPinToggle.setEnabled(true);
++                mPinDialog.setEnabled(true);
++            }
+             mPinToggle.setChecked(mPhone.getIccCard().getIccLockEnabled());
++        } else {
++            mPinDialog.setEnabled(false);
++            mPinToggle.setEnabled(false);
+         }
+     }
+ 
+diff --git a/src/com/android/settings/WifiCallingSettings.java b/src/com/android/settings/WifiCallingSettings.java
+index f4d143d..fe83dda 100644
+--- a/src/com/android/settings/WifiCallingSettings.java
++++ b/src/com/android/settings/WifiCallingSettings.java
+@@ -193,7 +193,7 @@ public class WifiCallingSettings extends SettingsPreferenceFragment
+         if (!isWfcModeSupported()) {
+             android.provider.Settings.Global.putInt(context.getContentResolver(),
+                     android.provider.Settings.Global.WFC_IMS_MODE,
+-                    ImsConfig.WfcModeFeatureValueConstants.WIFI_ONLY);
++                    ImsConfig.WfcModeFeatureValueConstants.WIFI_PREFERRED);
+         }
+ 
+         // NOTE: Buttons will be enabled/disabled in mPhoneStateListener
+diff --git a/src/com/android/settings/bluetooth/BluetoothSettings.java b/src/com/android/settings/bluetooth/BluetoothSettings.java
+index 0f0952e..37eebe7 100644
+--- a/src/com/android/settings/bluetooth/BluetoothSettings.java
++++ b/src/com/android/settings/bluetooth/BluetoothSettings.java
+@@ -140,7 +140,8 @@ public final class BluetoothSettings extends DeviceListPreferenceFragment implem
+     @Override
+     public void onActivityCreated(Bundle savedInstanceState) {
+         super.onActivityCreated(savedInstanceState);
+-        mInitialScanStarted = false;
++        /* Don't auto start scan if screen reconstructs due to frozen screen*/
++        mInitialScanStarted = (savedInstanceState != null);
+         mInitiateDiscoverable = true;
+ 
+         mEmptyView = (TextView) getView().findViewById(android.R.id.empty);
+diff --git a/src/com/android/settings/deviceinfo/SimStatus.java b/src/com/android/settings/deviceinfo/SimStatus.java
+index 036d00f..7410cd3 100644
+--- a/src/com/android/settings/deviceinfo/SimStatus.java
++++ b/src/com/android/settings/deviceinfo/SimStatus.java
+@@ -44,6 +44,7 @@ import android.widget.ListView;
+ import com.android.internal.logging.MetricsLogger;
+ import com.android.internal.telephony.DefaultPhoneNotifier;
+ import com.android.internal.telephony.Phone;
++import com.android.internal.telephony.PhoneConstants;
+ import com.android.internal.telephony.PhoneFactory;
+ import com.android.settings.InstrumentedPreferenceActivity;
+ import com.android.settings.R;
+@@ -170,6 +171,8 @@ public class SimStatus extends InstrumentedPreferenceActivity {
+                         CB_AREA_INFO_SENDER_PERMISSION, null);
+                 // Ask CellBroadcastReceiver to broadcast the latest area info received
+                 Intent getLatestIntent = new Intent(GET_LATEST_CB_AREA_INFO_ACTION);
++                getLatestIntent.putExtra(PhoneConstants.SUBSCRIPTION_KEY,
++                        mSir.getSubscriptionId());
+                 sendBroadcastAsUser(getLatestIntent, UserHandle.ALL,
+                         CB_AREA_INFO_SENDER_PERMISSION);
+             }
+@@ -373,6 +376,12 @@ public class SimStatus extends InstrumentedPreferenceActivity {
+                 }
+ 
+                 mPhone = phone;
++                updateAreaInfo("");
++                Intent getLatestIntent = new Intent(GET_LATEST_CB_AREA_INFO_ACTION);
++                getLatestIntent.putExtra(PhoneConstants.SUBSCRIPTION_KEY,
++                        mSir.getSubscriptionId());
++                sendBroadcastAsUser(getLatestIntent, UserHandle.ALL,
++                        CB_AREA_INFO_SENDER_PERMISSION);
+                 mPhoneStateListener = new PhoneStateListener(mSir.getSubscriptionId()) {
+                     @Override
+                     public void onDataConnectionStateChanged(int state) {
+diff --git a/src/com/android/settings/search/Index.java b/src/com/android/settings/search/Index.java
+index c58923f..055c2d8 100644
+--- a/src/com/android/settings/search/Index.java
++++ b/src/com/android/settings/search/Index.java
+@@ -31,6 +31,7 @@ import android.database.DatabaseUtils;
+ import android.database.MergeCursor;
+ import android.database.sqlite.SQLiteDatabase;
+ import android.database.sqlite.SQLiteException;
++import android.database.sqlite.SQLiteFullException;
+ import android.net.Uri;
+ import android.os.AsyncTask;
+ import android.provider.SearchIndexableData;
+@@ -1189,14 +1190,15 @@ public class Index {
+ 
+             final boolean forceUpdate = params[0].forceUpdate;
+ 
+-            final SQLiteDatabase database = getWritableDatabase();
+-            if (database == null) {
+-                Log.e(LOG_TAG, "Cannot update Index as I cannot get a writable database");
+-                return null;
+-            }
+-            final String localeStr = Locale.getDefault().toString();
++            SQLiteDatabase database = null;
+ 
+             try {
++                database = getWritableDatabase();
++                if (database == null) {
++                    Log.e(LOG_TAG, "Cannot update Index as I cannot get a writable database");
++                    return null;
++                }
++                final String localeStr = Locale.getDefault().toString();
+                 database.beginTransaction();
+                 if (dataToDelete.size() > 0) {
+                     processDataToDelete(database, localeStr, dataToDelete);
+@@ -1206,8 +1208,19 @@ public class Index {
+                             forceUpdate);
+                 }
+                 database.setTransactionSuccessful();
++            } catch (SQLiteFullException e) {
++                    Log.e(LOG_TAG, "SQLite database is full." + e.toString());
++            } catch (SQLiteException e) {
++                    Log.e(LOG_TAG, e.toString());
+             } finally {
+-                database.endTransaction();
++                try {
++                    if (database != null)
++                        database.endTransaction();
++                } catch (SQLiteFullException e) {
++                    Log.e(LOG_TAG, "SQLite database is full." + e.toString());
++                } catch (SQLiteException e) {
++                    Log.e(LOG_TAG, e.toString());
++                }
+             }
+ 
+             return null;
+diff --git a/src/com/android/settings/sim/SimSettings.java b/src/com/android/settings/sim/SimSettings.java
+index 20a401e..d85a509 100644
+--- a/src/com/android/settings/sim/SimSettings.java
++++ b/src/com/android/settings/sim/SimSettings.java
+@@ -28,6 +28,7 @@ import android.content.Intent;
+ import android.content.IntentFilter;
+ import android.content.res.Resources;
+ import android.graphics.drawable.BitmapDrawable;
++import android.os.AsyncTask;
+ import android.os.Bundle;
+ import android.os.Handler;
+ import android.os.Message;
+@@ -689,26 +690,44 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
+             if (!mSwitch.isEnabled()) {
+                 return;
+             }
+-            int result = -1;
++            new SimEnablerDisabler().execute();
++        }
++
++        private class SimEnablerDisabler extends AsyncTask<Void, Void, Integer> {
++
+             int newProvisionedState = NOT_PROVISIONED;
+-            mCmdInProgress = true;
+ 
+-            showProgressDialog();
+-            setEnabled(false);
+-            try {
+-                if (mIsChecked) {
+-                    result = mExtTelephony.activateUiccCard(mSir.getSimSlotIndex());
+-                    newProvisionedState = PROVISIONED;
+-                } else {
+-                    result = mExtTelephony.deactivateUiccCard(mSir.getSimSlotIndex());
++            @Override
++            protected void onPreExecute() {
++                super.onPreExecute();
++                mCmdInProgress = true;
++                showProgressDialog();
++                setEnabled(false);
++            }
++
++            @Override
++            protected Integer doInBackground(Void... params) {
++                int result = -1;
++                newProvisionedState = NOT_PROVISIONED;
++                try {
++                    if (mIsChecked) {
++                        result = mExtTelephony.activateUiccCard(mSir.getSimSlotIndex());
++                        newProvisionedState = PROVISIONED;
++                    } else {
++                        result = mExtTelephony.deactivateUiccCard(mSir.getSimSlotIndex());
++                    }
++                } catch (RemoteException ex) {
++                    loge("Activate  sub failed " + result + " phoneId " + mSir.getSimSlotIndex());
++                } catch (NullPointerException ex) {
++                    loge("Failed to activate sub Exception: " + ex);
+                 }
+-            } catch (RemoteException ex) {
+-                loge("Activate  sub failed " + result + " phoneId " + mSir.getSimSlotIndex());
+-            } catch (NullPointerException ex) {
+-                loge("Failed to activate sub Exception: " + ex);
++                return result;
+             }
+ 
+-            processSetUiccDone(result, newProvisionedState);
++            @Override
++            protected void onPostExecute(Integer result) {
++                processSetUiccDone(result.intValue(), newProvisionedState);
++            }
+         }
+ 
+         private void processSetUiccDone(int result, int newProvisionedState) {
+@@ -819,6 +838,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
+                 .OnClickListener() {
+                     public void onClick(DialogInterface dialog, int which) {
+                         if (which == DialogInterface.BUTTON_POSITIVE) {
++                            dismissDialog(sAlertDialog);
+                             sendUiccProvisioningRequest();
+                         } else if (which == DialogInterface.BUTTON_NEGATIVE) {
+                             update();
+diff --git a/src/com/android/settings/wifi/WifiSettings.java b/src/com/android/settings/wifi/WifiSettings.java
+index e83889c..5fc70e5 100644
+--- a/src/com/android/settings/wifi/WifiSettings.java
++++ b/src/com/android/settings/wifi/WifiSettings.java
+@@ -666,6 +666,10 @@ public class WifiSettings extends RestrictedSettingsFragment
+                 for (AccessPoint accessPoint : accessPoints) {
+                     // Ignore access points that are out of range.
+                     if (accessPoint.getLevel() != -1) {
++                        if (accessPoint.isSaved() && (!accessPoint.foundInScanResult)
++                               && (accessPoint.getDetailedState() == null)) {
++                            continue;
++                        }
+                         hasAvailableAccessPoints = true;
+                         if (accessPoint.getTag() != null) {
+                             final Preference pref = (Preference) accessPoint.getTag();
+-- 
+2.7.4
+

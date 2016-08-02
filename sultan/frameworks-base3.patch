@@ -1,0 +1,40 @@
+From d1ca594271e8017d2301f8702362217e8ac136ba Mon Sep 17 00:00:00 2001
+From: Sultan <sultanxda@gmail.com>
+Date: Fri, 10 Jun 2016 11:26:25 -0700
+Subject: [PATCH] Dynamically enable MSB AGPS at runtime for newer baseband
+ versions
+
+MSB currently does not work correctly for older basebands
+(i.e. DI.3.0.c6-00241 and older), but it's still useful, so enable it at
+runtime if a newer baseband is in use.
+---
+ .../java/com/android/server/location/GpsLocationProvider.java    | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/services/core/java/com/android/server/location/GpsLocationProvider.java b/services/core/java/com/android/server/location/GpsLocationProvider.java
+index 42b8783..bbf0d6b 100644
+--- a/services/core/java/com/android/server/location/GpsLocationProvider.java
++++ b/services/core/java/com/android/server/location/GpsLocationProvider.java
+@@ -24,6 +24,7 @@
+ import com.android.internal.location.ProviderRequest;
+ import com.android.internal.telephony.Phone;
+ import com.android.internal.telephony.PhoneConstants;
++import com.android.internal.telephony.TelephonyProperties;
+ 
+ import android.app.AlarmManager;
+ import android.app.AppOpsManager;
+@@ -1343,6 +1344,14 @@ private void hibernate() {
+     }
+ 
+     private boolean hasCapability(int capability) {
++        if (((capability & GPS_CAPABILITY_MSB) != 0) &&
++            ((mEngineCapabilities & capability) == 0)) {
++            String baseband =
++                SystemProperties.get(TelephonyProperties.PROPERTY_BASEBAND_VERSION, null);
++            if (baseband != null && baseband.matches("(.*)4\\.0\\.1(.*)")) {
++                mEngineCapabilities |= GPS_CAPABILITY_MSB;
++            }
++        }
+         return ((mEngineCapabilities & capability) != 0);
+     }
+ 

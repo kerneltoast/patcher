@@ -1,0 +1,371 @@
+From e87cfec997cd8bd3eed0245b91516f324dacb650 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Thu, 28 Jul 2016 13:36:52 -0700
+Subject: [PATCH] Squashed commit of the following:
+
+commit f1826d8287e51674cf3bac2f136d38c0d52c6ecc
+Author: Qiang Chen <cqiang@codeaurora.org>
+Date:   Sat Jan 23 15:28:49 2016 +0800
+
+    Fix updating FDN using uri without subId issue
+
+    This is a side-effect of CR 541836, SIM status changed intent
+    override static value subId in SubscriptionInfoHelper to -1
+    because of using wrong key set to get subId from intent,
+    when inserting FDN it would use uri(content://icc/fdn)
+    instead of uri(content://icc/fdn/subId/#), thus make telephony
+    confused to update FDN value to SIM card.
+
+    CRs-Fixed: 965758
+
+    Change-Id: I07cb6c0cb635c6c9bf3f9bc7c41078d9f65e4e94
+
+commit 8ff8c8498d91fa524fd62e1e4396ec515ed4d208
+Author: wangjing <wangjing@codeaurora.org>
+Date:   Mon Apr 13 11:55:41 2015 +0800
+
+    Mms: Fix SMS is not sent in ECBM unless click send again
+
+    When clicking "yes" button on "Emergency Callback Mode" dialog,
+    EmergencyCallbackModeExitDialog.onDismiss() function will be called
+    and set the "exit_ecm_result" to false. Thus, after back to
+    ComposeMessageActivity, the message can't be sent.
+
+    Change to listen the AlertDialog's onCancel event instead.
+
+    CRs-Fixed: 820011
+    Change-Id: Icf2e9a4b5e80c7901b0842c13c12a2dded28f50e
+
+commit 865ab32a2492d7e7bec76b4074501d5ab7ac51e9
+Author: Umashankar Godachi <umasha@codeaurora.org>
+Date:   Thu Dec 12 13:02:32 2013 +0530
+
+    Add "FDN service is not available" toast message
+
+    Display toast message in 'add contact to FDN list' screen,
+    while airplane mode is enabled.
+    Add a broadcast receiver for Sim state change and display
+    the toast if sim is absent.
+
+    Change-Id: Ic949ce0563a7458697eb754d4089d7d674cb4a60
+    CRs-Fixed: 541836
+
+commit d34b5c33b7f2f6af247b74f4eb82e76ca19b4361
+Author: Wileen Chiu <wileenc@codeaurora.org>
+Date:   Wed Nov 4 10:35:16 2015 -0800
+
+    SEEK: Change security check for getAtrUsingSubId
+
+    - The UID of the third party apk has changed
+    and is no longer equal to NFC_UID
+    - Check and throw security exception if apk UID is
+    not equal to SYSTEM UID and does not have PRIVILEGED
+    permission
+
+    Change-Id: I1c3c339732c149a1f985b44bc9e861442543b96d
+    CRs-Fixed: 934980
+
+commit 9bfe715efafa39fd117e3620d2c77503aa022141
+Author: Garik Badalyan <garikb@codeaurora.org>
+Date:   Tue Nov 17 17:55:38 2015 -0800
+
+    IMS-VT: Conf: Propagate call extras to UI.
+
+    Call extras of a conference call are not getting
+    propagating to UI because the ImsConference class
+    doesn't listen to the onCallExtras notifcations
+    of the original connection.
+
+    Change-Id: I6f5499e3b18f9de87869cb5c9a0191cd59a70f89
+    CRs-Fixed: 939132
+
+commit 95d94df9835db2326efbc053993e47a203c35824
+Author: Rakesh Pallerla <rakesh@codeaurora.org>
+Date:   Tue Sep 29 15:58:35 2015 +0530
+
+    Set APM mode property for RIL to access.
+
+    Set APM mode in ADB property so that RIL can access it
+    to know if the device is in APM in bootup.
+
+    Change-Id: Id54667602b1358eaa7a7e45bd77bd0e932569507
+
+Change-Id: I14b6c133cc5b8531a0c75ebe9a7af055ea07e734
+---
+ res/values/strings.xml                             |  1 +
+ .../phone/EmergencyCallbackModeExitDialog.java     | 12 ++---
+ src/com/android/phone/PhoneGlobals.java            |  9 ++++
+ src/com/android/phone/PhoneInterfaceManager.java   | 14 ++++-
+ .../phone/settings/fdn/EditFdnContactScreen.java   | 59 ++++++++++++++++++++++
+ .../android/services/telephony/ImsConference.java  |  7 +++
+ 6 files changed, 94 insertions(+), 8 deletions(-)
+
+diff --git a/res/values/strings.xml b/res/values/strings.xml
+index 3a03017..3586cc6 100644
+--- a/res/values/strings.xml
++++ b/res/values/strings.xml
+@@ -837,6 +837,7 @@
+     <string name="pin2_or_fdn_invalid">FDN wasn\'t updated. The PIN2 was incorrect, or the phone number was rejected.</string>
+     <!-- FDN settings: error message displayed in a popup (toast) -->
+     <string name="fdn_failed">FDN operation failed.</string>
++    <string name="fdn_service_unavailable">FDN service is not available.</string>
+ 
+     <!-- ADN related strings -->
+     <!-- Placeholder text displayed while loading the list of SIM contacts -->
+diff --git a/src/com/android/phone/EmergencyCallbackModeExitDialog.java b/src/com/android/phone/EmergencyCallbackModeExitDialog.java
+index b423e14..479e353 100644
+--- a/src/com/android/phone/EmergencyCallbackModeExitDialog.java
++++ b/src/com/android/phone/EmergencyCallbackModeExitDialog.java
+@@ -24,7 +24,7 @@ import android.content.BroadcastReceiver;
+ import android.content.ComponentName;
+ import android.content.Context;
+ import android.content.DialogInterface;
+-import android.content.DialogInterface.OnDismissListener;
++import android.content.DialogInterface.OnCancelListener;
+ import android.content.Intent;
+ import android.content.IntentFilter;
+ import android.content.ServiceConnection;
+@@ -48,7 +48,7 @@ import com.android.internal.telephony.TelephonyProperties;
+  *
+  * @see EmergencyCallbackModeService
+  */
+-public class EmergencyCallbackModeExitDialog extends Activity implements OnDismissListener {
++public class EmergencyCallbackModeExitDialog extends Activity implements OnCancelListener {
+ 
+     private static final String TAG = "EmergencyCallbackMode";
+ 
+@@ -247,7 +247,7 @@ public class EmergencyCallbackModeExitDialog extends Activity implements OnDismi
+                                     finish();
+                                 }
+                             }).create();
+-            mAlertDialog.setOnDismissListener(this);
++            mAlertDialog.setOnCancelListener(this);
+             return mAlertDialog;
+ 
+         case EXIT_ECM_IN_EMERGENCY_CALL_DIALOG:
+@@ -264,7 +264,7 @@ public class EmergencyCallbackModeExitDialog extends Activity implements OnDismi
+                                     finish();
+                                 }
+                             }).create();
+-            mAlertDialog.setOnDismissListener(this);
++            mAlertDialog.setOnCancelListener(this);
+             return mAlertDialog;
+ 
+         case EXIT_ECM_PROGRESS_DIALOG:
+@@ -300,10 +300,10 @@ public class EmergencyCallbackModeExitDialog extends Activity implements OnDismi
+     }
+ 
+     /**
+-     * Closes activity when dialog is dismissed
++     * Closes activity when dialog is canceled
+      */
+     @Override
+-    public void onDismiss(DialogInterface dialog) {
++    public void onCancel(DialogInterface dialog) {
+         EmergencyCallbackModeExitDialog.this.setResult(RESULT_OK, (new Intent())
+                 .putExtra(EXTRA_EXIT_ECM_RESULT, false));
+         finish();
+diff --git a/src/com/android/phone/PhoneGlobals.java b/src/com/android/phone/PhoneGlobals.java
+index 991fc37..9c9aaea 100644
+--- a/src/com/android/phone/PhoneGlobals.java
++++ b/src/com/android/phone/PhoneGlobals.java
+@@ -96,6 +96,7 @@ public class PhoneGlobals extends ContextWrapper {
+     private static final boolean DBG =
+             (PhoneGlobals.DBG_LEVEL >= 1) && (SystemProperties.getInt("ro.debuggable", 0) == 1);
+     private static final boolean VDBG = (PhoneGlobals.DBG_LEVEL >= 2);
++    private static final String PROPERTY_AIRPLANE_MODE_ON = "persist.radio.airplane_mode_on";
+ 
+     // Message codes; see mHandler below.
+     private static final int EVENT_SIM_NETWORK_LOCKED = 3;
+@@ -773,6 +774,14 @@ public class PhoneGlobals extends ContextWrapper {
+             if (action.equals(Intent.ACTION_AIRPLANE_MODE_CHANGED)) {
+                 boolean enabled = System.getInt(getContentResolver(),
+                         System.AIRPLANE_MODE_ON, 0) == 0;
++
++                // Set the airplane mode property for RIL to read on boot up
++                // to know if the phone is in airplane mode so that RIL can
++                // power down the ICC card.
++                Log.d(LOG_TAG, "Setting property " + PROPERTY_AIRPLANE_MODE_ON);
++                // enabled here implies airplane mode is OFF from above condition
++                SystemProperties.set(PROPERTY_AIRPLANE_MODE_ON, (enabled ? "0" : "1"));
++
+                 PhoneUtils.setRadioPower(enabled);
+             } else if (action.equals(TelephonyIntents.ACTION_ANY_DATA_CONNECTION_STATE_CHANGED)) {
+                 int subId = intent.getIntExtra(PhoneConstants.SUBSCRIPTION_KEY,
+diff --git a/src/com/android/phone/PhoneInterfaceManager.java b/src/com/android/phone/PhoneInterfaceManager.java
+index 5666556..023057a 100644
+--- a/src/com/android/phone/PhoneInterfaceManager.java
++++ b/src/com/android/phone/PhoneInterfaceManager.java
+@@ -3119,6 +3119,16 @@ public class PhoneInterfaceManager extends ITelephony.Stub {
+         }
+     }
+ 
++    private void enforceCanReadPhoneState(String message) {
++        try {
++            mApp.enforceCallingOrSelfPermission(
++                    android.Manifest.permission.READ_PRIVILEGED_PHONE_STATE, message);
++        } catch (SecurityException e) {
++            mApp.enforceCallingOrSelfPermission(android.Manifest.permission.READ_PHONE_STATE,
++                    message);
++        }
++    }
++
+     /**
+      * {@hide}
+      * Returns the modem stats
+@@ -3134,8 +3144,8 @@ public class PhoneInterfaceManager extends ITelephony.Stub {
+ 
+     @Override
+     public byte[] getAtrUsingSubId(int subId) {
+-        if (Binder.getCallingUid() != Process.NFC_UID) {
+-            throw new SecurityException("Only Smartcard API may access UICC");
++        if (Binder.getCallingUid() != Process.SYSTEM_UID) {
++            enforceCanReadPhoneState("getAtrUsingSubId");
+         }
+         Log.d(LOG_TAG, "SIM_GET_ATR ");
+         String response = (String)sendRequest(CMD_SIM_GET_ATR, null, subId);
+diff --git a/src/com/android/phone/settings/fdn/EditFdnContactScreen.java b/src/com/android/phone/settings/fdn/EditFdnContactScreen.java
+index ef295fb..1f8d652 100644
+--- a/src/com/android/phone/settings/fdn/EditFdnContactScreen.java
++++ b/src/com/android/phone/settings/fdn/EditFdnContactScreen.java
+@@ -21,9 +21,12 @@ import static android.view.Window.PROGRESS_VISIBILITY_ON;
+ 
+ import android.app.Activity;
+ import android.content.AsyncQueryHandler;
++import android.content.BroadcastReceiver;
+ import android.content.ContentResolver;
+ import android.content.ContentValues;
++import android.content.Context;
+ import android.content.Intent;
++import android.content.IntentFilter;
+ import android.content.res.Resources;
+ import android.database.Cursor;
+ import android.net.Uri;
+@@ -32,7 +35,9 @@ import android.os.Handler;
+ import android.provider.Contacts.PeopleColumns;
+ import android.provider.Contacts.PhonesColumns;
+ import android.provider.ContactsContract.CommonDataKinds;
++import android.provider.Settings;
+ import android.telephony.PhoneNumberUtils;
++import android.telephony.SubscriptionManager;
+ import android.text.Selection;
+ import android.text.Spannable;
+ import android.text.TextUtils;
+@@ -51,7 +56,10 @@ import android.widget.Toast;
+ import com.android.phone.PhoneGlobals;
+ import com.android.phone.R;
+ import com.android.phone.SubscriptionInfoHelper;
++import com.android.internal.telephony.IccCardConstants;
++import com.android.internal.telephony.PhoneConstants;
+ import com.android.internal.telephony.PhoneFactory;
++import com.android.internal.telephony.TelephonyIntents;
+ 
+ /**
+  * Activity to let the user add or edit an FDN contact.
+@@ -101,6 +109,31 @@ public class EditFdnContactScreen extends Activity {
+     /** flag to track saving state */
+     private boolean mDataBusy;
+ 
++    private BroadcastReceiver mSimStateChangedReceiver = new BroadcastReceiver() {
++        @Override
++        public void onReceive(Context context, Intent intent) {
++            if (intent != null && intent.getAction().equals(
++                    TelephonyIntents.ACTION_SIM_STATE_CHANGED)) {
++                String stateExtra = intent.getStringExtra(IccCardConstants.INTENT_KEY_ICC_STATE);
++                int subId = intent.getIntExtra(PhoneConstants.SUBSCRIPTION_KEY,
++                        SubscriptionManager.INVALID_SUBSCRIPTION_ID);
++                if (IccCardConstants.INTENT_VALUE_ICC_ABSENT.equals(stateExtra) &&
++                        subId == mSubscriptionInfoHelper.getSubId()) {
++                    handleSimAbsentIntent(context, intent);
++                }
++            }
++        }
++    };
++
++    protected void handleSimAbsentIntent(Context context, Intent intent) {
++        String absentReason = intent
++                .getStringExtra(IccCardConstants.INTENT_KEY_LOCKED_REASON);
++        if (!IccCardConstants.INTENT_VALUE_ABSENT_ON_PERM_DISABLED.equals(absentReason)) {
++            Toast.makeText(context, R.string.fdn_service_unavailable,
++                    Toast.LENGTH_SHORT).show();
++        }
++    }
++
+     @Override
+     protected void onCreate(Bundle icicle) {
+         super.onCreate(icicle);
+@@ -169,6 +202,20 @@ public class EditFdnContactScreen extends Activity {
+         }
+     }
+ 
++    @Override
++    protected void onResume() {
++        super.onResume();
++        IntentFilter filter = new IntentFilter(
++                TelephonyIntents.ACTION_SIM_STATE_CHANGED);
++        registerReceiver(mSimStateChangedReceiver, filter);
++    }
++
++    @Override
++    protected void onPause() {
++        unregisterReceiver(mSimStateChangedReceiver);
++        super.onPause();
++    }
++
+     /**
+      * Overridden to display the import and delete commands.
+      */
+@@ -288,6 +335,12 @@ public class EditFdnContactScreen extends Activity {
+     private void addContact() {
+         if (DBG) log("addContact");
+ 
++        if (Settings.Global.getInt(this.getContentResolver(),
++                Settings.Global.AIRPLANE_MODE_ON, 0) > 0) {
++            showStatus(getResources().getText(R.string.fdn_service_unavailable));
++            return;
++        }
++
+         final String number = PhoneNumberUtils.convertAndStrip(getNumberFromTextField());
+ 
+         if (!isValidNumber(number)) {
+@@ -311,6 +364,12 @@ public class EditFdnContactScreen extends Activity {
+     private void updateContact() {
+         if (DBG) log("updateContact");
+ 
++        if (Settings.Global.getInt(this.getContentResolver(),
++                Settings.Global.AIRPLANE_MODE_ON, 0) > 0) {
++            showStatus(getResources().getText(R.string.fdn_service_unavailable));
++            return;
++        }
++
+         final String name = getNameFromTextField();
+         final String number = PhoneNumberUtils.convertAndStrip(getNumberFromTextField());
+ 
+diff --git a/src/com/android/services/telephony/ImsConference.java b/src/com/android/services/telephony/ImsConference.java
+index c583c24..b0222d0 100644
+--- a/src/com/android/services/telephony/ImsConference.java
++++ b/src/com/android/services/telephony/ImsConference.java
+@@ -19,6 +19,7 @@ package com.android.services.telephony;
+ import android.content.Context;
+ import android.graphics.drawable.Icon;
+ import android.net.Uri;
++import android.os.Bundle;
+ import android.telecom.Conference;
+ import android.telecom.ConferenceParticipant;
+ import android.telecom.Connection.VideoProvider;
+@@ -184,6 +185,12 @@ public class ImsConference extends Conference {
+             Log.v(this, "onStatusHintsChanged");
+             updateStatusHints();
+         }
++
++        @Override
++        public void onExtrasChanged(Connection c, Bundle extras) {
++            Log.v(this, "onExtrasChanged: c=" + c + " Extras=" + extras);
++            setExtras(extras);
++        }
+     };
+ 
+     /**
+-- 
+2.7.4
+

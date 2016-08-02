@@ -1,0 +1,22 @@
+From 4123d86b8059d13c888702e58351469c5d176ecf Mon Sep 17 00:00:00 2001
+From: Steve Kondik <steve@cyngn.com>
+Date: Thu, 28 Jul 2016 12:17:40 -0700
+Subject: [PATCH] healthd: Add DASH charger type
+
+Change-Id: Ie1ca5018c465f6b2c15cbc00bdf3bb866d98ddef
+---
+ healthd/BatteryMonitor.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/healthd/BatteryMonitor.cpp b/healthd/BatteryMonitor.cpp
+index a59c779..86a4fc6 100644
+--- a/healthd/BatteryMonitor.cpp
++++ b/healthd/BatteryMonitor.cpp
+@@ -147,6 +147,7 @@ BatteryMonitor::PowerSupplyType BatteryMonitor::readPowerSupplyType(const String
+             { "Wipower", ANDROID_POWER_SUPPLY_TYPE_WIRELESS },
+             { "DockBattery", ANDROID_POWER_SUPPLY_TYPE_DOCK_BATTERY },
+             { "DockAC", ANDROID_POWER_SUPPLY_TYPE_DOCK_AC },
++            { "DASH", ANDROID_POWER_SUPPLY_TYPE_AC },
+             { NULL, 0 },
+     };
+ 

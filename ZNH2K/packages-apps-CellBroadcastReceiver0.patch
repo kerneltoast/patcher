@@ -1,0 +1,612 @@
+From 69c8244aa2c38e3748d28f44249d90743dcf4c37 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Thu, 28 Jul 2016 13:33:25 -0700
+Subject: [PATCH] Squashed commit of the following:
+
+commit 2126a2fa2bb353aa8409cda9e52138acbdde9368
+Author: Sridhar Dubbaka <sdubbaka@codeaurora.org>
+Date:   Thu Oct 29 18:46:14 2015 +0530
+
+    Use of SubId inplace of SlotId in CellBroadcastReceiver
+
+    Correct Use of SubId inplace of SlotId in
+    CellBroadcastReceiver while configure Cellbroadcast Channels
+    on service state change events.
+
+    Change-Id: If6e1bd69965a57aade01184068719a38b4e8fafd
+
+commit 9d5aa27f688b0d12e749bd693a6040adc836623e
+Author: Sridhar Dubbaka <sdubbaka@codeaurora.org>
+Date:   Fri Sep 11 15:01:53 2015 +0530
+
+    Add Msim support for Service State intent in CB receiver
+
+    Currently, Cellbroadcast message ids are configured for
+    defaultsmsSubId only.With this change,CB message ids are
+    configured for both subs, if they are in IN service.
+
+    Change-Id: I13facf694daacc56f717d1e08144097f05d034e7
+
+commit 7a760133672874bf4668b6c13a6d6e23e1e9470d
+Author: Sridhar Dubbaka <sdubbaka@codeaurora.org>
+Date:   Mon Sep 14 04:54:14 2015 +0530
+
+    Regional: Support Channel 60 switch in CellBroadcast
+
+    There is requirement from India that Channel 60 needs to be
+    disabled by default. But currently Channel 60 is enabled and
+    there is no checkbox to disable it in UI. We add Channel 60
+    checkbox in UI, and control Channel 60 disable/enable by
+    overlay key.
+    There are 2 keys to control Channel 60:
+    show_india_settings controls Channel 60 checkbox display,
+    default is false.
+    def_channel_60_enabled controls if Channel 60 is enabled,
+    default is true.
+    Change-Id: I6389efa731a303df165e1b0b0dc5904d950b68b0
+    CRs-Fixed: 776615
+
+    Cell Broadcast for channel 60 and widget support
+
+    - Add support for cell broadcasts on channel 60
+    - For Brazil, send cell broadcast to app widget
+      provider
+    Change-Id: I475a76c72882f3164ebd8b047505c492dcf4f6dd
+    CRs-Fixed: 576013
+
+commit 1389da58856fc53291dbe0f77e14be42e6b523a2
+Author: Sridhar Dubbaka <sdubbaka@codeaurora.org>
+Date:   Wed Oct 7 14:02:43 2015 +0530
+
+    Fix duplicate detection for ETWS primary and secondary notifications.
+
+    Add ETWS warning info when hashing to distinguish ETWS primary
+    and secondary notifications.
+
+    Change-Id: I40b3ce70a0187a6bbc1443517669fbccda8ba6f4
+    CRs-Fixed: 764424
+
+Change-Id: I8624271a4d5ea9b6f4bad7e93388fc939cedf1cf
+---
+ res/values-zh-rCN/strings.xml                      |  1 +
+ res/values/config.xml                              |  4 ++
+ res/values/strings.xml                             |  6 ++
+ res/xml/preferences.xml                            | 11 ++++
+ .../CellBroadcastAlertService.java                 | 74 ++++++++++++++++++----
+ .../CellBroadcastConfigService.java                | 28 +++++++-
+ .../CellBroadcastReceiver.java                     | 54 ++++++++++------
+ .../CellBroadcastReceiverApp.java                  | 11 ++--
+ .../CellBroadcastSearchIndexableProvider.java      | 10 +++
+ .../CellBroadcastSettings.java                     | 40 +++++++++++-
+ 10 files changed, 202 insertions(+), 37 deletions(-)
+
+diff --git a/res/values-zh-rCN/strings.xml b/res/values-zh-rCN/strings.xml
+index 6e022fd..9f4b1d9 100644
+--- a/res/values-zh-rCN/strings.xml
++++ b/res/values-zh-rCN/strings.xml
+@@ -68,6 +68,7 @@
+     <string name="category_brazil_settings_title" msgid="6343130548572319922">"针对巴西的设置"</string>
+     <string name="enable_channel_50_alerts_title" msgid="2818924064446974167">"显示 50 频道的广播"</string>
+     <string name="enable_channel_50_alerts_summary" msgid="7507770011325273009">"巴西使用频道 50 来广播区域动态信息"</string>
++    <string name="category_india_settings_title">针对印度的设置</string>
+     <string name="category_dev_settings_title" msgid="6194393458398329994">"开发者选项"</string>
+     <string name="cmas_category_heading" msgid="3923503130776640717">"警报类别："</string>
+     <string name="cmas_category_geo" msgid="4979494217069688527">"地球物理"</string>
+diff --git a/res/values/config.xml b/res/values/config.xml
+index 80bb7f0..efba6bc 100644
+--- a/res/values/config.xml
++++ b/res/values/config.xml
+@@ -25,4 +25,8 @@
+     <bool name="use_sound_duration">false</bool>
+     <!-- Whether to enable broadcast channels for Colombia -->
+     <bool name="enable_colombia_channels">false</bool>
++    <!-- Whether to enable channel 50 and 60 settings (India) -->
++    <bool name="show_india_settings">false</bool>
++    <!-- CellBroadcast channel 60 enabled or not,default value is true -->
++    <bool name="def_channel_60_enabled">true</bool>
+ </resources>
+diff --git a/res/values/strings.xml b/res/values/strings.xml
+index 57e2d9a..84e602a 100644
+--- a/res/values/strings.xml
++++ b/res/values/strings.xml
+@@ -137,10 +137,16 @@
+ 
+     <!-- Preference category title for Brazil settings. [CHAR LIMIT=50] -->
+     <string name="category_brazil_settings_title">Settings for Brazil</string>
++    <!-- Preference category title for India settings. [CHAR LIMIT=50] -->
++    <string name="category_india_settings_title">Settings for India</string>
+     <!-- Preference title for enable channel 50 alerts (Brazil only). [CHAR LIMIT=30] -->
+     <string name="enable_channel_50_alerts_title">Show channel 50 broadcasts</string>
+     <!-- Preference summary for enable channel 50 alerts (Brazil only). [CHAR LIMIT=100] -->
+     <string name="enable_channel_50_alerts_summary">Channel 50 is used in Brazil for area update information</string>
++    <!-- Preference title for enable channel 60 alerts. [CHAR LIMIT=30] -->
++    <string name="enable_channel_60_alerts_title">Show channel 60 broadcasts</string>
++    <!-- Preference summary for enable channel 60 alerts. [CHAR LIMIT=100] -->
++    <string name="enable_channel_60_alerts_summary">Channel 60 is used in India for Operator specific information</string>
+ 
+     <!-- Preference category title for developer settings. [CHAR LIMIT=50] -->
+     <string name="category_dev_settings_title">Developer options</string>
+diff --git a/res/xml/preferences.xml b/res/xml/preferences.xml
+index 3eb422e..4eac386 100644
+--- a/res/xml/preferences.xml
++++ b/res/xml/preferences.xml
+@@ -94,6 +94,17 @@
+ 
+     </PreferenceCategory>
+ 
++    <!-- This preference is ignored and hidden
++         unless the boolean "show_india_settings" is set to true in config.xml. -->
++    <PreferenceCategory android:title="@string/category_india_settings_title"
++                        android:key="category_india_settings">
++
++        <CheckBoxPreference android:key="enable_channel_60_alerts"
++                            android:summary="@string/enable_channel_60_alerts_summary"
++                            android:title="@string/enable_channel_60_alerts_title" />
++
++    </PreferenceCategory>
++
+     <!-- Only visible when Developer options toggle is enabled in Settings. -->
+     <PreferenceCategory android:title="@string/category_dev_settings_title"
+                         android:key="category_dev_settings">
+diff --git a/src/com/android/cellbroadcastreceiver/CellBroadcastAlertService.java b/src/com/android/cellbroadcastreceiver/CellBroadcastAlertService.java
+index 8607217..13cf28e 100644
+--- a/src/com/android/cellbroadcastreceiver/CellBroadcastAlertService.java
++++ b/src/com/android/cellbroadcastreceiver/CellBroadcastAlertService.java
+@@ -29,9 +29,12 @@ import android.os.IBinder;
+ import android.os.RemoteException;
+ import android.os.UserHandle;
+ import android.os.SystemProperties;
++import android.preference.PreferenceManager;
+ import android.provider.Telephony;
+ import android.telephony.CellBroadcastMessage;
++import android.telephony.TelephonyManager;
+ import android.telephony.SmsCbCmasInfo;
++import android.telephony.SmsCbEtwsInfo;
+ import android.telephony.SmsCbLocation;
+ import android.telephony.SmsCbMessage;
+ import android.telephony.SubscriptionManager;
+@@ -65,6 +68,12 @@ public class CellBroadcastAlertService extends Service {
+     /** Check for system property to enable/disable duplicate detection.  */
+     static boolean mUseDupDetection = SystemProperties.getBoolean(CB_DUP_DETECTION, true);
+ 
++    /** Channel 50 Cell Broadcast. */
++    static final int CB_CHANNEL_50 = 50;
++
++    /** Channel 60 Cell Broadcast. */
++    static final int CB_CHANNEL_60 = 60;
++
+     /**
+      *  Container for service category, serial number, location, and message body hash code for
+      *  duplicate message detection.
+@@ -74,6 +83,7 @@ public class CellBroadcastAlertService extends Service {
+         private final int mSerialNumber;
+         private final SmsCbLocation mLocation;
+         private final int mBodyHash;
++        private final SmsCbEtwsInfo mEtwsWarningInfo;
+ 
+         MessageServiceCategoryAndScope(int serviceCategory, int serialNumber,
+                 SmsCbLocation location, int bodyHash) {
+@@ -81,10 +91,23 @@ public class CellBroadcastAlertService extends Service {
+             mSerialNumber = serialNumber;
+             mLocation = location;
+             mBodyHash = bodyHash;
++            mEtwsWarningInfo = null;
++        }
++        MessageServiceCategoryAndScope(int serviceCategory, int serialNumber,
++                SmsCbLocation location, int bodyHash, SmsCbEtwsInfo etwsWarningInfo) {
++            mServiceCategory = serviceCategory;
++            mSerialNumber = serialNumber;
++            mLocation = location;
++            mBodyHash = bodyHash;
++            mEtwsWarningInfo = etwsWarningInfo;
+         }
+ 
+         @Override
+         public int hashCode() {
++            if (mEtwsWarningInfo != null) {
++                return mEtwsWarningInfo.hashCode() + mLocation.hashCode() + 5 * mServiceCategory
++                        + 7 * mSerialNumber + 13 * mBodyHash;
++            }
+             return mLocation.hashCode() + 5 * mServiceCategory + 7 * mSerialNumber + 13 * mBodyHash;
+         }
+ 
+@@ -95,6 +118,14 @@ public class CellBroadcastAlertService extends Service {
+             }
+             if (o instanceof MessageServiceCategoryAndScope) {
+                 MessageServiceCategoryAndScope other = (MessageServiceCategoryAndScope) o;
++                if (mEtwsWarningInfo == null && other.mEtwsWarningInfo != null) {
++                    return false;
++                } else if (mEtwsWarningInfo != null && other.mEtwsWarningInfo == null) {
++                    return false;
++                } else if (mEtwsWarningInfo != null && other.mEtwsWarningInfo != null
++                        && !mEtwsWarningInfo.equals(other.mEtwsWarningInfo)) {
++                    return false;
++                }
+                 return (mServiceCategory == other.mServiceCategory &&
+                         mSerialNumber == other.mSerialNumber &&
+                         mLocation.equals(other.mLocation) &&
+@@ -105,8 +136,10 @@ public class CellBroadcastAlertService extends Service {
+ 
+         @Override
+         public String toString() {
+-            return "{mServiceCategory: " + mServiceCategory + " serial number: " + mSerialNumber +
+-                    " location: " + mLocation.toString() + " body hash: " + mBodyHash + '}';
++            return "{mServiceCategory: " + mServiceCategory + " serial number: " + mSerialNumber
++                    + " location: " + mLocation.toString() + " mEtwsWarningInfo: "
++                    + (mEtwsWarningInfo == null ? "NULL" : mEtwsWarningInfo.toString())
++                    + " body hash: " + mBodyHash +'}';
+         }
+     }
+ 
+@@ -187,7 +220,9 @@ public class CellBroadcastAlertService extends Service {
+             // message ID of the oldest message is deleted from the list.
+             MessageServiceCategoryAndScope newCmasId = new MessageServiceCategoryAndScope(
+                     message.getServiceCategory(), message.getSerialNumber(), message.getLocation(),
+-                    hashCode);
++                            hashCode, message.getEtwsWarningInfo());
++            Log.v(TAG,"newCmasId:" + newCmasId + " hash: " + newCmasId.hashCode()
++                + "body hash:" + hashCode);
+ 
+             // Add the new message ID to the list. It's okay if this is a duplicate message ID,
+             // because the list is only used for removing old message IDs from the hash set.
+@@ -267,7 +302,6 @@ public class CellBroadcastAlertService extends Service {
+      * @return true if the user has enabled this message type; false otherwise
+      */
+     private boolean isMessageEnabledByUser(CellBroadcastMessage message) {
+-
+         // Check if ETWS/CMAS test message is forced to disabled on the device.
+         boolean forceDisableEtwsCmasTest =
+                 CellBroadcastSettings.isEtwsCmasTestMessageForcedDisabled(this, message.getSubId());
+@@ -312,10 +346,23 @@ public class CellBroadcastAlertService extends Service {
+                     return true;    // presidential-level CMAS alerts are always enabled
+             }
+         }
+-
+-        if (message.getServiceCategory() == 50) {
+-            // save latest area info broadcast for Settings display and send as broadcast
+-            CellBroadcastReceiverApp.setLatestAreaInfo(message);
++        int serviceCategory = message.getServiceCategory();
++        if (serviceCategory == CB_CHANNEL_50 || serviceCategory == CB_CHANNEL_60) {
++            boolean channel60Preference = false;
++            if (serviceCategory == CB_CHANNEL_50) {
++                // save latest area info on channel 50 for Settings display
++                CellBroadcastReceiverApp.setLatestAreaInfo(message);
++            } else { //it is Channel 60 CB
++                boolean enable60Channel =  SubscriptionManager.getResourcesForSubId(
++                        getApplicationContext(), message.getSubId()).getBoolean(
++                        R.bool.show_india_settings);
++                if (enable60Channel) {
++                    channel60Preference = PreferenceManager.getDefaultSharedPreferences(this).
++                            getBoolean(CellBroadcastSettings.KEY_ENABLE_CHANNEL_60_ALERTS,
++                            enable60Channel);
++                }
++            }
++            // send broadcasts for channel 50 and 60
+             Intent intent = new Intent(CB_AREA_INFO_RECEIVED_ACTION);
+             intent.putExtra("message", message);
+             // Send broadcast twice, once for apps that have PRIVILEGED permission and once
+@@ -324,9 +371,15 @@ public class CellBroadcastAlertService extends Service {
+                     android.Manifest.permission.READ_PRIVILEGED_PHONE_STATE);
+             sendBroadcastAsUser(intent, UserHandle.ALL,
+                     android.Manifest.permission.READ_PHONE_STATE);
+-            return false;   // area info broadcasts are displayed in Settings status screen
+-        }
+ 
++            String country = TelephonyManager.getDefault().getSimCountryIso(message.getSubId());
++            // In Brazil(50)/India(50/60) the area info broadcasts are displayed in Settings,
++            // CBwidget or Mms.
++            // But in other country it should be displayed as a normal CB alert.
++            boolean needIgnore = "in".equals(country)
++                    || ("br".equals(country) && (message.getServiceCategory() == CB_CHANNEL_50));
++            return ((!needIgnore) || channel60Preference);
++        }
+         return true;    // other broadcast messages are always enabled
+     }
+ 
+@@ -341,7 +394,6 @@ public class CellBroadcastAlertService extends Service {
+         // Close dialogs and window shade
+         Intent closeDialogs = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+         sendBroadcast(closeDialogs);
+-
+         // start audio/vibration/speech service for emergency alerts
+         Intent audioIntent = new Intent(this, CellBroadcastAlertAudio.class);
+         audioIntent.setAction(CellBroadcastAlertAudio.ACTION_START_ALERT_AUDIO);
+diff --git a/src/com/android/cellbroadcastreceiver/CellBroadcastConfigService.java b/src/com/android/cellbroadcastreceiver/CellBroadcastConfigService.java
+index 0464734..5a48977 100644
+--- a/src/com/android/cellbroadcastreceiver/CellBroadcastConfigService.java
++++ b/src/com/android/cellbroadcastreceiver/CellBroadcastConfigService.java
+@@ -168,13 +168,22 @@ public class CellBroadcastConfigService extends IntentService {
+                 TelephonyManager tm = (TelephonyManager) getSystemService(
+                         Context.TELEPHONY_SERVICE);
+ 
+-                boolean enableChannel50Support = res.getBoolean(R.bool.show_brazil_settings) ||
+-                        "br".equals(tm.getSimCountryIso());
++                String country = tm.getSimCountryIso(subId);
++                boolean enableChannel50Support = res.getBoolean(R.bool.show_brazil_settings)
++                        || "br".equals(country) || res.getBoolean(R.bool.show_india_settings)
++                        || "in".equals(country);
++
++                boolean enableChannel60Support = res.getBoolean(R.bool.show_india_settings)
++                        || "in".equals(tm.getSimCountryIso());
+ 
+                 boolean enableChannel50Alerts = enableChannel50Support &&
+                         SubscriptionManager.getBooleanSubscriptionProperty(subId,
+                                 SubscriptionManager.CB_CHANNEL_50_ALERT, true, this);
+ 
++                boolean enableChannel60Alerts = enableChannel60Support &&
++                        SubscriptionManager.getBooleanSubscriptionProperty(subId,
++                                SubscriptionManager.CB_CHANNEL_60_ALERT, true, this);
++
+                 // Note:  ETWS is for 3GPP only
+ 
+                 // Check if ETWS/CMAS test message is forced disabled on the device.
+@@ -346,6 +355,21 @@ public class CellBroadcastConfigService extends IntentService {
+                     manager.disableCellBroadcast(50, SmsManager.CELL_BROADCAST_RAN_TYPE_GSM);
+                 }
+ 
++                // Enable Channel 60 for India
++                if (isCdma) {
++                    if (DBG) log("channel 60 is not applicable for cdma");
++                } else { //gsm type
++                    if (enableChannel60Alerts) {
++                        if (DBG) log("enabling cell broadcast channel 60");
++                        manager.enableCellBroadcast(60, SmsManager.CELL_BROADCAST_RAN_TYPE_GSM);
++                        if (DBG) log("enabled cell broadcast channel 60");
++                    } else {
++                        if (DBG) log("disabling cell broadcast channel 60");
++                        manager.disableCellBroadcast(60, SmsManager.CELL_BROADCAST_RAN_TYPE_GSM);
++                        if (DBG) log("disabled cell broadcast channel 60");
++                    }
++                }
++
+                 if ("il".equals(tm.getSimCountryIso()) || "il".equals(tm.getNetworkCountryIso())) {
+                     if (DBG) log("enabling channels 919-928 for Israel");
+                     manager.enableCellBroadcastRange(919, 928,
+diff --git a/src/com/android/cellbroadcastreceiver/CellBroadcastReceiver.java b/src/com/android/cellbroadcastreceiver/CellBroadcastReceiver.java
+index f255f63..d776b8a 100644
+--- a/src/com/android/cellbroadcastreceiver/CellBroadcastReceiver.java
++++ b/src/com/android/cellbroadcastreceiver/CellBroadcastReceiver.java
+@@ -46,8 +46,8 @@ import java.util.List;
+ 
+ public class CellBroadcastReceiver extends BroadcastReceiver {
+     private static final String TAG = "CellBroadcastReceiver";
+-    static final boolean DBG = false;    // STOPSHIP: change to false before ship
+-    private static int mServiceState = -1;
++    static final boolean DBG = true;    // STOPSHIP: change to false before ship
++    private int[] mServiceState = null;
+     private static final String GET_LATEST_CB_AREA_INFO_ACTION =
+             "android.cellbroadcastreceiver.GET_LATEST_CB_AREA_INFO";
+ 
+@@ -63,18 +63,32 @@ public class CellBroadcastReceiver extends BroadcastReceiver {
+ 
+         if (TelephonyIntents.ACTION_SERVICE_STATE_CHANGED.equals(action)) {
+             if (DBG) log("Intent ACTION_SERVICE_STATE_CHANGED");
+-            int subId = intent.getExtras().getInt(PhoneConstants.SUBSCRIPTION_KEY);
++            int subId = intent.getIntExtra(PhoneConstants.SUBSCRIPTION_KEY,
++                    SubscriptionManager.INVALID_SUBSCRIPTION_ID);
+             Log.d(TAG, "subscriptionId = " + subId);
+             if (!SubscriptionManager.isValidSubscriptionId(subId)) {
+                 return;
+             }
+             ServiceState serviceState = ServiceState.newFromBundle(intent.getExtras());
+             int newState = serviceState.getState();
+-            if (newState != mServiceState) {
++            SubscriptionInfo subInfo = SubscriptionManager.from(context).
++                    getActiveSubscriptionInfo(subId);
++            if (subInfo == null) {
++                loge("subId is not active:" + subId);
++                return;
++            }
++            int slotId = subInfo.getSimSlotIndex();
++            if (mServiceState == null) {
++                int phoneCount = TelephonyManager.getDefault().getPhoneCount();
++                mServiceState = new int[phoneCount];
++                for (int i = 0; i < phoneCount; i++) {
++                    mServiceState[i] =  ServiceState.STATE_OUT_OF_SERVICE;
++                }
++            }
++            if (newState != mServiceState[slotId]) {
+                 Log.d(TAG, "Service state changed! " + newState + " Full: " + serviceState +
+-                        " Current state=" + mServiceState);
+-                mServiceState = newState;
+-
++                        " Current state=" + mServiceState[slotId]);
++                mServiceState[slotId] = newState;
+                 if (((newState == ServiceState.STATE_IN_SERVICE) ||
+                         (newState == ServiceState.STATE_EMERGENCY_ONLY)) &&
+                         (UserHandle.myUserId() == UserHandle.USER_OWNER)) {
+@@ -121,18 +135,20 @@ public class CellBroadcastReceiver extends BroadcastReceiver {
+             }
+         } else if (GET_LATEST_CB_AREA_INFO_ACTION.equals(action)) {
+             if (privileged) {
+-                CellBroadcastMessage message = CellBroadcastReceiverApp.getLatestAreaInfo();
+-                if (message != null) {
+-                    Intent areaInfoIntent = new Intent(
+-                            CellBroadcastAlertService.CB_AREA_INFO_RECEIVED_ACTION);
+-                    areaInfoIntent.putExtra("message", message);
+-                    // Send broadcast twice, once for apps that have PRIVILEGED permission and once
+-                    // for those that have the runtime one
+-                    context.sendBroadcastAsUser(areaInfoIntent, UserHandle.ALL,
+-                            android.Manifest.permission.READ_PRIVILEGED_PHONE_STATE);
+-                    context.sendBroadcastAsUser(areaInfoIntent, UserHandle.ALL,
+-                            android.Manifest.permission.READ_PHONE_STATE);
+-                }
++                int subId = intent.getIntExtra(PhoneConstants.SUBSCRIPTION_KEY,
++                        SubscriptionManager.getDefaultSmsSubId());
++                CellBroadcastMessage message = CellBroadcastReceiverApp.getLatestAreaInfo(subId);
++                Log.d(TAG, "onReceive GET_LATEST_CB_AREA_INFO_ACTION subId :" + subId
++                        + "message :" + message);
++                Intent areaInfoIntent = new Intent(
++                        CellBroadcastAlertService.CB_AREA_INFO_RECEIVED_ACTION);
++                areaInfoIntent.putExtra("message", message);
++                // Send broadcast twice, once for apps that have PRIVILEGED permission and once
++                // for those that have the runtime one
++                context.sendBroadcastAsUser(areaInfoIntent, UserHandle.ALL,
++                        android.Manifest.permission.READ_PRIVILEGED_PHONE_STATE);
++                context.sendBroadcastAsUser(areaInfoIntent, UserHandle.ALL,
++                        android.Manifest.permission.READ_PHONE_STATE);
+             } else {
+                 Log.e(TAG, "caller missing READ_PHONE_STATE permission, returning");
+             }
+diff --git a/src/com/android/cellbroadcastreceiver/CellBroadcastReceiverApp.java b/src/com/android/cellbroadcastreceiver/CellBroadcastReceiverApp.java
+index b9e6039..2b62177 100644
+--- a/src/com/android/cellbroadcastreceiver/CellBroadcastReceiverApp.java
++++ b/src/com/android/cellbroadcastreceiver/CellBroadcastReceiverApp.java
+@@ -21,6 +21,8 @@ import android.telephony.CellBroadcastMessage;
+ import android.util.Log;
+ import android.preference.PreferenceManager;
+ 
++import java.util.HashMap;
++import java.util.Map;
+ import java.util.ArrayList;
+ import java.util.concurrent.atomic.AtomicInteger;
+ 
+@@ -43,7 +45,8 @@ public class CellBroadcastReceiverApp extends Application {
+             new ArrayList<CellBroadcastMessage>(4);
+ 
+     /** Latest area info cell broadcast received. */
+-    private static CellBroadcastMessage sLatestAreaInfo;
++    private static Map<Integer, CellBroadcastMessage> sLatestAreaInfo =
++            new HashMap<Integer, CellBroadcastMessage>();
+ 
+     /** Adds a new unread non-emergency message and returns the current list. */
+     static ArrayList<CellBroadcastMessage> addNewMessageToList(CellBroadcastMessage message) {
+@@ -58,11 +61,11 @@ public class CellBroadcastReceiverApp extends Application {
+ 
+     /** Saves the latest area info broadcast received. */
+     static void setLatestAreaInfo(CellBroadcastMessage areaInfo) {
+-        sLatestAreaInfo = areaInfo;
++        sLatestAreaInfo.put(areaInfo.getSubId(), areaInfo);
+     }
+ 
+     /** Returns the latest area info broadcast received. */
+-    static CellBroadcastMessage getLatestAreaInfo() {
+-        return sLatestAreaInfo;
++    static CellBroadcastMessage getLatestAreaInfo(int subId) {
++        return sLatestAreaInfo.get(subId);
+     }
+ }
+diff --git a/src/com/android/cellbroadcastreceiver/CellBroadcastSearchIndexableProvider.java b/src/com/android/cellbroadcastreceiver/CellBroadcastSearchIndexableProvider.java
+index b8f56eb..e4c3014 100644
+--- a/src/com/android/cellbroadcastreceiver/CellBroadcastSearchIndexableProvider.java
++++ b/src/com/android/cellbroadcastreceiver/CellBroadcastSearchIndexableProvider.java
+@@ -144,6 +144,16 @@ public class CellBroadcastSearchIndexableProvider extends SearchIndexablesProvid
+             cursor.addRow(ref);
+         }
+ 
++        boolean enableChannel60Support = res.getBoolean(R.bool.show_india_settings) ||
++                "in".equals(tm.getSimCountryIso());
++
++        if (!enableChannel60Support) {
++            ref = new Object[1];
++            ref[COLUMN_INDEX_NON_INDEXABLE_KEYS_KEY_VALUE] =
++                    CellBroadcastSettings.KEY_CATEGORY_INDIA_SETTINGS;
++            cursor.addRow(ref);
++        }
++
+         if (!enableDevSettings) {
+             ref = new Object[1];
+             ref[COLUMN_INDEX_NON_INDEXABLE_KEYS_KEY_VALUE] =
+diff --git a/src/com/android/cellbroadcastreceiver/CellBroadcastSettings.java b/src/com/android/cellbroadcastreceiver/CellBroadcastSettings.java
+index cc0d16b..8f3fc7b 100644
+--- a/src/com/android/cellbroadcastreceiver/CellBroadcastSettings.java
++++ b/src/com/android/cellbroadcastreceiver/CellBroadcastSettings.java
+@@ -91,9 +91,14 @@ public class CellBroadcastSettings extends PreferenceActivity {
+     // Preference category for Brazil specific settings.
+     public static final String KEY_CATEGORY_BRAZIL_SETTINGS = "category_brazil_settings";
+ 
++    // Preference category for India specific settings.
++    public static final String KEY_CATEGORY_INDIA_SETTINGS = "category_india_settings";
++
+     // Preference key for whether to enable channel 50 notifications
+     // Enabled by default for phones sold in Brazil, otherwise this setting may be hidden.
+     public static final String KEY_ENABLE_CHANNEL_50_ALERTS = "enable_channel_50_alerts";
++    // Preference key for whether to enable channel 60 notifications
++    public static final String KEY_ENABLE_CHANNEL_60_ALERTS = "enable_channel_60_alerts";
+ 
+     // Preference key for initial opt-in/opt-out dialog.
+     public static final String KEY_SHOW_CMAS_OPT_OUT_DIALOG = "show_cmas_opt_out_dialog";
+@@ -122,6 +127,7 @@ public class CellBroadcastSettings extends PreferenceActivity {
+     private CheckBoxPreference mSpeechCheckBox;
+     private CheckBoxPreference mEtwsTestCheckBox;
+     private CheckBoxPreference mChannel50CheckBox;
++    private CheckBoxPreference mChannel60CheckBox;
+     private CheckBoxPreference mCmasCheckBox;
+     private CheckBoxPreference mOptOutCheckBox;
+     private PreferenceCategory mAlertCategory;
+@@ -194,6 +200,8 @@ public class CellBroadcastSettings extends PreferenceActivity {
+                     findPreference(KEY_ENABLE_ETWS_TEST_ALERTS);
+             mChannel50CheckBox = (CheckBoxPreference)
+                     findPreference(KEY_ENABLE_CHANNEL_50_ALERTS);
++            mChannel60CheckBox = (CheckBoxPreference)
++                    findPreference(KEY_ENABLE_CHANNEL_60_ALERTS);
+             mCmasCheckBox = (CheckBoxPreference)
+                     findPreference(KEY_ENABLE_CMAS_TEST_ALERTS);
+             mOptOutCheckBox = (CheckBoxPreference)
+@@ -220,6 +228,7 @@ public class CellBroadcastSettings extends PreferenceActivity {
+                 mSpeechCheckBox.setEnabled(false);
+                 mEtwsTestCheckBox.setEnabled(false);
+                 mChannel50CheckBox.setEnabled(false);
++                mChannel60CheckBox.setEnabled(false);
+                 mCmasCheckBox.setEnabled(false);
+                 mOptOutCheckBox.setEnabled(false);
+                 if (!enableDevSettings) {
+@@ -250,6 +259,12 @@ public class CellBroadcastSettings extends PreferenceActivity {
+                                                     SubscriptionManager.CB_CHANNEL_50_ALERT,
+                                                     newVal + "");
+                                     break;
++                                case KEY_ENABLE_CHANNEL_60_ALERTS:
++                                    SubscriptionManager
++                                            .setSubscriptionProperty(mSir.getSubscriptionId(),
++                                                    SubscriptionManager.CB_CHANNEL_60_ALERT,
++                                                    newVal + "");
++                                    break;
+                                 case KEY_ENABLE_ETWS_TEST_ALERTS:
+                                     SubscriptionManager
+                                             .setSubscriptionProperty(mSir.getSubscriptionId(),
+@@ -411,11 +426,24 @@ public class CellBroadcastSettings extends PreferenceActivity {
+             boolean enableChannel50Support = SubscriptionManager.getResourcesForSubId(
+                     getApplicationContext(), mSir.getSubscriptionId()).getBoolean(
+                     R.bool.show_brazil_settings)
+-                    || "br".equals(mTelephonyManager.getSimCountryIso());
++                    || "br".equals(mTelephonyManager.getSimCountryIso(mSir.getSubscriptionId()))
++                    || SubscriptionManager.getResourcesForSubId(
++                    getApplicationContext(), mSir.getSubscriptionId()).getBoolean(
++                    R.bool.show_india_settings)
++                    || "in".equals(mTelephonyManager.getSimCountryIso(mSir.getSubscriptionId()));
+ 
+             if (!enableChannel50Support) {
+                 prefScreen.removePreference(findPreference(KEY_CATEGORY_BRAZIL_SETTINGS));
+             }
++
++            boolean enableChannel60Support = SubscriptionManager.getResourcesForSubId(
++                    getApplicationContext(), mSir.getSubscriptionId()).getBoolean(
++                    R.bool.show_india_settings)
++                    || "in".equals(mTelephonyManager.getSimCountryIso(mSir.getSubscriptionId()));
++
++            if (!enableChannel60Support) {
++                prefScreen.removePreference(findPreference(KEY_CATEGORY_INDIA_SETTINGS));
++            }
+             if (!enableDevSettings) {
+                 prefScreen.removePreference(findPreference(KEY_CATEGORY_DEV_SETTINGS));
+             }
+@@ -490,6 +518,16 @@ public class CellBroadcastSettings extends PreferenceActivity {
+                 mChannel50CheckBox.setOnPreferenceChangeListener(startConfigServiceListener);
+             }
+ 
++            if (mChannel60CheckBox != null) {
++                if (SubscriptionManager.getBooleanSubscriptionProperty(mSir.getSubscriptionId(),
++                        SubscriptionManager.CB_CHANNEL_60_ALERT, true, this)) {
++                    mChannel60CheckBox.setChecked(true);
++                } else {
++                    mChannel60CheckBox.setChecked(false);
++                }
++                mChannel60CheckBox.setOnPreferenceChangeListener(startConfigServiceListener);
++            }
++
+             if (mEtwsTestCheckBox != null) {
+                 if (!forceDisableEtwsCmasTest &&
+                         SubscriptionManager.getBooleanSubscriptionProperty(mSir.getSubscriptionId(),
+-- 
+2.7.4
+

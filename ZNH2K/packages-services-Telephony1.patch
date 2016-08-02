@@ -1,0 +1,69 @@
+From a4ad53b5a1d7f17d925bffc97f15822d32c1486c Mon Sep 17 00:00:00 2001
+From: Benergy Meenan Ravuri <bravuri@codeaurora.org>
+Date: Wed, 2 Dec 2015 12:13:03 +0530
+Subject: [PATCH] IMS: Remove the methods with dummy implementation
+
+Since the base implementation is added for the listener, the methods
+with dummy implementation can be removed.
+
+Change-Id: I7a1c9e4f44d20eab3792923ce9877d0f5188467f
+CRs-Fixed: 901766
+---
+ src/com/android/phone/CallForwardEditPreference.java | 18 +++++++-----------
+ 1 file changed, 7 insertions(+), 11 deletions(-)
+
+diff --git a/src/com/android/phone/CallForwardEditPreference.java b/src/com/android/phone/CallForwardEditPreference.java
+index c4c8c18..cb4c471 100644
+--- a/src/com/android/phone/CallForwardEditPreference.java
++++ b/src/com/android/phone/CallForwardEditPreference.java
+@@ -29,6 +29,7 @@
+ 
+ import org.codeaurora.ims.qtiims.IQtiImsInterfaceListener;
+ import org.codeaurora.ims.qtiims.IQtiImsInterface;
++import org.codeaurora.ims.qtiims.QtiImsInterfaceListenerBaseImpl;
+ import org.codeaurora.ims.qtiims.QtiViceInfo;
+ 
+ import static com.android.phone.TimeConsumingPreferenceActivity.RESPONSE_ERROR;
+@@ -261,7 +262,10 @@ private void updateSummaryText() {
+ 
+     }
+ 
+-    private IQtiImsInterfaceListener imsInterfaceListener = new IQtiImsInterfaceListener.Stub() {
++    private QtiImsInterfaceListenerBaseImpl imsInterfaceListener =
++            new QtiImsInterfaceListenerBaseImpl() {
++
++        @Override
+         public void onSetCallForwardUncondTimer(int status) {
+             if (DBG) Log.d(LOG_TAG, "onSetCallForwardTimer status= "+status);
+             try {
+@@ -273,6 +277,7 @@ public void onSetCallForwardUncondTimer(int status) {
+             }
+         }
+ 
++        @Override
+         public void onGetCallForwardUncondTimer(int startHour, int endHour, int startMinute,
+                 int endMinute, int reason, int status, String number, int service) {
+             Log.d(LOG_TAG,"onGetCallForwardUncondTimer startHour= " + startHour + " endHour = "
+@@ -288,21 +293,12 @@ public void onGetCallForwardUncondTimer(int startHour, int endHour, int startMin
+             handleGetCFTimerResponse();
+         }
+ 
++        @Override
+         public void onUTReqFailed(int errCode, String errString) {
+             if (DBG) Log.d(LOG_TAG, "onUTReqFailed errCode= "+errCode + "errString ="+ errString);
+             mTcpListener.onError(CallForwardEditPreference.this, RESPONSE_ERROR);
+         }
+ 
+-        public void onGetPacketCount(int status, long packetCount) {
+-        }
+-
+-        public void onGetPacketErrorCount(int status, long packetErrorCount) {
+-        }
+-
+-        public void receiveCallDeflectResponse(int result) {
+-            /* Not implemented, dummy implementation to avoid compilation errors */
+-        }
+-
+         public void notifyRefreshViceInfo(QtiViceInfo qtiViceInfo) {
+         }
+     };

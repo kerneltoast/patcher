@@ -1,0 +1,43 @@
+From 44b8ecca7a07b05c71e595c03750a9f5915bce35 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Sat, 15 Aug 2015 19:17:58 -0700
+Subject: [PATCH] libmedia: Add 1440p camcorder quality
+
+Add support for 2.5k 1440p camcorder quality (including timelapse).
+
+Adjusted for Marshmallow.
+
+Change-Id: I932f7463ea8ab9786806b430aa3e3f3a09d99423
+---
+ include/media/MediaProfiles.h    | 4 +++-
+ media/libmedia/MediaProfiles.cpp | 2 ++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/include/media/MediaProfiles.h b/include/media/MediaProfiles.h
+index a45dc58..d0fdb3f 100755
+--- a/include/media/MediaProfiles.h
++++ b/include/media/MediaProfiles.h
+@@ -71,7 +71,9 @@ enum camcorder_quality {
+     CAMCORDER_QUALITY_2k = 10008,
+     CAMCORDER_QUALITY_TIME_LAPSE_QHD = 10009,
+     CAMCORDER_QUALITY_TIME_LAPSE_2k = 10010,
+-    CAMCORDER_QUALITY_VENDOR_END = 10010,
++    CAMCORDER_QUALITY_1440P = 10011,
++    CAMCORDER_QUALITY_TIME_LAPSE_1440P = 10012,
++    CAMCORDER_QUALITY_VENDOR_END = 10012,
+ };
+ 
+ enum video_decoder {
+diff --git a/media/libmedia/MediaProfiles.cpp b/media/libmedia/MediaProfiles.cpp
+index 52da7ed..d85ba35 100755
+--- a/media/libmedia/MediaProfiles.cpp
++++ b/media/libmedia/MediaProfiles.cpp
+@@ -105,6 +105,8 @@ const MediaProfiles::NameToTagMap MediaProfiles::sCamcorderQualityNameMap[] = {
+     {"2k", CAMCORDER_QUALITY_2k},
+     {"timelapseqhd", CAMCORDER_QUALITY_TIME_LAPSE_QHD},
+     {"timelapse2k", CAMCORDER_QUALITY_TIME_LAPSE_2k},
++    {"1440p", CAMCORDER_QUALITY_1440P},
++    {"timelapse1440p", CAMCORDER_QUALITY_TIME_LAPSE_1440P},
+ };
+ 
+ #if LOG_NDEBUG

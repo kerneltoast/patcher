@@ -1,0 +1,344 @@
+From cbf03eb61939bcba96cdc77ef5d7eb29bb3f3a79 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Mon, 1 Aug 2016 21:45:26 -0700
+Subject: [PATCH] Squashed commit of the following:
+
+commit 9122c16069c9368076ef710649a9a6cf53991816
+Author: Roman Birg <roman@cyngn.com>
+Date:   Wed Jun 22 15:56:59 2016 -0700
+
+    Ims: remove use of old nonexistant qti constant
+
+    Change-Id: I4668d4f810014ad317191c9dd37cd71b04bdb56a
+    Signed-off-by: Roman Birg <roman@cyngn.com>
+
+commit 8e0b6eeafda163aa014a77ea4c75dc6d906b782a
+Author: Muhammed Siju <msiju@codeaurora.org>
+Date:   Thu May 19 14:28:43 2016 +0530
+
+    IMS-VT: Remove unused QTI_IMS_CALL_RAT_EXTRA_KEY extra.
+
+    QTI_IMS_CALL_RAT_EXTRA_KEY is being replaced by
+    ImsCallProfile.EXTRA_CALL_RAT_TYPE.
+
+    Change-Id: I8e418fb1166783b35a65c010abec63e915781713
+    CRs-Fixed: 1000005
+
+commit 9e3df8a9a770af78e068dd912e1f561a36772913
+Author: Omkar Kolangade <omkark@codeaurora.org>
+Date:   Wed Feb 24 09:22:25 2016 -0800
+
+    IMS: Encrypted Calling Extras Key Definition
+
+    Adding a key String that will be used to
+    1. Pack and unpack encryption status/preference,
+       in the dial/start API.
+    2. Pack and unpack the encryption status in the
+       ImsCallProfile's extras Bundle.
+
+    Change-Id: I29ba8f384d04acb4c9bab4730e50e9f9bc17f84e
+    CRs-Fixed: 978178
+
+commit 079b0b5f2f00c51ea5f768661442e70f376bc2e4
+Author: Anju Mathapati <anjucm@codeaurora.org>
+Date:   Wed Feb 10 10:36:25 2016 -0800
+
+    IMS: Interface change for VOPS and SSAC
+
+    Add a new api for clients to query vops and
+    ssac status
+
+    Change-Id: I9999f6bbe1954981e20212cfcbfe8a21cf80a35e
+    CRs-Fixed: 965993
+
+commit bee587bdaa465739a31ff34e9652e13a0fed613d
+Author: Suresh Kumar Sugguna <sureshk@codeaurora.org>
+Date:   Fri Oct 16 18:09:19 2015 +0530
+
+    IMS: Explicit call transfer feature
+
+    Code changes to support IMS explicit call transfer feature.
+
+    Change-Id: I45547cfd0679ca6850a430579a48aee0b7ab6290
+    CRs-Fixed: 897726
+---
+ resources/res/values/config.xml                    |  3 ++
+ .../telephony/imsphone/ImsPhoneConnection.java     |  6 +--
+ .../codeaurora/ims/qtiims/IQtiImsInterface.aidl    | 30 +++++++++++++
+ .../ims/qtiims/IQtiImsInterfaceListener.aidl       | 33 ++++++++++++++-
+ .../qtiims/QtiImsInterfaceListenerBaseImpl.java    | 26 +++++-------
+ .../ims/qtiims/QtiImsInterfaceUtils.java           | 49 ++++++++++++++++++++--
+ 6 files changed, 124 insertions(+), 23 deletions(-)
+
+diff --git a/resources/res/values/config.xml b/resources/res/values/config.xml
+index 4bb6822..d36b3a3 100644
+--- a/resources/res/values/config.xml
++++ b/resources/res/values/config.xml
+@@ -48,4 +48,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     <string name="telephony_plugin_jar_name" translatable="false"></string>
+     <!--Fully qualified class name of telephony extended plugin.-->
+     <string name="telephony_plugin_class_name" translatable="false"></string>
++
++    <!-- control to enable or disable call transfer feature -->
++    <bool name="config_enable_calltransfer_over_ims">false</bool>
+ </resources>
+diff --git a/src/java/com/android/internal/telephony/imsphone/ImsPhoneConnection.java b/src/java/com/android/internal/telephony/imsphone/ImsPhoneConnection.java
+index b8b9daa..090c93c 100644
+--- a/src/java/com/android/internal/telephony/imsphone/ImsPhoneConnection.java
++++ b/src/java/com/android/internal/telephony/imsphone/ImsPhoneConnection.java
+@@ -911,14 +911,12 @@ public class ImsPhoneConnection extends Connection {
+      */
+     private void updateWifiStateFromExtras(Bundle extras) {
+         // Google and Qualcomm have competing implementations
+-        final String extraCompatType = extras.containsKey(ImsCallProfile.EXTRA_CALL_RAT_TYPE) ?
+-            ImsCallProfile.EXTRA_CALL_RAT_TYPE : QtiImsInterfaceUtils.QTI_IMS_CALL_RAT_EXTRA_KEY;
+-        if (extras.containsKey(extraCompatType)) {
++        if (extras.containsKey(ImsCallProfile.EXTRA_CALL_RAT_TYPE)) {
+             // The RIL (sadly) sends us the EXTRA_CALL_RAT_TYPE as a string extra, rather than an
+             // integer extra, so we need to parse it.
+             int radioTechnology;
+             try {
+-                radioTechnology = Integer.parseInt(extras.getString(extraCompatType));
++                radioTechnology = Integer.parseInt(extras.getString(ImsCallProfile.EXTRA_CALL_RAT_TYPE));
+             } catch (NumberFormatException nfe) {
+                 radioTechnology = ServiceState.RIL_RADIO_TECHNOLOGY_UNKNOWN;
+             }
+diff --git a/src/java/org/codeaurora/ims/qtiims/IQtiImsInterface.aidl b/src/java/org/codeaurora/ims/qtiims/IQtiImsInterface.aidl
+index 329b140..3a81faf 100644
+--- a/src/java/org/codeaurora/ims/qtiims/IQtiImsInterface.aidl
++++ b/src/java/org/codeaurora/ims/qtiims/IQtiImsInterface.aidl
+@@ -117,4 +117,34 @@ oneway interface IQtiImsInterface {
+      */
+     void registerForViceRefreshInfo(IQtiImsInterfaceListener listener);
+ 
++   /**
++     * sendCallTransferRequest
++     * Transfer an established call to given number or call id
++     *
++     * @param phoneId indicates the phone instance which triggered the request
++     * @param type is one of the values QTI_IMS_TRANSFER_TYPE_*, as defined in
++     *        <code>org.codeaurora.ims.qtiims.QtiImsInterfaceUtils.</code>
++     * @param number indicates the target number to transfer
++     * @param listener an IQtiImsInterfaceListener instance to indicate the response
++     * @return void
++     */
++    void sendCallTransferRequest(int phoneId, int type, String number,
++            IQtiImsInterfaceListener listener);
++
++    /**
++     * Query Vops information
++     *
++     * @param listener an IQtiImsInterfaceListener instance to indicate the response
++     * @return void
++     */
++    void queryVopsStatus(IQtiImsInterfaceListener listener);
++
++   /**
++     * Query Ssac information
++     *
++     * @param listener an IQtiImsInterfaceListener instance to indicate the response
++     * @return void
++     */
++    void querySsacStatus(IQtiImsInterfaceListener listener);
++
+ }
+diff --git a/src/java/org/codeaurora/ims/qtiims/IQtiImsInterfaceListener.aidl b/src/java/org/codeaurora/ims/qtiims/IQtiImsInterfaceListener.aidl
+index 32d1402..792bebc 100644
+--- a/src/java/org/codeaurora/ims/qtiims/IQtiImsInterfaceListener.aidl
++++ b/src/java/org/codeaurora/ims/qtiims/IQtiImsInterfaceListener.aidl
+@@ -92,7 +92,7 @@ oneway interface IQtiImsInterfaceListener {
+     /**
+      * Notifies client the result of call deflect request
+      *
+-     * @param <result> is one of the values QTIIMS_REQUEST_*, as defined in
++     * @param <result> is one of the values QTI_IMS_REQUEST_*, as defined in
+      *        <code>org.codeaurora.ims.qtiims.QtiImsInterfaceUtils.</code>
+      * @return void.
+      */
+@@ -106,4 +106,35 @@ oneway interface IQtiImsInterfaceListener {
+      * @return void.
+      */
+     void notifyRefreshViceInfo(in QtiViceInfo viceInfo);
++
++    /**
++     * Notifies client the result of call transfer request
++     *
++     * @param <result> is one of the values QTI_IMS_REQUEST_*, as defined in
++     *        <code>org.codeaurora.ims.qtiims.QtiImsInterfaceUtils.</code>
++     * @return void.
++     */
++    void receiveCallTransferResponse(int result);
++
++    /**
++     * Notifies Vops value to the clients
++     *
++     * @param vopsStatus
++     *        if true  : Voice is supported on LTE
++     *        if false : Voice is not supported on LTE
++     * @return void.
++     */
++    void notifyVopsStatus(boolean vopsStatus);
++
++    /**
++     * Notifies Ssac value to the clients
++     *
++     * @param ssacStatusResponse
++     *        if true  : Access barring factor for voice calls is 0
++     *        if false : Access barring factor for voice calls is non-zero
++     *                   Range: 0 to 100. Value 100 is used when
++     *                   the UE goes to the LTE Connected state
++     * @return void.
++     */
++    void notifySsacStatus(boolean ssacStatusResponse);
+ }
+diff --git a/src/java/org/codeaurora/ims/qtiims/QtiImsInterfaceListenerBaseImpl.java b/src/java/org/codeaurora/ims/qtiims/QtiImsInterfaceListenerBaseImpl.java
+index c93e2f9..44d9835 100644
+--- a/src/java/org/codeaurora/ims/qtiims/QtiImsInterfaceListenerBaseImpl.java
++++ b/src/java/org/codeaurora/ims/qtiims/QtiImsInterfaceListenerBaseImpl.java
+@@ -29,55 +29,51 @@
+ 
+ package org.codeaurora.ims.qtiims;
+ 
+-import android.telephony.Rlog;
+-
+ /**
+  * This class contains default implementation for IQtiImsInterfaceListener.
+  */
+ public class QtiImsInterfaceListenerBaseImpl extends IQtiImsInterfaceListener.Stub {
+ 
+-    private static String LOG_TAG = "QtiImsInterfaceListenerBaseImpl";
+-
+     @Override
+     public void onSetCallForwardUncondTimer(int status) {
+-        logUnexpectedQtiImsListenerCall("onSetCallForwardUncondTimer");
+     }
+ 
+     @Override
+     public void onGetCallForwardUncondTimer(int startHour, int endHour, int startMinute,
+             int endMinute, int reason, int status, String number, int service) {
+-        logUnexpectedQtiImsListenerCall("onGetCallForwardUncondTimer");
+     }
+ 
+     @Override
+     public void onUTReqFailed(int errCode, String errString) {
+-        logUnexpectedQtiImsListenerCall("onUTReqFailed");
+     }
+ 
+     @Override
+     public void onGetPacketCount(int status, long packetCount) {
+-        logUnexpectedQtiImsListenerCall("onGetPacketCount");
+     }
+ 
+     @Override
+     public void onGetPacketErrorCount(int status, long packetErrorCount) {
+-        logUnexpectedQtiImsListenerCall("onGetPacketErrorCount");
+     }
+ 
+     @Override
+     public void receiveCallDeflectResponse(int result) {
+-        logUnexpectedQtiImsListenerCall("receiveCallDeflectResponse");
+     }
+ 
+     @Override
+     public void notifyRefreshViceInfo(QtiViceInfo viceInfo) {
+-        logUnexpectedQtiImsListenerCall("notifyRefreshViceInfo");
+     }
+ 
+-    private static void logUnexpectedQtiImsListenerCall(String name)
+-    {
+-        Rlog.e(LOG_TAG, "Error! " + name + "() in QtiImsInterfaceListener should not be " +
+-                "called, Default Implementation.");
++    @Override
++    public void receiveCallTransferResponse(int result) {
++    }
++
++    @Override
++    public void notifyVopsStatus(boolean vopsStatus) {
+     }
++
++    @Override
++    public void notifySsacStatus(boolean ssacStatusResponse) {
++    }
++
+ }
+ 
+diff --git a/src/java/org/codeaurora/ims/qtiims/QtiImsInterfaceUtils.java b/src/java/org/codeaurora/ims/qtiims/QtiImsInterfaceUtils.java
+index de017dc..e594209 100644
+--- a/src/java/org/codeaurora/ims/qtiims/QtiImsInterfaceUtils.java
++++ b/src/java/org/codeaurora/ims/qtiims/QtiImsInterfaceUtils.java
+@@ -1,5 +1,5 @@
+ /**
+- * Copyright (c) 2015, The Linux Foundation. All rights reserved.
++ * Copyright (c) 2015, 2016 The Linux Foundation. All rights reserved.
+  *
+  * Redistribution and use in source and binary forms, with or without
+  * modification, are permitted provided that the following conditions are
+@@ -30,6 +30,8 @@
+ package org.codeaurora.ims.qtiims;
+ 
+ import android.content.ContentResolver;
++import android.content.Context;
++import com.android.internal.telephony.ConfigResourceUtil;
+ 
+ /**
+  * This class contains QtiImsInterface specific utiltity functions.
+@@ -50,8 +52,40 @@ public class QtiImsInterfaceUtils {
+     /* Default error value */
+     public static final int QTI_IMS_REQUEST_ERROR = 1;
+ 
+-    /* Call RAT extra key */
+-    public static final String QTI_IMS_CALL_RAT_EXTRA_KEY = "callRadioTech";
++    /**
++     * Definitions for the call transfer type. For easier implementation,
++     * the transfer type is defined as a bit mask value.
++     */
++    //Value representing blind call transfer type
++    public static final int QTI_IMS_BLIND_TRANSFER = 0x01;
++    //Value representing assured call transfer type
++    public static final int QTI_IMS_ASSURED_TRANSFER = 0x02;
++    //Value representing consultative call transfer type
++    public static final int QTI_IMS_CONSULTATIVE_TRANSFER = 0x04;
++
++    /* Call transfer extra key */
++    public static final String QTI_IMS_TRANSFER_EXTRA_KEY = "transferType";
++
++    /* Constants used for VOPS and SSAC feature */
++    // Intent action
++    public static final String ACTION_VOPS_SSAC_STATUS =
++            "org.codeaurora.VOIP_VOPS_SSAC_STATUS";
++    /* Intent extra
++     * if true  : Voice is supported on LTE
++     * if false : Voice is not supported on LTE
++     */
++    public static final String EXTRA_VOPS = "Vops";
++    /* Intent extra
++     * if true  : Access barring factor for voice calls is 0
++     * if false : Access barring factor for voice calls is non-zero
++     *            Range: 0 to 100. Value 100 is used when
++     *            the UE goes to the LTE Connected state
++     */
++    public static final String EXTRA_SSAC = "Ssac";
++
++
++    /* Call encryption status extra key. The value will be a boolean. */
++    public static final String QTI_IMS_CALL_ENCRYPTION_EXTRA_KEY = "CallEncryption";
+ 
+     /**
+      * Private constructor for QtiImsInterfaceUtils as we don't want to instantiate this class
+@@ -86,4 +120,13 @@ public class QtiImsInterfaceUtils {
+         android.provider.Settings.Global.putString(contentResolver,
+                 QTI_IMS_CALL_DEFLECT_NUMBER, deflectNum);
+     }
++
++    /***
++     * Checks if the IMS call transfer property is enabled or not.
++     * Returns true if enabled, or false otherwise.
++     */
++    public static boolean isCallTransferEnabled(Context context) {
++        ConfigResourceUtil mConfigResUtil = new ConfigResourceUtil();
++        return mConfigResUtil.getBooleanValue(context, "config_enable_calltransfer_over_ims");
++    }
+ }
+-- 
+2.7.4
+
