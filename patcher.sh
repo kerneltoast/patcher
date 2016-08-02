@@ -54,6 +54,7 @@ patch -d frameworks/opt/telephony		-p1 -s -N --no-backup-if-mismatch < $BRANCH/f
 patch -d packages/apps/CellBroadcastReceiver	-p1 -s -N --no-backup-if-mismatch < $BRANCH/packages-apps-CellBroadcastReceiver0.patch
 patch -d packages/apps/Dialer			-p1 -s -N --no-backup-if-mismatch < $BRANCH/packages-apps-Dialer0.patch
 patch -d packages/apps/InCallUI			-p1 -s -N --no-backup-if-mismatch < $BRANCH/packages-apps-InCallUI0.patch
+patch -d packages/apps/InCallUI			-p1 -s -N --no-backup-if-mismatch < $BRANCH/packages-apps-InCallUI1.patch
 patch -d packages/apps/Nfc			-p1 -s -N --no-backup-if-mismatch < $BRANCH/packages-apps-Nfc0.patch
 patch -d packages/apps/Settings			-p1 -s -N --no-backup-if-mismatch < $BRANCH/packages-apps-Settings0.patch
 patch -d packages/apps/Stk			-p1 -s -N --no-backup-if-mismatch < $BRANCH/packages-apps-Stk0.patch

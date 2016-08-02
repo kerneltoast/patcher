@@ -1,0 +1,165 @@
+From 3ef0f249fbaf933744228c2d48ece07ea3630cc8 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Thu, 28 Jul 2016 13:43:22 -0700
+Subject: [PATCH] Squashed commit of the following:
+
+commit cde32f3a7bbcff9a572573a3143db3895832e325
+Author: Muhammed Siju <msiju@codeaurora.org>
+Date:   Fri Feb 26 13:44:17 2016 +0530
+
+    IMS-VT: Fix for auto fullscreen issue during UI rotation.
+
+    Consider case where VT call UI is in fullscreen mode and the
+    UI orientation is changed. When InCall activity is re created
+    due to rotation, the fullscreen flag is still true, but actual
+    UI will be created in normal mode. Due to wrong fullscreen flag
+    value, auto enter fullscreen thread is not scheduled.
+    To fix this clear fullscreen flag in InCallActivity.onCreate().
+
+    Change-Id: I18ec2b4442eae3b9ec01aeacc2b38f91f08f21c9
+    CRs-Fixed: 979860
+
+commit 5a7ea944b9ac0ca169d360403b9b516f0e211e11
+Author: Mengjun Leng <mengju@codeaurora.org>
+Date:   Tue Nov 24 10:32:21 2015 +0800
+
+    Fix display 'null' for geocoder location
+
+    If ContactsProvider is unable to get geocoder location for call
+    number, the 'null' will be used to populate DB.
+
+    When InCallUI cannot get its geocodder loaction, it should ignore
+    displaying geocoder location info.
+
+    Change-Id: Ibdfcf607ba3044de39a886c171f144f804410b36
+    CRs-Fixed: 942213
+
+commit 5227cbd5278bf614197b6b0cf85517f82ad0eab8
+Author: Shaoxu Liu <shaoxu@codeaurora.org>
+Date:   Mon Nov 30 16:15:56 2015 +0800
+
+    Add rtl support to GlowPadView
+
+    When anwser a incoming call, GlowPadView alwasy shows the button
+    in LTR view. While the RTL locale needs the mirror UI of LTR.
+
+    Switch the left target and right target while in RTL view.
+
+    Change-Id: I693932ab1cba35910dbea418adb50e0a32a7364d
+
+commit f71be919310ec824a7d368fd9e2d8d7e08353718
+Author: Ravindra <c_rthat@codeaurora.org>
+Date:   Thu Nov 12 12:29:27 2015 +0530
+
+    Fix to incall screen for incoming call
+
+    When user answers the call from status bar do not display the incall
+    screen until ACTIVE state is received.
+
+    Change-Id: I3d9667bccdf1bac3ab817a0282a8140c6dea785b
+    CRs-Fixed: 936970
+
+Change-Id: I092a3c895afadfc907e45d4b0da77a27a10d0d5d
+---
+ src/com/android/incallui/InCallActivity.java          |  4 ++++
+ src/com/android/incallui/InCallPresenter.java         |  1 -
+ src/com/android/incallui/StatusBarNotifier.java       |  9 +++++----
+ .../incallui/widget/multiwaveview/GlowPadView.java    | 19 ++++++++++++++++++-
+ 4 files changed, 27 insertions(+), 6 deletions(-)
+
+diff --git a/src/com/android/incallui/InCallActivity.java b/src/com/android/incallui/InCallActivity.java
+index 092c2f6..ad0cae4 100644
+--- a/src/com/android/incallui/InCallActivity.java
++++ b/src/com/android/incallui/InCallActivity.java
+@@ -197,6 +197,10 @@ public class InCallActivity extends Activity implements FragmentDisplayManager {
+         // TODO(klp): Do we need to add this back when prox sensor is not available?
+         // lp.inputFeatures |= WindowManager.LayoutParams.INPUT_FEATURE_DISABLE_USER_ACTIVITY;
+ 
++        // Since activity is created newly, clear full screen flag. This will ensure that
++        // the flag is in sync with actual UI when UI is recreated due to orientation change.
++        InCallPresenter.getInstance().clearFullscreen();
++
+         setContentView(R.layout.incall_screen);
+ 
+         internalResolveIntent(getIntent());
+diff --git a/src/com/android/incallui/InCallPresenter.java b/src/com/android/incallui/InCallPresenter.java
+index 73cf70c..67b8dd5 100644
+--- a/src/com/android/incallui/InCallPresenter.java
++++ b/src/com/android/incallui/InCallPresenter.java
+@@ -778,7 +778,6 @@ public class InCallPresenter implements CallList.Listener,
+         Call call = mCallList.getIncomingCall();
+         if (call != null) {
+             TelecomAdapter.getInstance().answerCall(call.getId(), videoState);
+-            showInCall(false, false/* newOutgoingCall */);
+         }
+     }
+ 
+diff --git a/src/com/android/incallui/StatusBarNotifier.java b/src/com/android/incallui/StatusBarNotifier.java
+index 3b5ad7e..05ec1e7 100644
+--- a/src/com/android/incallui/StatusBarNotifier.java
++++ b/src/com/android/incallui/StatusBarNotifier.java
+@@ -454,14 +454,15 @@ public class StatusBarNotifier implements InCallPresenter.InCallStateListener,
+         }
+         if (TextUtils.isEmpty(contactInfo.name)) {
+             String contactNumberDisplayed = TextUtils.isEmpty(contactInfo.number) ?
+-                "" : contactInfo.number.toString();
++                    "" : contactInfo.number.toString();
+             if (mContext.getResources().
+-                getBoolean(R.bool.display_home_location_on_statusbar)) {
+-                    contactNumberDisplayed =  contactNumberDisplayed + " " + contactInfo.location;
++                    getBoolean(R.bool.display_home_location_on_statusbar) &&
++                    !TextUtils.isEmpty(contactInfo.location)) {
++                contactNumberDisplayed =  contactNumberDisplayed + " " + contactInfo.location;
+             }
+             return TextUtils.isEmpty(contactNumberDisplayed) ? null
+                     : BidiFormatter.getInstance().unicodeWrap(
+-                            contactNumberDisplayed, TextDirectionHeuristics.LTR);
++                    contactNumberDisplayed, TextDirectionHeuristics.LTR);
+         }
+ 
+         return contactInfo.name;
+diff --git a/src/com/android/incallui/widget/multiwaveview/GlowPadView.java b/src/com/android/incallui/widget/multiwaveview/GlowPadView.java
+index acbcdba..2acf2b6 100644
+--- a/src/com/android/incallui/widget/multiwaveview/GlowPadView.java
++++ b/src/com/android/incallui/widget/multiwaveview/GlowPadView.java
+@@ -56,6 +56,7 @@ import android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction;
+ import android.view.accessibility.AccessibilityNodeProvider;
+ 
+ import com.android.incallui.R;
++import com.android.incallui.InCallPresenter;
+ 
+ import java.util.ArrayList;
+ import java.util.List;
+@@ -641,7 +642,7 @@ public class GlowPadView extends View {
+         final int count = array.length();
+         ArrayList<TargetDrawable> drawables = new ArrayList<TargetDrawable>(count);
+         for (int i = 0; i < count; i++) {
+-            TypedValue value = array.peekValue(i);
++            TypedValue value = array.peekValue(getRtlTarget(i));
+             TargetDrawable target = new TargetDrawable(res, value != null ? value.resourceId : 0, 3);
+             drawables.add(target);
+         }
+@@ -1549,4 +1550,20 @@ public class GlowPadView extends View {
+         }
+ 
+     }
++
++    /**
++     * Get the mirrored target iterator if it is in RTL locale
++     */
++    private int getRtlTarget(int id) {
++        if (InCallPresenter.isRtl()) {
++            // In the drawable array, LEFT is array[0], TOP is array[1], RIGHT is array[2]
++            int LEFT = 0, RIGHT = 2;
++            if (id == LEFT) {
++                return RIGHT;
++            } else if (id == RIGHT) {
++                return LEFT;
++            }
++        }
++        return id;
++    }
+ }
+-- 
+2.7.4
+
