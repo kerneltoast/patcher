@@ -1,0 +1,30 @@
+From 50f0c0550b7ea8313d70601f3a4d0bd2d682ef10 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Fri, 5 Aug 2016 19:04:28 -0700
+Subject: [PATCH] display: Don't animate screen brightness when turning the
+ screen on
+
+Make the display wake from sleep faster by going directly to the target
+brightness instead of ramping up to it.
+
+Change-Id: I5b68dfb144ef11badff87275baf9b2c6bb96b4f5
+---
+ .../core/java/com/android/server/display/DisplayPowerController.java    | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/services/core/java/com/android/server/display/DisplayPowerController.java b/services/core/java/com/android/server/display/DisplayPowerController.java
+index ae596cb..4d27476 100644
+--- a/services/core/java/com/android/server/display/DisplayPowerController.java
++++ b/services/core/java/com/android/server/display/DisplayPowerController.java
+@@ -708,7 +708,7 @@ final class DisplayPowerController implements AutomaticBrightnessController.Call
+         // Animate the screen brightness when the screen is on or dozing.
+         // Skip the animation when the screen is off or suspended.
+         if (!mPendingScreenOff) {
+-            if (state == Display.STATE_ON || state == Display.STATE_DOZE) {
++            if (state == Display.STATE_DOZE) {
+                 animateScreenBrightness(brightness,
+                         slowChange ? BRIGHTNESS_RAMP_RATE_SLOW : BRIGHTNESS_RAMP_RATE_FAST);
+             } else {
+-- 
+2.7.4
+
