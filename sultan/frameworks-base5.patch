@@ -1,0 +1,38 @@
+From d3d205612f085f3fbe9fbf0f5e7f81c41b486199 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Sat, 6 Aug 2016 00:31:25 -0700
+Subject: [PATCH] fingerprint: Fix occasional lack of vibration on success
+
+The success vibrate pattern consists of only one actual value, so use the
+appropriate vibrate() function for it.
+
+Change-Id: I2fd50237f0294c45460e2510f3eecf2f513cfb93
+---
+ .../core/java/com/android/server/fingerprint/FingerprintUtils.java    | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/services/core/java/com/android/server/fingerprint/FingerprintUtils.java b/services/core/java/com/android/server/fingerprint/FingerprintUtils.java
+index 49dc8e4..dea7b7f 100644
+--- a/services/core/java/com/android/server/fingerprint/FingerprintUtils.java
++++ b/services/core/java/com/android/server/fingerprint/FingerprintUtils.java
+@@ -32,7 +32,7 @@ import java.util.List;
+ public class FingerprintUtils {
+ 
+     private static final long[] FP_ERROR_VIBRATE_PATTERN = new long[] {0, 30, 100, 30};
+-    private static final long[] FP_SUCCESS_VIBRATE_PATTERN = new long[] {0, 30};
++    private static final long FP_SUCCESS_VIBRATE_PATTERN = 30;
+ 
+     private static final Object sInstanceLock = new Object();
+     private static FingerprintUtils sInstance;
+@@ -82,7 +82,7 @@ public class FingerprintUtils {
+     public static void vibrateFingerprintSuccess(Context context) {
+         Vibrator vibrator = context.getSystemService(Vibrator.class);
+         if (vibrator != null) {
+-            vibrator.vibrate(FP_SUCCESS_VIBRATE_PATTERN, -1);
++            vibrator.vibrate(FP_SUCCESS_VIBRATE_PATTERN);
+         }
+     }
+ 
+-- 
+2.7.4
+
