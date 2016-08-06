@@ -25,6 +25,8 @@ cd $ROM_TREE/packages/apps/Settings
 git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/services/Telephony
 git clean -f -d && git reset --hard
+cd $ROM_TREE/system/bt
+git clean -f -d && git reset --hard
 cd $ROM_TREE/system/core
 git clean -f -d && git reset --hard
 cd $ROM_TREE/vendor/cm
@@ -38,6 +40,7 @@ patch -d frameworks/opt/telephony		-p1 -s -N --no-backup-if-mismatch < $BRANCH/f
 patch -d packages/apps/Dialer			-p1 -s -N --no-backup-if-mismatch < $BRANCH/packages-apps-Dialer0.patch
 patch -d packages/apps/Nfc			-p1 -s -N --no-backup-if-mismatch < $BRANCH/packages-apps-Nfc0.patch
 patch -d packages/services/Telephony		-p1 -s -N --no-backup-if-mismatch < $BRANCH/packages-services-Telephony0.patch
+patch -d system/bt				-p1 -s -N --no-backup-if-mismatch < $BRANCH/system-bt0.patch
 
 # Special git binary diff patch
 cd packages/apps/Messaging
