@@ -1,0 +1,41 @@
+From 2002fc9e3233171e2cd821728f3c98c945ce00c6 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Sat, 15 Aug 2015 19:28:35 -0700
+Subject: [PATCH] CamcorderProfile: Add 1440p camcorder profile
+
+Add encoding constants (regular and timelapse) for 2.5k 1440p resolution.
+
+Adjusted for Marshmallow.
+
+Change-Id: I0ce1dd33458f0c837f4bb1d9e8d07c1649cf338d
+---
+ media/java/android/media/CamcorderProfile.java | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/media/java/android/media/CamcorderProfile.java b/media/java/android/media/CamcorderProfile.java
+index 6785670..6f2de46 100644
+--- a/media/java/android/media/CamcorderProfile.java
++++ b/media/java/android/media/CamcorderProfile.java
+@@ -273,9 +273,21 @@
+      */
+     public static final int QUALITY_TIME_LAPSE_2k = 10010;
+ 
++    /**
++     * Quality level corresponding to 1440p (2560 x 1440) resolution.
++     * @hide
++     */
++    public static final int QUALITY_1440P = 10011;
++
++    /**
++     * Time lapse quality level corresponding to the 1440p (2560 x 1440) resolution.
++     * @hide
++     */
++    public static final int QUALITY_TIME_LAPSE_1440P = 10012;
++
+     // Start and end of vendor quality list
+     private static final int QUALITY_VENDOR_LIST_START = QUALITY_VGA;
+-    private static final int QUALITY_VENDOR_LIST_END = QUALITY_TIME_LAPSE_2k;
++    private static final int QUALITY_VENDOR_LIST_END = QUALITY_TIME_LAPSE_1440P;
+ 
+     /**
+      * Default recording duration in seconds before the session is terminated.

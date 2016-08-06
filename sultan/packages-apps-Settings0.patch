@@ -1,0 +1,30 @@
+From 730f2ec307f43cc26c0d176ddffb8947edf6782c Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Fri, 8 Apr 2016 21:54:56 -0700
+Subject: [PATCH] Settings: Remove 'Update Cyanogen recovery' preference
+
+This setting has been turned into a no-op by another change I made.
+---
+ src/com/android/settings/DevelopmentSettings.java | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/com/android/settings/DevelopmentSettings.java b/src/com/android/settings/DevelopmentSettings.java
+index d7a4145..1b03a20 100644
+--- a/src/com/android/settings/DevelopmentSettings.java
++++ b/src/com/android/settings/DevelopmentSettings.java
+@@ -380,6 +380,7 @@ public void onCreate(Bundle icicle) {
+         mUpdateRecovery = findAndInitSwitchPref(UPDATE_RECOVERY_KEY);
+         mDevelopmentShortcut = findAndInitSwitchPref(DEVELOPMENT_SHORTCUT_KEY);
+ 
++        removePreference(mUpdateRecovery);
+ 
+         if (!android.os.Process.myUserHandle().equals(UserHandle.OWNER)) {
+             disableForUser(mEnableAdb);
+@@ -387,7 +388,6 @@ public void onCreate(Bundle icicle) {
+             disableForUser(mEnableTerminal);
+             disableForUser(mPassword);
+             disableForUser(mAdvancedReboot);
+-            disableForUser(mUpdateRecovery);
+             disableForUser(mDevelopmentShortcut);
+         }
+ 

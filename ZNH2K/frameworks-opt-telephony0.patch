@@ -1,0 +1,67 @@
+From d483262f1e84d0bcba10060e3372d5fec9ebd1fe Mon Sep 17 00:00:00 2001
+From: Qingsheng Li <qingshengli@codeaurora.org>
+Date: Fri, 27 Nov 2015 13:51:46 +0800
+Subject: [PATCH] Telephony: Pass the subId when set data enabled
+
+After rebooting device, setDataEnabled() is called using
+the dummy subId, but before CMD_SET_USER_DATA_ENABLE is handled,
+the vaild subId is read, so in onSetUserDataEnabled() method we use
+valid subId to update db but not the dummy subId which we want to set.
+
+Pass the subId when set data enabled to ensure that we can
+save the mobile_data value to db using the correct subId.
+
+Change-Id: I7c3944fa4c9922e66170e320742371374a034163
+CRs-fixed: 930649
+---
+ .../internal/telephony/dataconnection/DcTrackerBase.java | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/src/java/com/android/internal/telephony/dataconnection/DcTrackerBase.java b/src/java/com/android/internal/telephony/dataconnection/DcTrackerBase.java
+index b1423e7..8137ff8 100644
+--- a/src/java/com/android/internal/telephony/dataconnection/DcTrackerBase.java
++++ b/src/java/com/android/internal/telephony/dataconnection/DcTrackerBase.java
+@@ -835,7 +835,9 @@ public boolean getDataOnRoamingEnabled() {
+     public void setDataEnabled(boolean enable) {
+         Message msg = obtainMessage(DctConstants.CMD_SET_USER_DATA_ENABLE);
+         msg.arg1 = enable ? 1 : 0;
+-        if (DBG) log("setDataEnabled: sendMessage: enable=" + enable);
++        msg.arg2 = mPhone.getSubId();
++        if (DBG) log("setDataEnabled: sendMessage: enable=" + enable +
++                ", subId=" + mPhone.getSubId());
+         sendMessage(msg);
+     }
+ 
+@@ -986,8 +988,9 @@ public void handleMessage(Message msg) {
+             }
+             case DctConstants.CMD_SET_USER_DATA_ENABLE: {
+                 final boolean enabled = (msg.arg1 == DctConstants.ENABLED) ? true : false;
+-                if (DBG) log("CMD_SET_USER_DATA_ENABLE enabled=" + enabled);
+-                onSetUserDataEnabled(enabled);
++                final int subId = msg.arg2;
++                if (DBG) log("CMD_SET_USER_DATA_ENABLE enabled=" + enabled + ", subId=" + subId);
++                onSetUserDataEnabled(enabled, subId);
+                 break;
+             }
+             case DctConstants.CMD_SET_DEPENDENCY_MET: {
+@@ -1377,6 +1380,10 @@ public void cleanUpAllConnections(String cause) {
+     public abstract boolean isDisconnected();
+ 
+     protected void onSetUserDataEnabled(boolean enabled) {
++        onSetUserDataEnabled(enabled, mPhone.getSubId());
++    }
++
++    protected void onSetUserDataEnabled(boolean enabled, int subId) {
+         synchronized (mDataEnabledLock) {
+             if (mUserDataEnabled != enabled) {
+                 mUserDataEnabled = enabled;
+@@ -1385,8 +1392,7 @@ protected void onSetUserDataEnabled(boolean enabled) {
+                 if (TelephonyManager.getDefault().getSimCount() == 1) {
+                     Settings.Global.putInt(mResolver, Settings.Global.MOBILE_DATA, enabled ? 1 : 0);
+                 } else {
+-                    int phoneSubId = mPhone.getSubId();
+-                    Settings.Global.putInt(mResolver, Settings.Global.MOBILE_DATA + phoneSubId,
++                    Settings.Global.putInt(mResolver, Settings.Global.MOBILE_DATA + subId,
+                             enabled ? 1 : 0);
+                 }
+                 if (getDataOnRoamingEnabled() == false &&

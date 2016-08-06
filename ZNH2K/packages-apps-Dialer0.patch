@@ -1,0 +1,26 @@
+From 8e281d61fee979b092bcdf76fcc75b586d81f19d Mon Sep 17 00:00:00 2001
+From: Shammi Khattar <skhattar@codeaurora.org>
+Date: Wed, 16 Dec 2015 12:41:16 -0800
+Subject: [PATCH] Added permission READ_PRIVILEGED_PHONE_STATE.
+
+Added permission READ_PRIVILEGED_PHONE_STATE required by Dialer app
+to avoid crash while on certain networks.
+
+Change-Id: Ia15f731b45aba5ce7375429d07fcc2f926f9f69d
+CRs-Fixed:952135
+---
+ AndroidManifest.xml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/AndroidManifest.xml b/AndroidManifest.xml
+index 6b69bb7..59a7c92 100644
+--- a/AndroidManifest.xml
++++ b/AndroidManifest.xml
+@@ -40,6 +40,7 @@
+     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"/>
+     <uses-permission android:name="android.permission.NFC" />
+     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
++    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" />
+     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+     <uses-permission android:name="android.permission.MODIFY_PHONE_STATE" />
+     <uses-permission android:name="android.permission.WAKE_LOCK" />
