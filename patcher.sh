@@ -15,17 +15,11 @@ cd $ROM_TREE/frameworks/av
 git clean -f -d && git reset --hard
 cd $ROM_TREE/frameworks/base
 git clean -f -d && git reset --hard
-cd $ROM_TREE/frameworks/opt/telephony
-git clean -f -d && git reset --hard
-cd $ROM_TREE/packages/apps/Dialer
-git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Messaging
 git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Nfc
 git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Settings
-git clean -f -d && git reset --hard
-cd $ROM_TREE/packages/services/Telephony
 git clean -f -d && git reset --hard
 cd $ROM_TREE/system/core
 git clean -f -d && git reset --hard
@@ -36,11 +30,7 @@ cd $ROM_TREE
 
 ### Useful upstream patches not present on the branch in use
 patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $BRANCH/frameworks-base0.patch
-patch -d frameworks/opt/telephony		-p1 -s -N --no-backup-if-mismatch < $BRANCH/frameworks-opt-telephony0.patch
-patch -d frameworks/opt/telephony		-p1 -s -N --no-backup-if-mismatch < $BRANCH/frameworks-opt-telephony1.patch
-patch -d packages/apps/Dialer			-p1 -s -N --no-backup-if-mismatch < $BRANCH/packages-apps-Dialer0.patch
 patch -d packages/apps/Nfc			-p1 -s -N --no-backup-if-mismatch < $BRANCH/packages-apps-Nfc0.patch
-patch -d packages/services/Telephony		-p1 -s -N --no-backup-if-mismatch < $BRANCH/packages-services-Telephony0.patch
 
 # Special git binary diff patch
 cd packages/apps/Messaging
