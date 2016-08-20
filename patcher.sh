@@ -46,6 +46,11 @@ git clean -f -d && git reset --hard
 
 cd $ROM_TREE
 
+# Revert frameworks/opt/telephony commit to make frameworks-opt-telephony2.patch apply cleanly
+cd frameworks/opt/telephony
+git revert --no-edit --no-commit 5cde3d3f3fac3e0f7ceb6a9baec2f024d9f5843c
+cd $ROM_TREE
+
 ### Useful upstream patches not present on the branch in use
 patch -d build					-p1 -s -N --no-backup-if-mismatch < $BRANCH/build0.patch
 patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $BRANCH/frameworks-base0.patch
