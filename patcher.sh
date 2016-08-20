@@ -47,6 +47,7 @@ git clean -f -d && git reset --hard
 cd $ROM_TREE
 
 ### Useful upstream patches not present on the branch in use
+patch -d build					-p1 -s -N --no-backup-if-mismatch < $BRANCH/build0.patch
 patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $BRANCH/frameworks-base0.patch
 patch -d frameworks/native			-p1 -s -N --no-backup-if-mismatch < $BRANCH/frameworks-native0.patch
 patch -d frameworks/opt/telephony		-p1 -s -N --no-backup-if-mismatch < $BRANCH/frameworks-opt-telephony0.patch
@@ -67,9 +68,13 @@ patch -d packages/services/Telephony		-p1 -s -N --no-backup-if-mismatch < $BRANC
 patch -d packages/services/Telephony		-p1 -s -N --no-backup-if-mismatch < $BRANCH/packages-services-Telephony2.patch
 patch -d system/core				-p1 -s -N --no-backup-if-mismatch < $BRANCH/system-core0.patch
 
-# Special git binary diff patch
+# Special git binary diff patches
 cd packages/apps/Messaging
 git apply $BRANCH/packages-apps-Messaging0.patch
+cd $ROM_TREE
+
+cd vendor/cm
+git apply $BRANCH/vendor-cm0.patch
 cd $ROM_TREE
 
 ### Custom patches
