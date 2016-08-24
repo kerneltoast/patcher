@@ -96,6 +96,7 @@ patch -d packages/apps/Settings			-p1 -s -N --no-backup-if-mismatch < $CUSTOM/pa
 patch -d packages/apps/Settings			-p1 -s -N --no-backup-if-mismatch < $CUSTOM/packages-apps-Settings1.patch
 patch -d system/core				-p1 -s -N --no-backup-if-mismatch < $CUSTOM/system-core0.patch
 patch -d system/core				-p1 -s -N --no-backup-if-mismatch < $CUSTOM/system-core1.patch
+patch -d system/core				-p1 -s -N --no-backup-if-mismatch < $CUSTOM/system-core2.patch
 
 # Get APN list from nightly branch and apply patch on top
 curl -s $APN_LIST_URL > vendor/cm/prebuilt/common/etc/apns-conf.xml
