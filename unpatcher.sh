@@ -17,6 +17,8 @@ cd $ROM_TREE/packages/apps/CellBroadcastReceiver
 git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Dialer
 git clean -f -d && git reset --hard
+cd $ROM_TREE/packages/apps/Eleven
+git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/InCallUI
 git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Messaging
