@@ -9,6 +9,8 @@ cd $ROM_TREE/frameworks/av
 git clean -f -d && git reset --hard
 cd $ROM_TREE/frameworks/base
 git clean -f -d && git reset --hard
+cd $ROM_TREE/packages/apps/Eleven
+git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Messaging
 git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Nfc
