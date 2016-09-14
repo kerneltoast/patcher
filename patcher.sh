@@ -48,9 +48,14 @@ git clean -f -d && git reset --hard
 
 cd $ROM_TREE
 
-# Revert frameworks/opt/telephony commit to make frameworks-opt-telephony2.patch apply cleanly
+# Revert duplicate commits to make squashed patches apply cleanly
 cd frameworks/opt/telephony
+git revert --no-edit --no-commit 617c077a51c0fd785f978f376da7d0c894b7573f
 git revert --no-edit --no-commit 5cde3d3f3fac3e0f7ceb6a9baec2f024d9f5843c
+cd $ROM_TREE
+
+cd packages/apps/Stk
+git revert --no-edit --no-commit d15e3e7ff1d954420b4c6cb4a6e1fbbcf938c4de
 cd $ROM_TREE
 
 ### Useful upstream patches not present on the branch in use
@@ -60,7 +65,6 @@ patch -d frameworks/native			-p1 -s -N --no-backup-if-mismatch < $BRANCH/framewo
 patch -d frameworks/opt/telephony		-p1 -s -N --no-backup-if-mismatch < $BRANCH/frameworks-opt-telephony0.patch
 patch -d frameworks/opt/telephony		-p1 -s -N --no-backup-if-mismatch < $BRANCH/frameworks-opt-telephony1.patch
 patch -d frameworks/opt/telephony		-p1 -s -N --no-backup-if-mismatch < $BRANCH/frameworks-opt-telephony2.patch
-patch -d frameworks/opt/telephony		-p1 -s -N --no-backup-if-mismatch < $BRANCH/frameworks-opt-telephony3.patch
 patch -d packages/apps/CellBroadcastReceiver	-p1 -s -N --no-backup-if-mismatch < $BRANCH/packages-apps-CellBroadcastReceiver0.patch
 patch -d packages/apps/Dialer			-p1 -s -N --no-backup-if-mismatch < $BRANCH/packages-apps-Dialer0.patch
 patch -d packages/apps/InCallUI			-p1 -s -N --no-backup-if-mismatch < $BRANCH/packages-apps-InCallUI0.patch
@@ -106,6 +110,7 @@ curl -s $APN_LIST_URL > vendor/cm/prebuilt/common/etc/apns-conf.xml
 # Revert media key patches to Eleven, as Eleven randomly starts playing
 # music with them when no headset is plugged in
 cd $ROM_TREE/packages/apps/Eleven
+git revert --no-edit --no-commit 89f5a4d2c22bd1d2c17500fcee6a37e2754aff49
 git revert --no-edit --no-commit 675ece946691185f1a2877b2880f933a417f03df
 git revert --no-edit --no-commit c7f1f86ff59b739af1193df837b0aadf7a2386ce
 git revert --no-edit --no-commit 815e4d86dc19e623b32366b035d027a3ffa169fa

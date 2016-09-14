@@ -1,1886 +1,344 @@
-From f58b9f1caede119cc11c0d0ef1411519240b4bc3 Mon Sep 17 00:00:00 2001
+From cbf03eb61939bcba96cdc77ef5d7eb29bb3f3a79 Mon Sep 17 00:00:00 2001
 From: Sultanxda <sultanxda@gmail.com>
-Date: Thu, 28 Jul 2016 13:45:57 -0700
+Date: Mon, 1 Aug 2016 21:45:26 -0700
 Subject: [PATCH] Squashed commit of the following:
 
-commit 9f4f4beef60b29a7611688bda81c78119ddedde3
-Author: Altaf-Mahdi <altaf.mahdi@gmail.com>
-Date:   Sun Jun 26 23:40:17 2016 +0100
+commit 9122c16069c9368076ef710649a9a6cf53991816
+Author: Roman Birg <roman@cyngn.com>
+Date:   Wed Jun 22 15:56:59 2016 -0700
 
-    Subscription updater: don't post messages on events in BroadcastReceiver
+    Ims: remove use of old nonexistant qti constant
 
-    * for dual sim devices with 2 sims inserted, this fixes sims not
-      being detected on boot when QTI telephony extension is present.
+    Change-Id: I4668d4f810014ad317191c9dd37cd71b04bdb56a
+    Signed-off-by: Roman Birg <roman@cyngn.com>
 
-    Change-Id: I478b150055f21d210ccba7459f55ff75786e4723
-
-commit 3b24907c2bb11199c3a9bb3d1f9b74ae8629428b
-Author: kaiyiz <kaiyiz@codeaurora.org>
-Date:   Mon Nov 10 16:32:27 2014 +0800
-
-    TelephonyProvider: Add CDMA call forwarding/waiting function
-
-    There isn't CDMA call forwarding and waiting function.
-
-    Add CDMA call forwarding/waiting function.
-
-    CRs-Fixed: 748144
-
-    Change-Id: Ic817678c6973ba6bdf8378481e6e71b3ed23af23
-
-commit c49c7446bcc3a074851862fc017de61931131739
-Author: Steve Kondik <steve@cyngn.com>
-Date:   Fri Jul 1 04:52:40 2016 -0700
-
-    dct: Sync with upstream
-
-    Change-Id: I3193a98e61e3bef2e496b4caba476a219cbdf3d2
-
-commit 8ea51be3ad25c0b507db031db0147155272130ce
-Author: Sandeep Gutta <sangutta@codeaurora.org>
-Date:   Mon Apr 4 12:23:57 2016 +0530
-
-    MSIM: Send FINISH request on flex map START fail
-
-    When flex map START request fails
-    send FINISH with failure status.
-
-    - While sending FINISH pass new RAF/modem Uuid
-     if overall request is success.
-
-    - Treat null radio capability response received for
-     phase finish due to SSR as valid.
-
-    Change-Id: Iad23b8a0d72430bc22e3b7f8c576370cbb4eae5f
-    CRs-Fixed: 1001601
-
-commit 3e12eb4dbb2323bb50ca9c6595b2520e16598e1e
-Author: Umashankar Godachi <umasha@codeaurora.org>
-Date:   Mon Apr 18 19:58:07 2016 +0530
-
-    Set additional info for LaunchBrowser error case.
-
-    A recent change in 3GPP TS 31.124 27.22.4.26 spec for
-    LAUNCH BROWSER SEQ 1.6. expects an additional info
-    'Default URL unavailable' incase where default url
-    is not set.
-
-    Fix: In CatService, while handling the Launch Browser
-    error response include the additonal info 'Default
-    URL unavailable'.
-
-    3GPP Ref link:
-    http://www.etsi.org/deliver/etsi_ts/131100_131199/131124/
-    13.02.00_60/ts_131124v130200p.pdf
-
-    Change-Id: Idb80c1b8f36749a0ad6e5d53c7a4ac693917d884
-    CRs-Fixed: 1002699
-
-commit 83ffc486fd82310e0f010c873951a8192dd653b8
-Author: Yashdev Singh <yashdevs@codeaurora.org>
-Date:   Wed Apr 27 14:56:11 2016 -0700
-
-    Telephony: Reduce back to back same APN activation delay.
-
-    - The default delay to activate same APN in quick succession is
-      20 seconds.
-    - Some application like embms may want to activate APN quickly
-      in short burst. Current 20 seconds would result in artificial
-      delays in such applications.
-    - Hence changing the default delay value to be equivalent of
-      fail-fast delay which is 3 seconds.
-
-    Change-Id: I792c9697e8ff2d90ec0e9bf2fda8ccf1b3dd9074
-
-commit 4cc7ede0602603151de740ba042f91cb0923f6b5
-Author: Susheel nyamala <snyamala@codeaurora.org>
-Date:   Mon Feb 1 19:09:08 2016 +0530
-
-    Fix emergency ims pdn setup issue
-
-    Add network capability EIMS for emergency apn type
-
-    Change-Id: I6ddc23c656fb2fc8e208f093879a2b5b1bc9f701
-    CRs-Fixed: 984318
-
-commit 09ca1bb16eabefb09dc50d94ff00463f6ed79fa0
-Author: Susheel nyamala <snyamala@codeaurora.org>
-Date:   Thu Apr 7 13:11:07 2016 +0530
-
-    Fix ims pdn issue on non dds sub on iwlan
-
-    Set Dds flag if top sub id doesnt match dds sub id.
-    Allow Dds switch in iwlan, only if dds flag is set.
-
-    Change-Id: I39695cf11b27fcffe222620ce0ea0ac046bc9683
-    CRs-Fixed: 998685
-
-commit 4a6e7c5d98a223cb5642107a011413d4e101c18b
-Author: Ravindra <c_rthat@codeaurora.org>
-Date:   Mon Mar 14 16:29:35 2016 +0530
-
-    Fix to resolve data call issue for sim hot swap case
-
-    Update the setting for MOBILE_DATA irrespective of mUserDataEnabled
-    memeber varible because there are scenarios where the value of this
-    variable will be true for dummy subId which prevents updating the
-    actual value to data base.
-
-    Change-Id: I3324703c6c1df76a3b5ffc505ea8239d2c1c9bad
-    CRs-Fixed: 990158
-
-commit a9d7209ff06367252fdd827f4bac051c1a38ffb3
-Author: Ravindra Thattahalli Javaraiah <c_rthat@codeaurora.org>
-Date:   Tue Dec 8 18:35:17 2015 +0530
-
-    Notify disconnect on phone dispose
-
-    While disposing a phone object if there are any active connections then
-    notify disconnect to the registrants to update the ui.
-
-    Change-Id: I74a3d5c9e3919083a786df43053b2b70ad9deb15
-    CRs-Fixed: 954722
-
-commit e93e6b5ade17936021e5ef69f4bd82c44cb701b8
-Author: Dheeraj Shetty <dshetty@codeaurora.org>
-Date:   Wed Apr 13 20:55:54 2016 -0700
-
-    Use EVS codec for HD if carrier supports it.
-
-    If the audio codec is EVS_WB, EVS_NWB or EVS_FB and the carrier
-    config to use HD for EVS codec is set to true, then set HD to true.
-
-    Change-Id: I5550e6c9660c0ccd25418a33c44ee2c71ddd47b9
-    CRs-fixed: 986961
-
-commit a8208a51278a86fe62a5187d4a93c3e59f49b521
-Author: Susheel nyamala <snyamala@codeaurora.org>
-Date:   Wed Mar 23 23:44:11 2016 +0530
-
-    Fix Dds switch issue for wifi and IWLAN scenarios
-
-    In wifi on case, internet requests are released and there are
-    no oustanding requests to process, so user triggered Dds switch will
-    be blocked. Add a dummy network request to force Dds switch.
-
-    If IWLAN is reported on non dds sub, move state machine to Attached
-    state, to process any on demand network requests possible over IWLAN
-
-    Change-Id: I38a917906808511705eedb7d39534781759296cb
-    CRs-Fixed: 993272
-
-commit b6d95be167664c9bc81bfbb0d1f487f2926cbf84
-Author: Ravindra <c_rthat@codeaurora.org>
-Date:   Thu Apr 7 16:41:18 2016 +0530
-
-    Fix to avoid unnecessary PS attach.
-
-    When data attach event is received in IDLE state send
-    PS attach only if the attached RAT is CDMA.
-
-    Change-Id: Id4b1b8267f7052101eaea115e49849b4a09cd694
-    CRs-Fixed: 995959 963959
-
-commit fea40e5c879a0173a8822e9d44c4810602ca58cb
-Author: Susheel nyamala <snyamala@codeaurora.org>
-Date:   Wed Apr 6 17:44:27 2016 +0530
-
-    Fix ims pdn request issue
-
-    Make onSubInfoReady protected for inheritance
-
-    Change-Id: Ifa8763909cf4e0d636e73fbdd952e8ce2d4eec95
-
-commit cbaa8d31506c2843ae8c549bc3dff9743300c531
-Author: Yujing Gu <guy@codeaurora.org>
-Date:   Tue Mar 29 17:27:25 2016 +0800
-
-    Parse the record number from byte to int
-
-    ADN won't be retrieved correctly if the record number is more
-    than 127. Need to Parse the record number from byte to int.
-
-    Change-Id: I0b324c3a0ca0fff07609b84079541d2099b964cc
-    CRs-Fixed: 985649
-
-commit ce2ca072fee674bcf7e53ceb3367c8643869cee2
-Author: pengfeix <pengfeix@codeaurora.org>
-Date:   Tue Apr 12 13:13:21 2016 +0800
-
-    Finer grained character boundaries in computing SMS fragment lengths
-
-    The standard Java character iterator has potentially unbounded
-    distance between character boundaries, meaning that when
-    breaking an SMS message into fragments it's not safe to assume that
-    the fragment will contain such a boundary. This patch
-    special-cases flags (pairs of Regional Indicator Symbols) and also
-    guarantees some progress in the case of no boundary found.
-
-    Change-Id: I35990b44ad72887e1fdd436223808e18b04bd578
-    CRs-Fixed: 994916
-
-commit b3571da33cd77218deb382374bddb8a043f27383
-Author: Sandeep Gutta <sangutta@codeaurora.org>
-Date:   Thu Dec 31 09:01:45 2015 +0530
-
-    MSIM: Use SIM specific subId for setMccMnc
-
-    While updating MccMnc value use the subId corresponds
-    to the SIM slotId.
-
-    Change-Id: Ifd7295a264f48e1210d87cb83ac76f5ad46df356
-    CRs-Fixed: 956103
-
-commit 8b477da8c8c30195b307303c392a857695ddc04e
-Author: Suchand Ghosh <suchan@codeaurora.org>
-Date:   Mon Mar 21 12:35:47 2016 +0530
-
-    IMS: Fix phone app crash at setOutgoingCallerIdDisplay().
-
-    Phone process crash due to duplicate callback received at
-    GsmPhone when launch additional call settings and click on
-    Caller ID->Hide number.
-    Correct logic to receive messge EVENT_SET_CLIR_COMPLETE by
-    the requested phone (GsmPhone or ImsPhone), not by both.
-
-    Change-Id: Iec19577b7bf567c769089c40c05c656754b694ae
-    CRs-Fixed: 990931
-
-commit 0f88ef6b7d8f96d7fae7b628d71b6aece8d586ba
+commit 8e0b6eeafda163aa014a77ea4c75dc6d906b782a
 Author: Muhammed Siju <msiju@codeaurora.org>
-Date:   Fri Mar 11 13:26:23 2016 +0530
+Date:   Thu May 19 14:28:43 2016 +0530
 
-    Fix DDS switch issues for CDMA and IWLAN scenarios.
+    IMS-VT: Remove unused QTI_IMS_CALL_RAT_EXTRA_KEY extra.
 
-    Maintain data allowed flags for each phone, based on the
-    current DDS switch scenerio. Ignore ATTACHed event in DcSSM
-    IdleState, if data is not allowed on that phone.
-    This helps to prevent unnecessary ALLOW_DATA(T) requests
-    when CDMA or IWLAN data registration is reported after PS
-    detach is initiated for the phone. It also helps to avoid
-    wrong DDS switch in case of race condition between PS detach
-    and data registration indication.
+    QTI_IMS_CALL_RAT_EXTRA_KEY is being replaced by
+    ImsCallProfile.EXTRA_CALL_RAT_TYPE.
 
-    Change-Id: I4bb1923e39182dd3df80207fcd6841273c67d75c
-    CRs-Fixed: 986052
+    Change-Id: I8e418fb1166783b35a65c010abec63e915781713
+    CRs-Fixed: 1000005
 
-commit 7e642723d7bb97b4074f8f2962a51b38a7aa529b
-Author: Yujing Gu <guy@codeaurora.org>
-Date:   Mon Nov 16 17:45:52 2015 +0800
+commit 9e3df8a9a770af78e068dd912e1f561a36772913
+Author: Omkar Kolangade <omkark@codeaurora.org>
+Date:   Wed Feb 24 09:22:25 2016 -0800
 
-    Add the slot id when broadcasting card state to STK app.
+    IMS: Encrypted Calling Extras Key Definition
 
-    Add the slot id when broadcasting card state to STK app.
+    Adding a key String that will be used to
+    1. Pack and unpack encryption status/preference,
+       in the dial/start API.
+    2. Pack and unpack the encryption status in the
+       ImsCallProfile's extras Bundle.
 
-    Change-Id: Iad6df264a0223c5097a1983ae13911485a6d269e
+    Change-Id: I29ba8f384d04acb4c9bab4730e50e9f9bc17f84e
+    CRs-Fixed: 978178
 
-commit 0dbab41dd234c211a7322e5a6f1a794580ecba44
-Author: Susheel nyamala <snyamala@codeaurora.org>
-Date:   Wed Feb 24 21:04:51 2016 +0530
+commit 079b0b5f2f00c51ea5f768661442e70f376bc2e4
+Author: Anju Mathapati <anjucm@codeaurora.org>
+Date:   Wed Feb 10 10:36:25 2016 -0800
 
-    Fix default data reset issue on device powerup
+    IMS: Interface change for VOPS and SSAC
 
-    Subinfo null check is leading to default data call reset.
-    Replace it with sim state check.
+    Add a new api for clients to query vops and
+    ssac status
 
-    Change-Id: I64c255c667e7ed667e004b361c0a68e507b30e5d
-    CRs-Fixed: 980485
+    Change-Id: I9999f6bbe1954981e20212cfcbfe8a21cf80a35e
+    CRs-Fixed: 965993
 
-commit 1e4c0b0eeeb3d966c5da4e137b1af09568edc566
-Author: Wileen Chiu <wileenc@codeaurora.org>
-Date:   Mon Feb 22 13:11:31 2016 -0800
-
-    Send shutdown command to modem
-
-    - The shutdown command is not sent to
-    the modem for a graceful shutdown when
-    the modem is in offline state in which,
-    the RADIO_POWER off request is rejected
-    - Send the shutdown command as soon as
-    the device has been given a chance to
-    power down the radio
-
-    Change-Id: I2fc2eae04918f3927e93924f6ae7b3e19f920de2
-    CRs-Fixed: 977534
-
-commit 8b4ba43ce0732e6fac4b95b028f999de713e0ed3
-Author: Huaibin Yang <huaibiny@codeaurora.org>
-Date:   Mon Jan 25 13:49:06 2016 -0800
-
-    Telephony: CDMA: allow MT SMS when in ECBM
-
-    Currently CDMA telephony ignores MT SMS when phone is in Emergency
-    Callback Mode (ECBM), so app layer won't be able to receive SMS. This
-    may not be desired when a carrier requires app to receive MT SMS in
-    ECBM. This change allows ECBM MT SMS from ril on telephony side.
-
-    CRs-Fixed: 948338
-    Change-Id: I43cd4fd97bdede931864ef29cfc65c7e0573c022
-
-commit eec0d6166faae45bfd574d0887cdcfafe4eeca05
+commit bee587bdaa465739a31ff34e9652e13a0fed613d
 Author: Suresh Kumar Sugguna <sureshk@codeaurora.org>
-Date:   Thu Dec 10 22:14:10 2015 +0530
+Date:   Fri Oct 16 18:09:19 2015 +0530
 
-    IMS: Exit ECBM before dialing a pending non-emergency MO call
+    IMS: Explicit call transfer feature
 
-    When the device is in Emergency CallBack Mode, then exit the
-    ECBM before dialing a pending non-emergency mobile originating call.
+    Code changes to support IMS explicit call transfer feature.
 
-    Change-Id: I7f24b9cadb83351965b00cf17be0fb061197ac43
-    CRs-Fixed: 948702
-
-commit 28678cf38af0dd3d01f6e3df6db6b286ab11807b
-Author: Benergy Meenan Ravuri <bravuri@codeaurora.org>
-Date:   Thu Dec 31 17:37:17 2015 +0530
-
-    IMS: Fix null pointer exception for call forwarding
-
-    Check if ICCrecords are present, before setting the call forwarding
-    flag in ICCrecrods.
-
-    Change-Id: I7fe632acd4a9b42caf8c8bf6fee7d2cd97c41102
-    CRs-Fixed: 955679
-
-commit 35b357b911ebb9eac4ff4f3b003797b243cc25ac
-Author: Sukanya Rajkhowa <srajkh@codeaurora.org>
-Date:   Fri Dec 18 14:48:26 2015 -0800
-
-    Setup data on new APNs only when APN changes
-
-    - If new records are loaded due to RAT change 1x->LTE or vice versa,
-      connections need to be restarted
-    - If CDMA subscription change event is received, APN list needs to be
-      created before setting up data call
-    - For all other cases, setup data connections if there is also a change
-      in APN
-
-    CRs-Fixed: 960246
-
-    Change-Id: I5093f506daed8b8d5e8a1fd5220043d0cd55918c
-
-commit 31cadbe401e8396b1acd82fd56ef65d08cf64db6
-Author: Sandeep Kunta <skunta@codeaurora.org>
-Date:   Tue Sep 9 18:24:05 2014 +0530
-
-    MSIM: Fix ECBM dialog issue in G+C
-
-    Fix ECBM dialog issue by setting ECM mode property value
-     as single SIM instead of comma separation in MSIM.
-
-    Change-Id: I7bb3c169dc0e0216afbf773236e4d08fda33a0c0
-    CRs-Fixed: 732984
-
-commit fe0a2f2629ff6f7d3b61025513b7ad499b9b5e2e
-Author: Richard LIU <richardl@codeaurora.org>
-Date:   Wed Nov 18 19:32:52 2015 +0800
-
-    Do not set "gsm.operator.idpstring" per phoneId
-
-    Do not set "gsm.operator.idpstring" per phoneId, otherwise
-    PhoneNumberUtils could not get the right value
-
-    Change-Id: I540846d9208f84ff48b6830d45c66abfb16a8a54
-
-commit 2a2094e8f054e21d09193e69ddb4f2cb57a7dea2
-Author: Andalam Parthasarathi <andala@codeaurora.org>
-Date:   Mon Nov 23 18:19:13 2015 +0530
-
-    Telephony: Config values for other languages
-
-    Added config strings for spanish and portuguese
-    languages.
-
-    Change-Id: Ifef59f4fafec455c976ab684fb6f0aa440214275
-    CRs-Fixed: 943387
-
-commit 200c49557fd2f2c1452403858ab32ef6e41f77a8
-Author: David Ng <dave@codeaurora.org>
-Date:   Wed Dec 9 22:06:47 2015 -0800
-
-    Revert "updateSpnDisplay: When PLMN values are same for before & after SIM loading in."
-
-    This reverts commit e85f0481135dd33c0e3392e16796add80de44eeb.
-
-    Conflicts:
-    	src/java/com/android/internal/telephony/cdma/CdmaServiceStateTracker.java
-
-    Change-Id: I83054b1549e1a1c29cc56e17bdec1942cee546a9
-
-commit 9a69cada259f987ba69757782c5d049113397a59
-Author: Wileen Chiu <wileenc@codeaurora.org>
-Date:   Fri Nov 6 17:11:41 2015 -0800
-
-    Check subid when querying network selection
-
-    - Manual network selection is not supported for all
-    global modes, and will automatically switch to automatic
-    for unsupported modes
-    - when checking if manual network selection is supported,
-    we do not check if the subid is active, and the default
-    network mode is used for DUMMY SUBIDs instead
-    - If the subid is not active, use the network mode
-    associated with the phone id instead
-
-    Change-Id: I955de159990fab59f7d48f4900c615580763417b
-    CRs-Fixed: 936605
-
-commit 3139447fe6d7b569563b34c0f4a28188e5560a6d
-Author: Umashankar Godachi <umasha@codeaurora.org>
-Date:   Thu Oct 8 21:16:27 2015 +0530
-
-    FR29338: Read SIM Contacts from EF-ADN if EF-PBR read failed.
-
-    Currently on a USIM UICC card, contacts are read from EF-PBR.
-    If EF-PBR file is absent or the read failed, no contacts displayed.
-    This requirement will add the support for reading SIM contacts from
-    EF-ADN, if EF-PBR read failed.
-
-    Fix: In IccPhoneBookInterfaceManager, while loading the records check
-    for EF-PBR present. If EF-PBR is absent, treat the card as 2g and
-    reload the records from EF-ADN.
-
-    Add code to check if EF-PBR is present in UsimPhoneBookManager.
-
-    Change-Id: I55ef0541789cd5958da26cd18b070a46d75d78b0
-
-commit 07d7e4536b6f1a15ee6263bfd656bb4afdcf2a18
-Author: Umashankar Godachi <umasha@codeaurora.org>
-Date:   Thu Oct 22 12:02:20 2015 +0530
-
-    Fix ADN records loading removing EFEXT1 dependency.
-
-    Currently if EFEXT1 file is not present on a card a
-    runtime exception is thrown, and ADN records are not
-    loaded.
-
-    Fix: Allow ADN records loading even if EFEXT1 file is
-    not present by not throwing runtime exception.
-    Also in AdnRecordCache, find the free EXT1 record and
-    pass it to updateEF method, inorder to add the contact
-    with number greater than 20 in size.
-
-    Change-Id: Ibce813f259a1b734c57d15b98d7ac98d7f553bb4
-    CRs-Fixed: 927889
-
-commit f567219cd29a672f1cfbff63e43303a1d2648b12
-Author: Sridhar Dubbaka <sdubbaka@codeaurora.org>
-Date:   Tue Sep 22 22:13:39 2015 +0530
-
-    Add channel 60 Cellboradcast support.
-
-    Add channel 60 Cellboradcast support.
-
-    Change-Id: I9790fc7f952b8f471b1446555b9b98fac8c9bee6
-
-Change-Id: I93560194e1b28c0cebfdb258bd1a0434128f155f
+    Change-Id: I45547cfd0679ca6850a430579a48aee0b7ab6290
+    CRs-Fixed: 897726
 ---
- resources/res/values-es-rUS/config.xml             |  37 ++++++
- resources/res/values-pt-rPT/config.xml             |  36 ++++++
- src/java/android/provider/Telephony.java           |  33 +++++-
- .../telephony/IccPhoneBookInterfaceManager.java    |  15 ++-
- .../com/android/internal/telephony/PhoneBase.java  |   5 +-
- .../internal/telephony/ProxyController.java        |  13 ++-
- .../internal/telephony/ServiceStateTracker.java    |  11 ++
- .../android/internal/telephony/SmsMessageBase.java |  21 +++-
- .../internal/telephony/SubscriptionController.java |   2 +
- .../telephony/SubscriptionInfoUpdater.java         |  16 +--
- .../android/internal/telephony/cat/CatService.java |  10 +-
- .../android/internal/telephony/cdma/CDMAPhone.java |   4 +-
- .../internal/telephony/cdma/CdmaCallTracker.java   |   6 +
- .../telephony/cdma/CdmaInboundSmsHandler.java      |  17 ---
- .../telephony/cdma/CdmaServiceStateTracker.java    |  12 +-
- .../telephony/dataconnection/DataConnection.java   |   4 +
- .../dataconnection/DcSwitchStateMachine.java       |  36 +++++-
- .../telephony/dataconnection/DcTracker.java        |   7 +-
- .../telephony/dataconnection/DcTrackerBase.java    |  18 +--
- .../telephony/dataconnection/DctController.java    | 127 ++++++++++++++-------
- .../android/internal/telephony/gsm/GSMPhone.java   |   8 +-
- .../internal/telephony/gsm/GsmCallTracker.java     |   6 +
- .../telephony/gsm/GsmServiceStateTracker.java      |   2 +-
- .../telephony/gsm/UsimPhoneBookManager.java        |  24 ++--
- .../telephony/imsphone/ImsPhoneCallTracker.java    |  46 +++++++-
- .../telephony/imsphone/ImsPhoneConnection.java     |  43 ++++++-
- .../internal/telephony/uicc/AdnRecordCache.java    |  19 ++-
- .../internal/telephony/uicc/AdnRecordLoader.java   |  41 +++----
- .../internal/telephony/uicc/SIMRecords.java        |   7 +-
- 29 files changed, 471 insertions(+), 155 deletions(-)
- create mode 100644 resources/res/values-es-rUS/config.xml
- create mode 100644 resources/res/values-pt-rPT/config.xml
+ resources/res/values/config.xml                    |  3 ++
+ .../telephony/imsphone/ImsPhoneConnection.java     |  6 +--
+ .../codeaurora/ims/qtiims/IQtiImsInterface.aidl    | 30 +++++++++++++
+ .../ims/qtiims/IQtiImsInterfaceListener.aidl       | 33 ++++++++++++++-
+ .../qtiims/QtiImsInterfaceListenerBaseImpl.java    | 26 +++++-------
+ .../ims/qtiims/QtiImsInterfaceUtils.java           | 49 ++++++++++++++++++++--
+ 6 files changed, 124 insertions(+), 23 deletions(-)
 
-diff --git a/resources/res/values-es-rUS/config.xml b/resources/res/values-es-rUS/config.xml
-new file mode 100644
-index 0000000..73df57c
---- /dev/null
-+++ b/resources/res/values-es-rUS/config.xml
-@@ -0,0 +1,37 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<!-- Copyright (c) 2015, The Linux Foundation. All rights reserved.
+diff --git a/resources/res/values/config.xml b/resources/res/values/config.xml
+index 4bb6822..d36b3a3 100644
+--- a/resources/res/values/config.xml
++++ b/resources/res/values/config.xml
+@@ -48,4 +48,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     <string name="telephony_plugin_jar_name" translatable="false"></string>
+     <!--Fully qualified class name of telephony extended plugin.-->
+     <string name="telephony_plugin_class_name" translatable="false"></string>
 +
-+Redistribution and use in source and binary forms, with or without
-+modification, are permitted provided that the following conditions are
-+met:
-+    * Redistributions of source code must retain the above copyright
-+      notice, this list of conditions and the following disclaimer.
-+    * Redistributions in binary form must reproduce the above
-+      copyright notice, this list of conditions and the following
-+      disclaimer in the documentation and/or other materials provided
-+      with the distribution.
-+    * Neither the name of The Linux Foundation nor the names of its
-+      contributors may be used to endorse or promote products derived
-+      from this software without specific prior written permission.
-+
-+THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
-+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
-+ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
-+BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-+BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
-+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+-->
-+
-+<!-- These resources are around just to allow their values to be customized
-+     for different hardware and product builds.  Do not translate. -->
-+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-+    <!-- pdp data reject dialog string for cause 29 and 33 -->
-+    <string name="data_conn_status_title" translatable="false"></string>
-+    <string name="user_authentication_failed" translatable="false"></string>
-+    <string name="service_not_subscribed" translatable="false"></string>
-+</resources>
-diff --git a/resources/res/values-pt-rPT/config.xml b/resources/res/values-pt-rPT/config.xml
-new file mode 100644
-index 0000000..ac287f5
---- /dev/null
-+++ b/resources/res/values-pt-rPT/config.xml
-@@ -0,0 +1,36 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<!-- Copyright (c) 2015, The Linux Foundation. All rights reserved.
-+
-+Redistribution and use in source and binary forms, with or without
-+modification, are permitted provided that the following conditions are
-+met:
-+    * Redistributions of source code must retain the above copyright
-+      notice, this list of conditions and the following disclaimer.
-+    * Redistributions in binary form must reproduce the above
-+      copyright notice, this list of conditions and the following
-+      disclaimer in the documentation and/or other materials provided
-+      with the distribution.
-+    * Neither the name of The Linux Foundation nor the names of its
-+      contributors may be used to endorse or promote products derived
-+      from this software without specific prior written permission.
-+
-+THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
-+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
-+ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
-+BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-+BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
-+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+-->
-+
-+<!-- These resources are around just to allow their values to be customized
-+     for different hardware and product builds.  Do not translate. -->
-+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-+    <!-- SDN related strings -->
-+    <string name="sdn" translatable="false"></string>
-+    <string name="summary_sdn" translatable="false"></string>
-+</resources>
-diff --git a/src/java/android/provider/Telephony.java b/src/java/android/provider/Telephony.java
-index 0fc49a1..6a5bc82 100644
---- a/src/java/android/provider/Telephony.java
-+++ b/src/java/android/provider/Telephony.java
-@@ -3102,7 +3102,6 @@ public final class Telephony {
-          * The content:// style URL for this table
-          */
-         public static final Uri CONTENT_URI =
--
-                 Uri.parse("content://blacklist");
- 
-         /**
-@@ -3163,4 +3162,36 @@ public final class Telephony {
-          */
-         public static final String MESSAGE_MODE = "message";
-     }
-+
-+    /**
-+     * @hide
-+     */
-+    public static final class CdmaCallOptions implements BaseColumns {
-+        /**
-+         * The content:// style URL for this table
-+         */
-+        public static final Uri CONTENT_URI =
-+                Uri.parse("content://cdma/calloption");
-+
-+        /**
-+         * The default sort order for this table
-+         */
-+        public static final String DEFAULT_SORT_ORDER = "name ASC";
-+
-+        public static final String NAME = "name";
-+
-+        public static final String MCC = "mcc";
-+
-+        public static final String MNC = "mnc";
-+
-+        public static final String NUMERIC = "numeric";
-+
-+        public static final String NUMBER = "number";
-+
-+        public static final String TYPE = "type";
-+
-+        public static final String CATEGORY = "category";
-+
-+        public static final String STATE = "state";
-+    }
- }
-diff --git a/src/java/com/android/internal/telephony/IccPhoneBookInterfaceManager.java b/src/java/com/android/internal/telephony/IccPhoneBookInterfaceManager.java
-index b495e61..085c4e2 100644
---- a/src/java/com/android/internal/telephony/IccPhoneBookInterfaceManager.java
-+++ b/src/java/com/android/internal/telephony/IccPhoneBookInterfaceManager.java
-@@ -51,6 +51,7 @@ public abstract class IccPhoneBookInterfaceManager {
-     protected final Object mLock = new Object();
-     protected int mRecordSize[];
-     protected boolean mSuccess;
-+    private   boolean mForceAdnUsage = false;
-     protected List<AdnRecord> mRecords;
- 
- 
-@@ -139,6 +140,7 @@ public abstract class IccPhoneBookInterfaceManager {
-         if (mRecords != null) {
-             mRecords.clear();
-         }
-+        mForceAdnUsage = false;
-     }
- 
-     public void updateIccRecords(IccRecords iccRecords) {
-@@ -328,13 +330,13 @@ public abstract class IccPhoneBookInterfaceManager {
-                     "Requires android.permission.READ_CONTACTS permission");
-         }
- 
--        efid = updateEfForIccType(efid);
--        if (DBG) logd("getAdnRecordsInEF: efid=" + efid);
--
-         synchronized(mLock) {
-             checkThread();
-             AtomicBoolean status = new AtomicBoolean(false);
-             Message response = mBaseHandler.obtainMessage(EVENT_LOAD_DONE, status);
-+            efid = updateEfForIccType(efid);
-+            if (DBG) logd("getAdnRecordsInEF: efid=" + efid);
-+
-             if (mAdnCache != null) {
-                 mAdnCache.requestLoadAllAdnLike(efid,
-                         mAdnCache.extensionEfForEf(efid), null, response);
-@@ -342,6 +344,11 @@ public abstract class IccPhoneBookInterfaceManager {
-             } else {
-                 loge("Failure while trying to load from SIM due to uninitialised adncache");
-             }
-+            if (mRecords == null && efid == IccConstants.EF_PBR && !mAdnCache.isPbrPresent()) {
-+                logd("getAdnRecordsInEF: Load from EF_ADN as pbr is not present");
-+                mForceAdnUsage = true;
-+                return getAdnRecordsInEf(IccConstants.EF_ADN);
-+            }
-         }
-         return mRecords;
-     }
-@@ -383,7 +390,7 @@ public abstract class IccPhoneBookInterfaceManager {
- 
-     private int updateEfForIccType(int efid) {
-         // Check if we are trying to read ADN records
--        if (efid == IccConstants.EF_ADN) {
-+        if (efid == IccConstants.EF_ADN && !mForceAdnUsage) {
-             if (mPhone.getCurrentUiccAppType() == AppType.APPTYPE_USIM ||
-                     mPhone.getCurrentUiccAppType() == AppType.APPTYPE_CSIM) {
-                 return IccConstants.EF_PBR;
-diff --git a/src/java/com/android/internal/telephony/PhoneBase.java b/src/java/com/android/internal/telephony/PhoneBase.java
-index ed16933..dc790d7 100644
---- a/src/java/com/android/internal/telephony/PhoneBase.java
-+++ b/src/java/com/android/internal/telephony/PhoneBase.java
-@@ -1525,7 +1525,10 @@ public abstract class PhoneBase extends Handler implements Phone {
- 
-     public void setVoiceCallForwardingFlag(int line, boolean enable, String number) {
-         setCallForwardingIndicatorInSharedPref(enable);
--        mIccRecords.get().setVoiceCallForwardingFlag(line, enable, number);
-+        IccRecords r = mIccRecords.get();
-+        if (r != null) {
-+            r.setVoiceCallForwardingFlag(line, enable, number);
-+        }
-     }
- 
-     protected void setVoiceCallForwardingFlag(IccRecords r, int line, boolean enable,
-diff --git a/src/java/com/android/internal/telephony/ProxyController.java b/src/java/com/android/internal/telephony/ProxyController.java
-index b39c37d..5c1823a 100644
---- a/src/java/com/android/internal/telephony/ProxyController.java
-+++ b/src/java/com/android/internal/telephony/ProxyController.java
-@@ -361,7 +361,10 @@ public class ProxyController {
-     private void onStartRadioCapabilityResponse(Message msg) {
-         synchronized (mSetRadioAccessFamilyStatus) {
-             AsyncResult ar = (AsyncResult)msg.obj;
--            if (ar.exception != null) {
-+            // Abort here only in Single SIM case, in Multi SIM cases
-+            // send FINISH with failure so that below layers can do
-+            // fall back to proper states.
-+            if ((TelephonyManager.getDefault().getPhoneCount() == 1) && (ar.exception != null)) {
-                 // just abort now.  They didn't take our start so we don't have to revert
-                 logd("onStartRadioCapabilityResponse got exception=" + ar.exception);
-                 mRadioCapabilitySessionId = mUniqueIdGenerator.getAndIncrement();
-@@ -496,7 +499,7 @@ public class ProxyController {
-      */
-     void onFinishRadioCapabilityResponse(Message msg) {
-         RadioCapability rc = (RadioCapability) ((AsyncResult) msg.obj).result;
--        if ((rc == null) || (rc.getSession() != mRadioCapabilitySessionId)) {
-+        if ((rc != null) && (rc.getSession() != mRadioCapabilitySessionId)) {
-             logd("onFinishRadioCapabilityResponse: Ignore session=" + mRadioCapabilitySessionId
-                     + " rc=" + rc);
-             return;
-@@ -545,8 +548,10 @@ public class ProxyController {
-                         i,
-                         sessionId,
-                         RadioCapability.RC_PHASE_FINISH,
--                        mOldRadioAccessFamily[i],
--                        mCurrentLogicalModemIds[i],
-+                        (mTransactionFailed ? mOldRadioAccessFamily[i] :
-+                        mNewRadioAccessFamily[i]),
-+                        (mTransactionFailed ? mCurrentLogicalModemIds[i] :
-+                        mNewLogicalModemIds[i]),
-                         (mTransactionFailed ? RadioCapability.RC_STATUS_FAIL :
-                         RadioCapability.RC_STATUS_SUCCESS),
-                         EVENT_FINISH_RC_RESPONSE);
-diff --git a/src/java/com/android/internal/telephony/ServiceStateTracker.java b/src/java/com/android/internal/telephony/ServiceStateTracker.java
-index 1c831f1..f8ab9ad 100644
---- a/src/java/com/android/internal/telephony/ServiceStateTracker.java
-+++ b/src/java/com/android/internal/telephony/ServiceStateTracker.java
-@@ -185,6 +185,7 @@ public abstract class ServiceStateTracker extends Handler {
-     protected static final int EVENT_IMS_STATE_CHANGED                 = 46;
-     protected static final int EVENT_IMS_STATE_DONE                    = 47;
-     protected static final int EVENT_IMS_CAPABILITY_CHANGED            = 48;
-+    protected static final int EVENT_RADIO_POWER_OFF_DONE                  = 49;
- 
-     protected static final String TIMEZONE_PROPERTY = "persist.sys.timezone";
- 
-@@ -632,6 +633,16 @@ public abstract class ServiceStateTracker extends Handler {
-                 }
-                 break;
- 
-+            case EVENT_RADIO_POWER_OFF_DONE:
-+                if (DBG) log("EVENT_RADIO_POWER_OFF_DONE");
-+                if (mDeviceShuttingDown && mCi.getRadioState().isAvailable()) {
-+                    // during shutdown the modem may not send radio state changed event
-+                    // as a result of radio power request
-+                    // Hence, issuing shut down regardless of radio power response
-+                    mCi.requestShutdown(null);
-+                }
-+                break;
-+
-             default:
-                 log("Unhandled message with number: " + msg.what);
-                 break;
-diff --git a/src/java/com/android/internal/telephony/SmsMessageBase.java b/src/java/com/android/internal/telephony/SmsMessageBase.java
-index 0b8dfdf..a4cc690 100644
---- a/src/java/com/android/internal/telephony/SmsMessageBase.java
-+++ b/src/java/com/android/internal/telephony/SmsMessageBase.java
-@@ -352,6 +352,10 @@ public abstract class SmsMessageBase {
-          mIsEmail = Telephony.Mms.isEmailAddress(mEmailFrom);
-     }
- 
-+    //Returns true if the given code point is regional indicator symbol
-+    private static boolean isRegionalIndicatorSymbol(int codepoint) {
-+        return (0x1F1E6 <= codepoint && codepoint <= 0x1F1FF);
-+    }
-     /**
-      * Find the next position to start a new fragment of a multipart SMS.
-      *
-@@ -370,7 +374,22 @@ public abstract class SmsMessageBase {
-             BreakIterator breakIterator = BreakIterator.getCharacterInstance();
-             breakIterator.setText(msgBody.toString());
-             if (!breakIterator.isBoundary(nextPos)) {
--                nextPos = breakIterator.preceding(nextPos);
-+                int breakPos = breakIterator.preceding(nextPos);
-+                while (breakPos + 4 <= nextPos
-+                    && isRegionalIndicatorSymbol(
-+                     Character.codePointAt(msgBody, breakPos))
-+                    && isRegionalIndicatorSymbol(
-+                     Character.codePointAt(msgBody, breakPos + 2))) {
-+                   // skip forward over flags (pairs of Regional Indicator Symbol)
-+                   breakPos += 4;
-+                }
-+                if (breakPos > currentPosition) {
-+                    nextPos = breakPos;
-+                } else if (Character.isHighSurrogate(msgBody.charAt(nextPos - 1))) {
-+                  // no character boundary in this fragment, try to at least land on a code point
-+                    nextPos -= 1;
-+                }
-+
-             }
-         }
-         return nextPos;
-diff --git a/src/java/com/android/internal/telephony/SubscriptionController.java b/src/java/com/android/internal/telephony/SubscriptionController.java
-index 0020ea3..2979a76 100644
---- a/src/java/com/android/internal/telephony/SubscriptionController.java
-+++ b/src/java/com/android/internal/telephony/SubscriptionController.java
-@@ -1783,6 +1783,7 @@ public class SubscriptionController extends ISub.Stub {
-             case SubscriptionManager.CB_ALERT_SPEECH:
-             case SubscriptionManager.CB_ETWS_TEST_ALERT:
-             case SubscriptionManager.CB_CHANNEL_50_ALERT:
-+            case SubscriptionManager.CB_CHANNEL_60_ALERT:
-             case SubscriptionManager.CB_CMAS_TEST_ALERT:
-             case SubscriptionManager.CB_OPT_OUT_DIALOG:
-                 value.put(propKey, Integer.parseInt(propValue));
-@@ -1879,6 +1880,7 @@ public class SubscriptionController extends ISub.Stub {
-                         case SubscriptionManager.CB_ALERT_SPEECH:
-                         case SubscriptionManager.CB_ETWS_TEST_ALERT:
-                         case SubscriptionManager.CB_CHANNEL_50_ALERT:
-+                        case SubscriptionManager.CB_CHANNEL_60_ALERT:
-                         case SubscriptionManager.CB_CMAS_TEST_ALERT:
-                         case SubscriptionManager.CB_OPT_OUT_DIALOG:
-                             resultValue = cursor.getInt(0) + "";
-diff --git a/src/java/com/android/internal/telephony/SubscriptionInfoUpdater.java b/src/java/com/android/internal/telephony/SubscriptionInfoUpdater.java
-index 0b489a9..e4987c7 100644
---- a/src/java/com/android/internal/telephony/SubscriptionInfoUpdater.java
-+++ b/src/java/com/android/internal/telephony/SubscriptionInfoUpdater.java
-@@ -231,13 +231,15 @@ public class SubscriptionInfoUpdater extends Handler {
-                 }
-             }
- 
--            if (IccCardConstants.INTENT_VALUE_ICC_LOCKED.equals(simStatus)) {
--                mLockedSims.set(slotId);
--                update(slotId);
--            } else if (IccCardConstants.INTENT_VALUE_ICC_READY.equals(simStatus)
--                    || IccCardConstants.INTENT_VALUE_ICC_LOADED.equals(simStatus)) {
--                mLockedSims.clear(slotId);
--                update(slotId);
-+            if (isAllIccIdQueryDone()) {
-+                if (IccCardConstants.INTENT_VALUE_ICC_LOCKED.equals(simStatus)) {
-+                    mLockedSims.set(slotId);
-+                    update(slotId);
-+                } else if (IccCardConstants.INTENT_VALUE_ICC_READY.equals(simStatus)
-+                        || IccCardConstants.INTENT_VALUE_ICC_LOADED.equals(simStatus)) {
-+                    mLockedSims.clear(slotId);
-+                    update(slotId);
-+                }
-             }
- 
-             logd("[Receiver]-");
-diff --git a/src/java/com/android/internal/telephony/cat/CatService.java b/src/java/com/android/internal/telephony/cat/CatService.java
-index 9151c75..ec23bd9 100755
---- a/src/java/com/android/internal/telephony/cat/CatService.java
-+++ b/src/java/com/android/internal/telephony/cat/CatService.java
-@@ -1005,8 +1005,9 @@ public class CatService extends Handler implements AppInterface {
- 
-         // This sends an intent with CARD_ABSENT (0 - false) /CARD_PRESENT (1 - true).
-         intent.putExtra(AppInterface.CARD_STATUS, cardPresent);
-+        intent.putExtra("SLOT_ID", mSlotId);
-         CatLog.d(this, "Sending Card Status: "
--                + cardState + " " + "cardPresent: " + cardPresent);
-+                + cardState + " " + "cardPresent: " + cardPresent +  "SLOT_ID: " +  mSlotId);
-         mContext.sendBroadcast(intent, AppInterface.STK_PERMISSION);
-     }
- 
-@@ -1129,6 +1130,13 @@ public class CatService extends Handler implements AppInterface {
-                 }
-                 break;
-             case LAUNCH_BROWSER:
-+                if (resMsg.mResCode == ResultCode.LAUNCH_BROWSER_ERROR) {
-+                    // Additional info for Default URL unavailable.
-+                    resMsg.setAdditionalInfo(0x04);
-+                } else {
-+                    resMsg.mIncludeAdditionalInfo = false;
-+                    resMsg.mAdditionalInfo = 0;
-+                }
-                 break;
-             // 3GPP TS.102.223: Open Channel alpha confirmation should not send TR
-             case OPEN_CHANNEL:
-diff --git a/src/java/com/android/internal/telephony/cdma/CDMAPhone.java b/src/java/com/android/internal/telephony/cdma/CDMAPhone.java
-index 724b231..dd6631c 100644
---- a/src/java/com/android/internal/telephony/cdma/CDMAPhone.java
-+++ b/src/java/com/android/internal/telephony/cdma/CDMAPhone.java
-@@ -1174,7 +1174,7 @@ public class CDMAPhone extends PhoneBase {
-             mIsPhoneInEcmState = true;
-             // notify change
-             sendEmergencyCallbackModeChange();
--            setSystemProperty(TelephonyProperties.PROPERTY_INECM_MODE, "true");
-+            super.setSystemProperty(TelephonyProperties.PROPERTY_INECM_MODE, "true");
- 
-             // Post this runnable so we will automatically exit
-             // if no one invokes exitEmergencyCallbackMode() directly.
-@@ -1202,7 +1202,7 @@ public class CDMAPhone extends PhoneBase {
-         if (ar.exception == null) {
-             if (mIsPhoneInEcmState) {
-                 mIsPhoneInEcmState = false;
--                setSystemProperty(TelephonyProperties.PROPERTY_INECM_MODE, "false");
-+                super.setSystemProperty(TelephonyProperties.PROPERTY_INECM_MODE, "false");
-             }
-             // send an Intent
-             sendEmergencyCallbackModeChange();
-diff --git a/src/java/com/android/internal/telephony/cdma/CdmaCallTracker.java b/src/java/com/android/internal/telephony/cdma/CdmaCallTracker.java
-index b3ab17b..f10ecb1 100644
---- a/src/java/com/android/internal/telephony/cdma/CdmaCallTracker.java
-+++ b/src/java/com/android/internal/telephony/cdma/CdmaCallTracker.java
-@@ -1022,6 +1022,12 @@ public final class CdmaCallTracker extends CallTracker {
- 
-         if (!mPhone.mIsTheCurrentActivePhone) {
-             Rlog.w(LOG_TAG, "Ignoring events received on inactive CdmaPhone");
-+            for (int i = 0; i < mConnections.length; i++) {
-+                CdmaConnection conn = mConnections[i];
-+                if ((conn != null) && (conn.mCause != DisconnectCause.NOT_DISCONNECTED)) {
-+                    conn.onDisconnect(conn.mCause);
-+                }
-+            }
-             return;
-         }
-         switch (msg.what) {
-diff --git a/src/java/com/android/internal/telephony/cdma/CdmaInboundSmsHandler.java b/src/java/com/android/internal/telephony/cdma/CdmaInboundSmsHandler.java
-index 8ef952b..8139b0f 100644
---- a/src/java/com/android/internal/telephony/cdma/CdmaInboundSmsHandler.java
-+++ b/src/java/com/android/internal/telephony/cdma/CdmaInboundSmsHandler.java
-@@ -89,15 +89,6 @@ public class CdmaInboundSmsHandler extends InboundSmsHandler {
-     }
- 
-     /**
--     * Return whether the device is in Emergency Call Mode (only for 3GPP2).
--     * @return true if the device is in ECM; false otherwise
--     */
--    private static boolean isInEmergencyCallMode() {
--        String inEcm = SystemProperties.get(TelephonyProperties.PROPERTY_INECM_MODE, "false");
--        return "true".equals(inEcm);
--    }
--
--    /**
-      * Return true if this handler is for 3GPP2 messages; false for 3GPP format.
-      * @return true (3GPP2)
-      */
-@@ -113,10 +104,6 @@ public class CdmaInboundSmsHandler extends InboundSmsHandler {
-      */
-     @Override
-     protected int dispatchMessageRadioSpecific(SmsMessageBase smsb) {
--        if (isInEmergencyCallMode()) {
--            return Activity.RESULT_OK;
--        }
--
-         SmsMessage sms = (SmsMessage) smsb;
-         boolean isBroadcastType = (SmsEnvelope.MESSAGE_TYPE_BROADCAST == sms.getMessageType());
- 
-@@ -207,10 +194,6 @@ public class CdmaInboundSmsHandler extends InboundSmsHandler {
-      */
-     @Override
-     protected void acknowledgeLastIncomingSms(boolean success, int result, Message response) {
--        if (isInEmergencyCallMode()) {
--            return;
--        }
--
-         int causeCode = resultToCause(result);
-         mPhone.mCi.acknowledgeLastIncomingCdmaSms(success, causeCode, response);
- 
-diff --git a/src/java/com/android/internal/telephony/cdma/CdmaServiceStateTracker.java b/src/java/com/android/internal/telephony/cdma/CdmaServiceStateTracker.java
-index 6095042..0c38e27 100644
---- a/src/java/com/android/internal/telephony/cdma/CdmaServiceStateTracker.java
-+++ b/src/java/com/android/internal/telephony/cdma/CdmaServiceStateTracker.java
-@@ -591,8 +591,6 @@ public class CdmaServiceStateTracker extends ServiceStateTracker {
-         String plmn = mSS.getOperatorAlphaLong();
-         boolean showPlmn = false;
- 
--        showPlmn = plmn != null;
--
-         int subId = SubscriptionManager.INVALID_SUBSCRIPTION_ID;
-         int[] subIds = SubscriptionManager.getSubId(mPhone.getPhoneId());
-         if (subIds != null && subIds.length > 0) {
-@@ -614,6 +612,7 @@ public class CdmaServiceStateTracker extends ServiceStateTracker {
-             // would set showPlmn to true only if plmn was not empty, i.e. was not
-             // null and not blank. But this would cause us to incorrectly display
-             // "No Service". Now showPlmn is set to true for any non null string.
-+            showPlmn = plmn != null;
-             if (DBG) {
-                 log(String.format("updateSpnDisplay: changed sending intent" +
-                             " showPlmn='%b' plmn='%s' subId='%d'", showPlmn, plmn, subId));
-@@ -665,7 +664,7 @@ public class CdmaServiceStateTracker extends ServiceStateTracker {
-                 if (states.length > 0) {
-                     try {
-                         regState = Integer.parseInt(states[0]);
--
-+    
-                         // states[3] (if present) is the current radio technology
-                         if (states.length >= 4 && states[3] != null) {
-                             dataRadioTechnology = Integer.parseInt(states[3]);
-@@ -1438,11 +1437,10 @@ public class CdmaServiceStateTracker extends ServiceStateTracker {
-         String idd = mHbpcdUtils.getIddByMcc(
-                 Integer.parseInt(operatorNumeric.substring(0,3)));
-         if (idd != null && !idd.isEmpty()) {
--            mPhone.setSystemProperty(TelephonyProperties.PROPERTY_OPERATOR_IDP_STRING,
--                     idd);
-+            SystemProperties.set(TelephonyProperties.PROPERTY_OPERATOR_IDP_STRING, idd);
-         } else {
-             // use default "+", since we don't know the current IDP
--            mPhone.setSystemProperty(TelephonyProperties.PROPERTY_OPERATOR_IDP_STRING, "+");
-+            SystemProperties.set(TelephonyProperties.PROPERTY_OPERATOR_IDP_STRING, "+");
-         }
-     }
- 
-@@ -1996,7 +1994,7 @@ public class CdmaServiceStateTracker extends ServiceStateTracker {
-         mPhone.mCT.mRingingCall.hangupIfAlive();
-         mPhone.mCT.mBackgroundCall.hangupIfAlive();
-         mPhone.mCT.mForegroundCall.hangupIfAlive();
--        mCi.setRadioPower(false, null);
-+        mCi.setRadioPower(false, obtainMessage(EVENT_RADIO_POWER_OFF_DONE));
-     }
- 
-     protected void parseSidNid (String sidStr, String nidStr) {
-diff --git a/src/java/com/android/internal/telephony/dataconnection/DataConnection.java b/src/java/com/android/internal/telephony/dataconnection/DataConnection.java
-index 2e72884..edc58af 100644
---- a/src/java/com/android/internal/telephony/dataconnection/DataConnection.java
-+++ b/src/java/com/android/internal/telephony/dataconnection/DataConnection.java
-@@ -990,6 +990,10 @@ public class DataConnection extends StateMachine {
-                         result.addCapability(NetworkCapabilities.NET_CAPABILITY_IA);
-                         break;
-                     }
-+                    case PhoneConstants.APN_TYPE_EMERGENCY: {
-+                        result.addCapability(NetworkCapabilities.NET_CAPABILITY_EIMS);
-+                        break;
-+                    }
-                     default:
-                 }
-             }
-diff --git a/src/java/com/android/internal/telephony/dataconnection/DcSwitchStateMachine.java b/src/java/com/android/internal/telephony/dataconnection/DcSwitchStateMachine.java
-index 9ec9f05..12d2c03 100644
---- a/src/java/com/android/internal/telephony/dataconnection/DcSwitchStateMachine.java
-+++ b/src/java/com/android/internal/telephony/dataconnection/DcSwitchStateMachine.java
-@@ -138,15 +138,27 @@ public class DcSwitchStateMachine extends StateMachine {
-                         log("IdleState: EVENT_DATA_ATTACHED");
-                     }
- 
--                    if (ddsPhoneId == mId) {
-+                    int dataRat = mPhone.getServiceState().getRilDataRadioTechnology();
-+                    if (dataRat == ServiceState.RIL_RADIO_TECHNOLOGY_IWLAN) {
-+                        if (DBG) {
-+                            log("IdleState: IWLAN reported in IDLE state");
-+                        }
-+                        transitionTo(mAttachedState);
-+                    } else if (DctController.getInstance().isDataAllowedOnPhoneId(mId)) {
-                         if (DBG) {
-                             log("IdleState: DDS sub reported ATTACHed in IDLE state");
-                         }
-                         /* Move to AttachingState and handle this ATTACH msg over there.
-                          * This would ensure that Modem gets a ALLOW_DATA(true)
-                          */
--                        deferMessage(msg);
--                        transitionTo(mAttachingState);
-+                        if (ServiceState.isCdma(dataRat)) {
-+                            deferMessage(msg);
-+                            transitionTo(mAttachingState);
-+                        } else {
-+                            transitionTo(mAttachedState);
-+                        }
-+                    } else {
-+                        if (DBG) log("IdleState: ignore ATATCHed event as data is not allowed");
-                     }
-                     retVal = HANDLED;
-                     break;
-@@ -249,6 +261,7 @@ public class DcSwitchStateMachine extends StateMachine {
-             final PhoneBase pb = (PhoneBase)((PhoneProxy)mPhone).getActivePhone();
-             pb.mCi.setDataAllowed(true, obtainMessage(EVENT_DATA_ALLOWED,
-                     ++mCurrentAllowedSequence, 0));
-+            DctController.getInstance().resetDdsSwitchNeededFlag();
-             // if we're on a carrier that unattaches us if we're idle for too long
-             // (on wifi) and they won't re-attach until we poke them.  Poke them!
-             // essentially react as Attached does here in Attaching.
-@@ -440,7 +453,22 @@ public class DcSwitchStateMachine extends StateMachine {
-                     apnRequest.log("DcSwitchStateMachine.AttachedState: REQ_CONNECT");
-                     if (DBG) log("AttachedState: REQ_CONNECT, apnRequest=" + apnRequest);
- 
--                    DctController.getInstance().executeRequest(apnRequest);
-+                    int dataRat = mPhone.getServiceState().getRilDataRadioTechnology();
-+                    if (dataRat == ServiceState.RIL_RADIO_TECHNOLOGY_IWLAN &&
-+                             DctController.getInstance().isDdsSwitchNeeded()) {
-+                        SubscriptionController subController = SubscriptionController.getInstance();
-+                        int ddsSubId = subController.getDefaultDataSubId();
-+                        int ddsPhoneId = subController.getPhoneId(ddsSubId);
-+                        if (mId == ddsPhoneId) {
-+                            logd("AttachedState: Already attached on IWLAN. " +
-+                                    "Retry Allow Data for Dds switch");
-+                            transitionTo(mAttachingState);
-+                        } else {
-+                            DctController.getInstance().executeRequest(apnRequest);
-+                        }
-+                    } else {
-+                        DctController.getInstance().executeRequest(apnRequest);
-+                    }
-                     retVal = HANDLED;
-                     break;
-                 }
-diff --git a/src/java/com/android/internal/telephony/dataconnection/DcTracker.java b/src/java/com/android/internal/telephony/dataconnection/DcTracker.java
-index 9295b91..e1569ae 100644
---- a/src/java/com/android/internal/telephony/dataconnection/DcTracker.java
-+++ b/src/java/com/android/internal/telephony/dataconnection/DcTracker.java
-@@ -2930,9 +2930,6 @@ public class DcTracker extends DcTrackerBase {
- 
-             case DctConstants.EVENT_CDMA_SUBSCRIPTION_SOURCE_CHANGED: // fall thru
-             case DctConstants.EVENT_DATA_RAT_CHANGED:
--                //May new Network allow setupData, so try it here
--                setupDataOnConnectableApns(Phone.REASON_NW_TYPE_CHANGED,
--                        RetryFailures.ONLY_ON_CHANGE);
-                 // When data rat changes we might need to load different
-                 // set of apns (example, LTE->1x)
-                 if (onUpdateIcc()) {
-@@ -2942,6 +2939,10 @@ public class DcTracker extends DcTrackerBase {
-                     // If cdma subscription source changed to NV or data rat changed to cdma
-                     // (while subscription source was NV) - we need to trigger NV ready
-                     onNvReady();
-+                } else {
-+                    //May new Network allow setupData, so try it here
-+                    setupDataOnConnectableApns(Phone.REASON_NW_TYPE_CHANGED,
-+                            RetryFailures.ONLY_ON_CHANGE);
-                 }
-                 break;
- 
-diff --git a/src/java/com/android/internal/telephony/dataconnection/DcTrackerBase.java b/src/java/com/android/internal/telephony/dataconnection/DcTrackerBase.java
-index 8137ff8..febed59 100644
---- a/src/java/com/android/internal/telephony/dataconnection/DcTrackerBase.java
-+++ b/src/java/com/android/internal/telephony/dataconnection/DcTrackerBase.java
-@@ -97,7 +97,7 @@ public abstract class DcTrackerBase extends Handler {
- 
-     /** Delay between APN attempts.
-         Note the property override mechanism is there just for testing purpose only. */
--    protected static final int APN_DELAY_DEFAULT_MILLIS = 20000;
-+    protected static final int APN_DELAY_DEFAULT_MILLIS = 3000;
- 
-     /** Delay between APN attempts when in fail fast mode */
-     protected static final int APN_FAIL_FAST_DELAY_DEFAULT_MILLIS = 3000;
-@@ -1385,16 +1385,16 @@ public abstract class DcTrackerBase extends Handler {
- 
-     protected void onSetUserDataEnabled(boolean enabled, int subId) {
-         synchronized (mDataEnabledLock) {
-+            // For single SIM phones, this is a per phone property.
-+            if (TelephonyManager.getDefault().getSimCount() == 1) {
-+                Settings.Global.putInt(mResolver, Settings.Global.MOBILE_DATA, enabled ? 1 : 0);
-+            } else {
-+                Settings.Global.putInt(mResolver, Settings.Global.MOBILE_DATA + subId,
-+                        enabled ? 1 : 0);
-+            }
-+
-             if (mUserDataEnabled != enabled) {
-                 mUserDataEnabled = enabled;
--
--                // For single SIM phones, this is a per phone property.
--                if (TelephonyManager.getDefault().getSimCount() == 1) {
--                    Settings.Global.putInt(mResolver, Settings.Global.MOBILE_DATA, enabled ? 1 : 0);
--                } else {
--                    Settings.Global.putInt(mResolver, Settings.Global.MOBILE_DATA + subId,
--                            enabled ? 1 : 0);
--                }
-                 if (getDataOnRoamingEnabled() == false &&
-                         mPhone.getServiceState().getDataRoaming() == true) {
-                     if (enabled) {
-diff --git a/src/java/com/android/internal/telephony/dataconnection/DctController.java b/src/java/com/android/internal/telephony/dataconnection/DctController.java
-index e1c8bac..1a6024a 100644
---- a/src/java/com/android/internal/telephony/dataconnection/DctController.java
-+++ b/src/java/com/android/internal/telephony/dataconnection/DctController.java
-@@ -32,7 +32,6 @@ import android.os.Message;
- import android.os.Messenger;
- import android.provider.Settings;
- import android.telephony.Rlog;
--import android.telephony.SubscriptionInfo;
- import android.telephony.SubscriptionManager;
- import android.telephony.SubscriptionManager.OnSubscriptionsChangedListener;
- import android.text.TextUtils;
-@@ -45,12 +44,16 @@ import com.android.internal.telephony.PhoneConstants;
- import com.android.internal.telephony.PhoneProxy;
- import com.android.internal.telephony.SubscriptionController;
- import com.android.internal.telephony.dataconnection.DcSwitchAsyncChannel.RequestInfo;
-+import com.android.internal.telephony.uicc.IccCardStatus;
-+import com.android.internal.telephony.uicc.UiccCard;
-+import com.android.internal.telephony.uicc.UiccController;
- import com.android.internal.util.AsyncChannel;
- import com.android.internal.util.IndentingPrintWriter;
- 
- import java.io.FileDescriptor;
- import java.io.PrintWriter;
- import java.util.ArrayDeque;
-+import java.util.concurrent.atomic.AtomicBoolean;
- import java.util.HashMap;
- import java.util.Iterator;
- import java.util.Map.Entry;
-@@ -92,6 +95,9 @@ public class DctController extends Handler {
- 
-     private SubscriptionManager mSubMgr;
- 
-+    protected AtomicBoolean[] mIsDataAllowed;
-+    protected AtomicBoolean mNeedsDdsSwitch = new AtomicBoolean(false);
-+
-     private OnSubscriptionsChangedListener mOnSubscriptionsChangedListener =
-             new OnSubscriptionsChangedListener() {
-         @Override
-@@ -232,9 +238,16 @@ public class DctController extends Handler {
-         mNetworkFactoryMessenger = new Messenger[mPhoneNum];
-         mNetworkFactory = new NetworkFactory[mPhoneNum];
-         mNetworkFilter = new NetworkCapabilities[mPhoneNum];
-+        mIsDataAllowed = new AtomicBoolean[mPhoneNum];
- 
-         for (int i = 0; i < mPhoneNum; ++i) {
-             int phoneId = i;
-+            if (mPhoneNum == 1) {
-+                // For single SIM mode allow data by default
-+                mIsDataAllowed[i] = new AtomicBoolean(true);
-+            } else {
-+                mIsDataAllowed[i] = new AtomicBoolean(false);
-+            }
-             mDcSwitchStateMachine[i] = new DcSwitchStateMachine(mPhones[i],
-                     "DcSwitchStateMachine-" + phoneId, phoneId);
-             mDcSwitchStateMachine[i].start();
-@@ -393,7 +406,12 @@ public class DctController extends Handler {
-                 + ", activePhoneId=" + activePhoneId);
- 
-         if (requestedPhoneId == INVALID_PHONE_INDEX) {
--            // we have no network request - don't bother with this
-+            // either we have no network request
-+            // or there is no valid subscription at the moment
-+            if (activePhoneId != INVALID_PHONE_INDEX) {
-+                // detatch so we can try connecting later
-+                mDcSwitchAsyncChannel[activePhoneId].disconnectAll();
-+            }
-             return;
-         }
- 
-@@ -405,23 +423,6 @@ public class DctController extends Handler {
-                 if (requestInfo.executedPhoneId != INVALID_PHONE_INDEX) continue;
-                 if (getRequestPhoneId(requestInfo.request) == requestedPhoneId) {
-                     mDcSwitchAsyncChannel[requestedPhoneId].connect(requestInfo);
--                    Phone phone = mPhones[requestedPhoneId].getActivePhone();
--                    if ((phone.getPhoneType() == PhoneConstants.PHONE_TYPE_CDMA)
--                            && (activePhoneId == -1)) {
--                        /* Traditionally modem reports data registered on CDMA sub even when it is
--                         * non-dds because CDMA network does not have PS ATTACH/DETACH concept.
--                         *
--                         * So when CDMA sub becomes DDS from non-dds the state-machine is expacting
--                         * onDataConnectionAttach() call from serviceStateTracker. It would never
--                         * happen since cdma SST did not notice change in registration during DDS
--                         * switch.
--                         *
--                         * Hence we need to fake the ATTACH to move/progress DcSwitchStateMachine.
--                         */
--                        logd("Active phone is CDMA, fake ATTACH");
--                        mDcSwitchAsyncChannel[requestedPhoneId].notifyDataAttached();
--                    }
--
-                 }
-             }
-         } else {
-@@ -485,8 +486,7 @@ public class DctController extends Handler {
-         Iterator<Integer> iterator = mRequestInfos.keySet().iterator();
-         while (iterator.hasNext()) {
-             RequestInfo requestInfo = mRequestInfos.get(iterator.next());
--            if ((requestInfo.executedPhoneId == phoneId)
--                || isWithOutSpecifier(requestInfo)) {
-+            if (requestInfo.executedPhoneId == phoneId) {
-                 onReleaseRequest(requestInfo);
-             }
-         }
-@@ -496,7 +496,7 @@ public class DctController extends Handler {
-         final int topPriPhone = getTopPriorityRequestPhoneId();
-         logd("onRetryAttach phoneId=" + phoneId + " topPri phone = " + topPriPhone);
- 
--        if (phoneId != INVALID_PHONE_INDEX && phoneId == topPriPhone) {
-+        if (phoneId != -1 && phoneId == topPriPhone) {
-             mDcSwitchAsyncChannel[phoneId].retryConnect();
-         }
-     }
-@@ -507,10 +507,25 @@ public class DctController extends Handler {
-         Iterator<Integer> iterator = mRequestInfos.keySet().iterator();
-         while (iterator.hasNext()) {
-             RequestInfo requestInfo = mRequestInfos.get(iterator.next());
--            String specifier = requestInfo.request.networkCapabilities
--                .getNetworkSpecifier();
--            if (specifier == null || specifier.equals("")) {
--                onReleaseRequest(requestInfo);
-+            if (requestInfo != null) {
-+                String specifier = requestInfo.request.networkCapabilities
-+                    .getNetworkSpecifier();
-+                if (specifier == null || specifier.equals("")) {
-+                    if (requestInfo.executedPhoneId != INVALID_PHONE_INDEX) {
-+                        String apn = apnForNetworkRequest(requestInfo.request);
-+                        int phoneId = requestInfo.executedPhoneId;
-+                        requestInfo.executedPhoneId = INVALID_PHONE_INDEX;
-+                        logd("[setDataSubId] subId =" + dataSubId);
-+                        requestInfo.log(
-+                                "DctController.onSettingsChange releasing request");
-+                        for (int i = 0; i < mPhoneNum; i++) {
-+                            PhoneBase phoneBase =
-+                                (PhoneBase)mPhones[i].getActivePhone();
-+                            DcTrackerBase dcTracker = phoneBase.mDcTracker;
-+                            dcTracker.decApnRefCount(apn, requestInfo.getLog());
-+                        }
-+                    }
-+                }
-             }
-         }
-     }
-@@ -518,7 +533,7 @@ public class DctController extends Handler {
-     protected void onSettingsChanged() {
-         //Sub Selection
-         int dataSubId = mSubController.getDefaultDataSubId();
--
-+        mNeedsDdsSwitch.set(true);
-         int activePhoneId = -1;
-         for (int i=0; i<mDcSwitchStateMachine.length; i++) {
-             if (!mDcSwitchAsyncChannel[i].isIdleSync()) {
-@@ -540,50 +555,51 @@ public class DctController extends Handler {
-     }
- 
-     protected int getTopPriorityRequestPhoneId() {
-+        RequestInfo retRequestInfo = null;
-         String topSubId = null;
-         int priority = -1;
-         int subId;
- 
--        int activePhoneId = -1;
--        for (int i = 0; i < mDcSwitchStateMachine.length; i++) {
--            if (!mDcSwitchAsyncChannel[i].isIdleSync()) {
--                activePhoneId = i;
--                break;
--            }
--        }
--
-         for (RequestInfo requestInfo : mRequestInfos.values()) {
-             logd("getTopPriorityRequestPhoneId requestInfo=" + requestInfo);
-             if (requestInfo.priority > priority) {
-                 priority = requestInfo.priority;
-                 topSubId = requestInfo.request.networkCapabilities.getNetworkSpecifier();
--            } else if (priority == requestInfo.priority) {
--                if (requestInfo.executedPhoneId == activePhoneId) {
--                    topSubId = requestInfo.request.networkCapabilities.getNetworkSpecifier();
--                }
-+                retRequestInfo = requestInfo;
-             }
-         }
-         if (TextUtils.isEmpty(topSubId)) {
-             subId = mSubController.getDefaultDataSubId();
-         } else {
-             subId = Integer.parseInt(topSubId);
-+            if (apnForNetworkRequest(retRequestInfo.request).equals(
-+                    PhoneConstants.APN_TYPE_IMS) && mNeedsDdsSwitch.get()) {
-+                logd("getTopPriorityRequestPhoneId: ims request, use dds phone id");
-+                subId = mSubController.getDefaultDataSubId();
-+            } else if (subId != mSubController.getDefaultDataSubId()) {
-+                logd("getTopPriorityRequestPhoneId: Request needs Dds switch");
-+                mNeedsDdsSwitch.set(true);
-+            }
-         }
-         final int phoneId = mSubController.getPhoneId(subId);
-         if (phoneId == DEFAULT_PHONE_INDEX) {
-             // that means there isn't a phone for the default sub
-             return INVALID_PHONE_INDEX;
-         }
-+
-         return phoneId;
-     }
- 
--    private void onSubInfoReady() {
-+    protected void onSubInfoReady() {
-         logd("onSubInfoReady mPhoneNum=" + mPhoneNum);
-+        UiccController uiccController = UiccController.getInstance();
-         for (int i = 0; i < mPhoneNum; ++i) {
-+            UiccCard card = uiccController.getUiccCard(i);
-             int subId = mPhones[i].getSubId();
-             logd("onSubInfoReady handle pending requests subId=" + subId);
--            SubscriptionInfo subInfo = mSubMgr.getActiveSubscriptionInfoForSimSlotIndex(i);
--            if (subInfo == null) {  // No sim in slot
--                logd("onSubInfoReady: subInfo = null");
-+            if ((card == null) || (card.getCardState() ==
-+                    IccCardStatus.CardState.CARDSTATE_ABSENT)) {
-+                logd("onSubInfoReady: SIM card absent on phoneId = " + i);
-                 PhoneBase phoneBase = (PhoneBase)mPhones[i].getActivePhone();
-                 DcTrackerBase dcTracker = phoneBase.mDcTracker;
-                 if (dcTracker.isApnTypeActive(PhoneConstants.APN_TYPE_DEFAULT)) {
-@@ -689,6 +705,12 @@ public class DctController extends Handler {
-             subId = Integer.parseInt(specifier);
-         }
-         int phoneId = mSubController.getPhoneId(subId);
-+        if (!SubscriptionManager.isValidPhoneId(phoneId)) {
-+            phoneId = 0;
-+            if (!SubscriptionManager.isValidPhoneId(phoneId)) {
-+                throw new RuntimeException("Should not happen, no valid phoneId");
-+            }
-+        }
-         return phoneId;
-     }
- 
-@@ -845,6 +867,25 @@ public class DctController extends Handler {
-         }
-     }
- 
-+    protected void setDataAllowedOnPhoneId(int phoneId, boolean dataAllowed) {
-+        if (SubscriptionManager.isValidPhoneId(phoneId)) {
-+            mIsDataAllowed[phoneId].set(dataAllowed);
-+        }
-+    }
-+
-+    public boolean isDataAllowedOnPhoneId(int phoneId) {
-+        return SubscriptionManager.isValidPhoneId(phoneId) &&
-+                mIsDataAllowed[phoneId].get();
-+    }
-+
-+    public boolean isDdsSwitchNeeded() {
-+        return mNeedsDdsSwitch.get();
-+    }
-+
-+    public void resetDdsSwitchNeededFlag() {
-+        mNeedsDdsSwitch.set(false);
-+    }
-+
-     public void dump(FileDescriptor fd, PrintWriter pw, String[] args) {
-         pw.println("DctController:");
-         try {
-diff --git a/src/java/com/android/internal/telephony/gsm/GSMPhone.java b/src/java/com/android/internal/telephony/gsm/GSMPhone.java
-index 126c4d9..e2624da 100644
---- a/src/java/com/android/internal/telephony/gsm/GSMPhone.java
-+++ b/src/java/com/android/internal/telephony/gsm/GSMPhone.java
-@@ -38,6 +38,7 @@ import android.telephony.TelephonyManager;
- 
- import com.android.internal.telephony.CallTracker;
- import com.android.internal.telephony.ConfigResourceUtil;
-+import com.android.internal.telephony.PhoneFactory;
- 
- import android.text.TextUtils;
- import android.telephony.Rlog;
-@@ -1328,8 +1329,7 @@ public class GSMPhone extends PhoneBase {
-         ImsPhone imsPhone = mImsPhone;
-         if ((imsPhone != null)
-                 && (imsPhone.getServiceState().getState() == ServiceState.STATE_IN_SERVICE)) {
--            imsPhone.setOutgoingCallerIdDisplay(commandInterfaceCLIRMode,
--            obtainMessage(EVENT_SET_CLIR_COMPLETE, commandInterfaceCLIRMode, 0, onComplete));
-+            imsPhone.setOutgoingCallerIdDisplay(commandInterfaceCLIRMode, onComplete);
-             return;
-         }
-         // Packing CLIR value in the message. This will be required for
-@@ -1933,9 +1933,7 @@ public class GSMPhone extends PhoneBase {
-         int nwMode = Phone.PREFERRED_NT_MODE;
-         int subId = getSubId();
- 
--        nwMode = android.provider.Settings.Global.getInt(mContext.getContentResolver(),
--                    android.provider.Settings.Global.PREFERRED_NETWORK_MODE + subId, nwMode);
--
-+        nwMode = PhoneFactory.calculatePreferredNetworkType(mContext, subId);
-         Rlog.d(LOG_TAG, "isManualNetSelAllowed in mode = " + nwMode);
-         /*
-          *  For multimode targets in global mode manual network
-diff --git a/src/java/com/android/internal/telephony/gsm/GsmCallTracker.java b/src/java/com/android/internal/telephony/gsm/GsmCallTracker.java
-index 1856642..0601002 100644
---- a/src/java/com/android/internal/telephony/gsm/GsmCallTracker.java
-+++ b/src/java/com/android/internal/telephony/gsm/GsmCallTracker.java
-@@ -913,6 +913,12 @@ public final class GsmCallTracker extends CallTracker {
-         if (!mPhone.mIsTheCurrentActivePhone) {
-             Rlog.e(LOG_TAG, "Received message " + msg +
-                     "[" + msg.what + "] while being destroyed. Ignoring.");
-+            for (int i = 0; i < mConnections.length; i++) {
-+                GsmConnection conn = mConnections[i];
-+                if ((conn != null) && (conn.mCause != DisconnectCause.NOT_DISCONNECTED)) {
-+                    conn.onDisconnect(conn.mCause);
-+                }
-+            }
-             return;
-         }
-         switch (msg.what) {
-diff --git a/src/java/com/android/internal/telephony/gsm/GsmServiceStateTracker.java b/src/java/com/android/internal/telephony/gsm/GsmServiceStateTracker.java
-index 6bb5cfa..531f393 100644
---- a/src/java/com/android/internal/telephony/gsm/GsmServiceStateTracker.java
-+++ b/src/java/com/android/internal/telephony/gsm/GsmServiceStateTracker.java
-@@ -575,7 +575,7 @@ public class GsmServiceStateTracker extends ServiceStateTracker {
-             mPhone.mCT.mForegroundCall.hangupIfAlive();
-         }
- 
--        mCi.setRadioPower(false, null);
-+        mCi.setRadioPower(false, obtainMessage(EVENT_RADIO_POWER_OFF_DONE));
-     }
- 
-     @Override
-diff --git a/src/java/com/android/internal/telephony/gsm/UsimPhoneBookManager.java b/src/java/com/android/internal/telephony/gsm/UsimPhoneBookManager.java
-index b18fdfd..d2e1d54 100644
---- a/src/java/com/android/internal/telephony/gsm/UsimPhoneBookManager.java
-+++ b/src/java/com/android/internal/telephony/gsm/UsimPhoneBookManager.java
-@@ -149,6 +149,10 @@ public class UsimPhoneBookManager extends Handler implements IccConstants {
-         mRefreshCache = false;
-     }
- 
-+    public boolean isPbrFilePresent() {
-+        return mIsPbrPresent;
-+    }
-+
-     public ArrayList<AdnRecord> loadEfFilesFromUsim() {
-         synchronized (mLock) {
-             if (!mPhoneBookRecords.isEmpty()) {
-@@ -523,9 +527,9 @@ public class UsimPhoneBookManager extends Handler implements IccConstants {
-                     Rlog.e(LOG_TAG, "Error: Improper ICC card: No IAP record for ADN, continuing");
-                     break;
-                 }
--                int recNum = record[mEmailTagNumberInIap];
-+                int recNum = record[mEmailTagNumberInIap] & 0xFF;
- 
--                if (recNum > 0) {
-+                if (recNum != 0xFF && recNum > 0) {
-                     String[] emails = new String[1];
-                     // SIM record numbers are 1 based
-                     emails[0] = readEmailRecord(recNum - 1, pbrIndex, 0);
-@@ -574,8 +578,8 @@ public class UsimPhoneBookManager extends Handler implements IccConstants {
-                     Rlog.e(LOG_TAG, "Error: Improper ICC card: No IAP record for ADN, continuing");
-                     break;
-                 }
--                int recNum = record[mAnrTagNumberInIap];
--                if (recNum > 0) {
-+                int recNum = record[mAnrTagNumberInIap] & 0xFF;
-+                if (recNum != 0xFF && recNum > 0) {
-                     String[] anrs = new String[1];
-                     // SIM record numbers are 1 based
-                     anrs[0] = readAnrRecord(recNum - 1, pbrIndex, 0);
-@@ -767,8 +771,9 @@ public class UsimPhoneBookManager extends Handler implements IccConstants {
-             } catch (IndexOutOfBoundsException e) {
-                 Rlog.e(LOG_TAG, "IndexOutOfBoundsException in getEmailRecNumber");
-             }
--            if (record != null && record[mEmailTagNumberInIap] > 0) {
--                recordNumber = record[mEmailTagNumberInIap];
-+            if (record != null && (record[mEmailTagNumberInIap] & 0xFF) != 0xFF
-+                && (record[mEmailTagNumberInIap] & 0xFF) > 0) {
-+                recordNumber = record[mEmailTagNumberInIap] & 0xFF;
-                 log(" getEmailRecNumber: record is " + IccUtils.bytesToHexString(record)
-                         + ", the email recordNumber is :" + recordNumber);
-                 return recordNumber;
-@@ -808,8 +813,9 @@ public class UsimPhoneBookManager extends Handler implements IccConstants {
-             } catch (IndexOutOfBoundsException e) {
-                 Rlog.e(LOG_TAG, "IndexOutOfBoundsException in getAnrRecNumber");
-             }
--            if (record != null && record[mAnrTagNumberInIap] > 0) {
--                recordNumber = record[mAnrTagNumberInIap];
-+            if (record != null && (record[mAnrTagNumberInIap] & 0xFF) != 0xFF
-+                && (record[mAnrTagNumberInIap] & 0xFF) > 0) {
-+                recordNumber = record[mAnrTagNumberInIap] & 0xFF;
-                 log("getAnrRecNumber: recnum from iap is :" + recordNumber);
-                 return recordNumber;
-             } else {
-@@ -953,6 +959,8 @@ public class UsimPhoneBookManager extends Handler implements IccConstants {
-                 ar = (AsyncResult) msg.obj;
-                 if (ar.exception == null) {
-                     createPbrFile((ArrayList<byte[]>) ar.result);
-+                } else {
-+                    mIsPbrPresent = false;
-                 }
-                 synchronized (mLock) {
-                     mLock.notify();
-diff --git a/src/java/com/android/internal/telephony/imsphone/ImsPhoneCallTracker.java b/src/java/com/android/internal/telephony/imsphone/ImsPhoneCallTracker.java
-index 854c9d3..962f8ad 100644
---- a/src/java/com/android/internal/telephony/imsphone/ImsPhoneCallTracker.java
-+++ b/src/java/com/android/internal/telephony/imsphone/ImsPhoneCallTracker.java
-@@ -161,6 +161,7 @@ public final class ImsPhoneCallTracker extends CallTracker {
-     private static final int EVENT_HANGUP_PENDINGMO = 18;
-     private static final int EVENT_RESUME_BACKGROUND = 19;
-     private static final int EVENT_DIAL_PENDINGMO = 20;
-+    private static final int EVENT_EXIT_ECBM_BEFORE_PENDINGMO = 21;
- 
-     private static final int TIMEOUT_HANGUP_PENDINGMO = 500;
- 
-@@ -310,8 +311,7 @@ public final class ImsPhoneCallTracker extends CallTracker {
-     synchronized Connection
-     dial(String dialString, int clirMode, int videoState, Bundle intentExtras)
-             throws CallStateException {
--        boolean isPhoneInEcmMode = SystemProperties.getBoolean(
--                TelephonyProperties.PROPERTY_INECM_MODE, false);
-+        boolean isPhoneInEcmMode = isPhoneInEcbMode();
-         boolean isEmergencyNumber = PhoneNumberUtils.isEmergencyNumber(dialString);
- 
-         if (DBG) log("dial clirMode=" + clirMode);
-@@ -1148,6 +1148,28 @@ public final class ImsPhoneCallTracker extends CallTracker {
-     }
- 
-     /**
-+     * @return true if the phone is in Emergency Callback mode, otherwise false
-+     */
-+    private boolean isPhoneInEcbMode() {
-+        return SystemProperties.getBoolean(TelephonyProperties.PROPERTY_INECM_MODE, false);
-+    }
-+
-+    /**
-+     * Before dialing pending MO request, check for the Emergency Callback mode.
-+     * If device is in Emergency callback mode, then exit the mode before dialing pending MO.
-+     */
-+    private void dialPendingMO() {
-+        boolean isPhoneInEcmMode = isPhoneInEcbMode();
-+        boolean isEmergencyNumber = PhoneNumberUtils.isEmergencyNumber(
-+                mPendingMO.getOrigDialString());
-+        if ((!isPhoneInEcmMode) || (isPhoneInEcmMode && isEmergencyNumber)) {
-+            sendEmptyMessage(EVENT_DIAL_PENDINGMO);
-+        } else {
-+            sendEmptyMessage(EVENT_EXIT_ECBM_BEFORE_PENDINGMO);
-+        }
-+    }
-+
-+    /**
-      * Listen to the IMS call state change
-      */
-     private ImsCall.Listener mImsCallListener = new ImsCall.Listener() {
-@@ -1279,7 +1301,7 @@ public final class ImsPhoneCallTracker extends CallTracker {
-                         //only the first callback reaches here
-                         //otherwise the oldState is already HOLDING
-                         if (mPendingMO != null) {
--                            sendEmptyMessage(EVENT_DIAL_PENDINGMO);
-+                            dialPendingMO();
-                         }
- 
-                         // In this case there will be no call resumed, so we can assume that we
-@@ -1301,7 +1323,7 @@ public final class ImsPhoneCallTracker extends CallTracker {
-                 if (reasonInfo.getCode() == ImsReasonInfo.CODE_LOCAL_CALL_TERMINATED) {
-                     // disconnected while processing hold
-                     if (mPendingMO != null) {
--                        sendEmptyMessage(EVENT_DIAL_PENDINGMO);
-+                        dialPendingMO();
-                     }
-                 } else if (bgState == ImsPhoneCall.State.ACTIVE) {
-                     mForegroundCall.switchWith(mBackgroundCall);
-@@ -1768,6 +1790,22 @@ public final class ImsPhoneCallTracker extends CallTracker {
-                 mPendingIntentExtras = null;
-                 break;
- 
-+            case EVENT_EXIT_ECBM_BEFORE_PENDINGMO:
-+                if (mPendingMO != null) {
-+                    //Send ECBM exit request
-+                    try {
-+                        getEcbmInterface().exitEmergencyCallbackMode();
-+                        mPhone.setOnEcbModeExitResponse(this, EVENT_EXIT_ECM_RESPONSE_CDMA, null);
-+                        pendingCallClirMode = mClirMode;
-+                        pendingCallInEcm = true;
-+                    } catch (ImsException e) {
-+                        e.printStackTrace();
-+                        mPendingMO.setDisconnectCause(DisconnectCause.ERROR_UNSPECIFIED);
-+                        sendEmptyMessageDelayed(EVENT_HANGUP_PENDINGMO, TIMEOUT_HANGUP_PENDINGMO);
-+                    }
-+                }
-+                break;
-+
-             case EVENT_EXIT_ECM_RESPONSE_CDMA:
-                 // no matter the result, we still do the same here
-                 if (pendingCallInEcm) {
++    <!-- control to enable or disable call transfer feature -->
++    <bool name="config_enable_calltransfer_over_ims">false</bool>
+ </resources>
 diff --git a/src/java/com/android/internal/telephony/imsphone/ImsPhoneConnection.java b/src/java/com/android/internal/telephony/imsphone/ImsPhoneConnection.java
-index 090c93c..089cd57 100644
+index b8b9daa..090c93c 100644
 --- a/src/java/com/android/internal/telephony/imsphone/ImsPhoneConnection.java
 +++ b/src/java/com/android/internal/telephony/imsphone/ImsPhoneConnection.java
-@@ -986,8 +986,10 @@ public class ImsPhoneConnection extends Connection {
+@@ -911,14 +911,12 @@ public class ImsPhoneConnection extends Connection {
+      */
+     private void updateWifiStateFromExtras(Bundle extras) {
+         // Google and Qualcomm have competing implementations
+-        final String extraCompatType = extras.containsKey(ImsCallProfile.EXTRA_CALL_RAT_TYPE) ?
+-            ImsCallProfile.EXTRA_CALL_RAT_TYPE : QtiImsInterfaceUtils.QTI_IMS_CALL_RAT_EXTRA_KEY;
+-        if (extras.containsKey(extraCompatType)) {
++        if (extras.containsKey(ImsCallProfile.EXTRA_CALL_RAT_TYPE)) {
+             // The RIL (sadly) sends us the EXTRA_CALL_RAT_TYPE as a string extra, rather than an
+             // integer extra, so we need to parse it.
+             int radioTechnology;
+             try {
+-                radioTechnology = Integer.parseInt(extras.getString(extraCompatType));
++                radioTechnology = Integer.parseInt(extras.getString(ImsCallProfile.EXTRA_CALL_RAT_TYPE));
+             } catch (NumberFormatException nfe) {
+                 radioTechnology = ServiceState.RIL_RADIO_TECHNOLOGY_UNKNOWN;
+             }
+diff --git a/src/java/org/codeaurora/ims/qtiims/IQtiImsInterface.aidl b/src/java/org/codeaurora/ims/qtiims/IQtiImsInterface.aidl
+index 329b140..3a81faf 100644
+--- a/src/java/org/codeaurora/ims/qtiims/IQtiImsInterface.aidl
++++ b/src/java/org/codeaurora/ims/qtiims/IQtiImsInterface.aidl
+@@ -117,4 +117,34 @@ oneway interface IQtiImsInterface {
+      */
+     void registerForViceRefreshInfo(IQtiImsInterfaceListener listener);
  
-     /**
-      * Determines the {@link ImsPhoneConnection} audio quality based on the local and remote
--     * {@link ImsCallProfile}. If indicate a HQ audio call if the local stream profile
--     * indicates AMR_WB or EVRC_WB and there is no remote restrict cause.
-+     * {@link ImsCallProfile}. Indicate a HD audio call if the local stream profile
-+     * is AMR_WB, EVRC_WB, EVS_WB, EVS_SWB, EVS_FB (EVS codec is considered only if the
-+     * operator supports HD on EVS) and
-+     * there is no remote restrict cause.
-      *
-      * @param localCallProfile The local call profile.
-      * @param remoteCallProfile The remote call profile.
-@@ -1000,15 +1002,47 @@ public class ImsPhoneConnection extends Connection {
-             return AUDIO_QUALITY_STANDARD;
-         }
- 
--        boolean isHighDef = (localCallProfile.mMediaProfile.mAudioQuality
-+        final boolean isEvsCodecHighDef = getBooleanCarrierConfig(mOwner.mPhone.getContext(),
-+                CarrierConfigManager.KEY_IMS_SUPPORT_EVS_HD_ICON_BOOL) &&
-+                (localCallProfile.mMediaProfile.mAudioQuality
-+                         == ImsStreamMediaProfile.AUDIO_QUALITY_EVS_WB
-+                || localCallProfile.mMediaProfile.mAudioQuality
-+                         == ImsStreamMediaProfile.AUDIO_QUALITY_EVS_SWB
-+                || localCallProfile.mMediaProfile.mAudioQuality
-+                         == ImsStreamMediaProfile.AUDIO_QUALITY_EVS_FB);
-+
-+        final boolean isHighDef = (localCallProfile.mMediaProfile.mAudioQuality
-                         == ImsStreamMediaProfile.AUDIO_QUALITY_AMR_WB
-                 || localCallProfile.mMediaProfile.mAudioQuality
--                        == ImsStreamMediaProfile.AUDIO_QUALITY_EVRC_WB)
-+                        == ImsStreamMediaProfile.AUDIO_QUALITY_EVRC_WB
-+                || isEvsCodecHighDef)
-                 && remoteCallProfile.mRestrictCause == ImsCallProfile.CALL_RESTRICT_CAUSE_NONE;
-         return isHighDef ? AUDIO_QUALITY_HIGH_DEFINITION : AUDIO_QUALITY_STANDARD;
-     }
- 
-     /**
-+     * Get the boolean config from carrier config manager.
++   /**
++     * sendCallTransferRequest
++     * Transfer an established call to given number or call id
 +     *
-+     * @param context the context to get carrier service
-+     * @param key config key defined in CarrierConfigManager
-+     * @return boolean value of corresponding key.
++     * @param phoneId indicates the phone instance which triggered the request
++     * @param type is one of the values QTI_IMS_TRANSFER_TYPE_*, as defined in
++     *        <code>org.codeaurora.ims.qtiims.QtiImsInterfaceUtils.</code>
++     * @param number indicates the target number to transfer
++     * @param listener an IQtiImsInterfaceListener instance to indicate the response
++     * @return void
 +     */
-+    private boolean getBooleanCarrierConfig(Context context, String key) {
-+        CarrierConfigManager configManager = (CarrierConfigManager) context.getSystemService(
-+                Context.CARRIER_CONFIG_SERVICE);
-+        PersistableBundle b = null;
-+        if (configManager != null) {
-+            b = configManager.getConfig();
-+        }
-+        if (b != null) {
-+            return b.getBoolean(key);
-+        } else {
-+            // Return static default defined in CarrierConfigManager.
-+            return CarrierConfigManager.getDefaultConfig().getBoolean(key);
-+        }
-+    }
++    void sendCallTransferRequest(int phoneId, int type, String number,
++            IQtiImsInterfaceListener listener);
 +
 +    /**
-      * Provides a string representation of the {@link ImsPhoneConnection}.  Primarily intended for
-      * use in log statements.
-      *
-@@ -1039,4 +1073,3 @@ public class ImsPhoneConnection extends Connection {
-         return mIsEmergency;
-     }
++     * Query Vops information
++     *
++     * @param listener an IQtiImsInterfaceListener instance to indicate the response
++     * @return void
++     */
++    void queryVopsStatus(IQtiImsInterfaceListener listener);
++
++   /**
++     * Query Ssac information
++     *
++     * @param listener an IQtiImsInterfaceListener instance to indicate the response
++     * @return void
++     */
++    void querySsacStatus(IQtiImsInterfaceListener listener);
++
  }
+diff --git a/src/java/org/codeaurora/ims/qtiims/IQtiImsInterfaceListener.aidl b/src/java/org/codeaurora/ims/qtiims/IQtiImsInterfaceListener.aidl
+index 32d1402..792bebc 100644
+--- a/src/java/org/codeaurora/ims/qtiims/IQtiImsInterfaceListener.aidl
++++ b/src/java/org/codeaurora/ims/qtiims/IQtiImsInterfaceListener.aidl
+@@ -92,7 +92,7 @@ oneway interface IQtiImsInterfaceListener {
+     /**
+      * Notifies client the result of call deflect request
+      *
+-     * @param <result> is one of the values QTIIMS_REQUEST_*, as defined in
++     * @param <result> is one of the values QTI_IMS_REQUEST_*, as defined in
+      *        <code>org.codeaurora.ims.qtiims.QtiImsInterfaceUtils.</code>
+      * @return void.
+      */
+@@ -106,4 +106,35 @@ oneway interface IQtiImsInterfaceListener {
+      * @return void.
+      */
+     void notifyRefreshViceInfo(in QtiViceInfo viceInfo);
++
++    /**
++     * Notifies client the result of call transfer request
++     *
++     * @param <result> is one of the values QTI_IMS_REQUEST_*, as defined in
++     *        <code>org.codeaurora.ims.qtiims.QtiImsInterfaceUtils.</code>
++     * @return void.
++     */
++    void receiveCallTransferResponse(int result);
++
++    /**
++     * Notifies Vops value to the clients
++     *
++     * @param vopsStatus
++     *        if true  : Voice is supported on LTE
++     *        if false : Voice is not supported on LTE
++     * @return void.
++     */
++    void notifyVopsStatus(boolean vopsStatus);
++
++    /**
++     * Notifies Ssac value to the clients
++     *
++     * @param ssacStatusResponse
++     *        if true  : Access barring factor for voice calls is 0
++     *        if false : Access barring factor for voice calls is non-zero
++     *                   Range: 0 to 100. Value 100 is used when
++     *                   the UE goes to the LTE Connected state
++     * @return void.
++     */
++    void notifySsacStatus(boolean ssacStatusResponse);
+ }
+diff --git a/src/java/org/codeaurora/ims/qtiims/QtiImsInterfaceListenerBaseImpl.java b/src/java/org/codeaurora/ims/qtiims/QtiImsInterfaceListenerBaseImpl.java
+index c93e2f9..44d9835 100644
+--- a/src/java/org/codeaurora/ims/qtiims/QtiImsInterfaceListenerBaseImpl.java
++++ b/src/java/org/codeaurora/ims/qtiims/QtiImsInterfaceListenerBaseImpl.java
+@@ -29,55 +29,51 @@
+ 
+ package org.codeaurora.ims.qtiims;
+ 
+-import android.telephony.Rlog;
 -
-diff --git a/src/java/com/android/internal/telephony/uicc/AdnRecordCache.java b/src/java/com/android/internal/telephony/uicc/AdnRecordCache.java
-index 3d3f855..862368f 100644
---- a/src/java/com/android/internal/telephony/uicc/AdnRecordCache.java
-+++ b/src/java/com/android/internal/telephony/uicc/AdnRecordCache.java
-@@ -156,10 +156,12 @@ public final class AdnRecordCache extends Handler implements IccConstants {
-     /* Find the free EXT1 record in the EXT1 file */
-     private int findFreeExtRec(int extensionEf) {
-         int[] extRec = extRecList.get(extensionEf);
--        for (int i = 0; i  < extRec.length; i++) {
--            if (extRec[i] == 0) {
--                Rlog.d(LOG_TAG, "Free record found: " +(i+1));
--                return (i+1);
-+        if (extRec != null) {
-+            for (int i = 0; i < extRec.length; i++) {
-+                if (extRec[i] == 0) {
-+                    Rlog.d(LOG_TAG, "Free record found: " +(i+1));
-+                    return (i+1);
-+                }
-             }
-         }
+ /**
+  * This class contains default implementation for IQtiImsInterfaceListener.
+  */
+ public class QtiImsInterfaceListenerBaseImpl extends IQtiImsInterfaceListener.Stub {
  
-@@ -333,7 +335,7 @@ public final class AdnRecordCache extends Handler implements IccConstants {
-         } else {
-             mUserWriteResponse.put(efid, response);
-             new AdnRecordLoader(mFh).updateEF(newAdn, efid, extensionEF,
--                    index, pin2,
-+                    index, pin2, findFreeExtRec(extensionEF),
-                     obtainMessage(EVENT_UPDATE_ADN_DONE, efid, index, newAdn));
-         }
- 
-@@ -353,6 +355,10 @@ public final class AdnRecordCache extends Handler implements IccConstants {
-                 useLocalPb ? mUsimLocalPhoneBookManager : mUsimGlobalPhoneBookManager;
+-    private static String LOG_TAG = "QtiImsInterfaceListenerBaseImpl";
+-
+     @Override
+     public void onSetCallForwardUncondTimer(int status) {
+-        logUnexpectedQtiImsListenerCall("onSetCallForwardUncondTimer");
      }
  
-+    public boolean isPbrPresent() {
-+        return (mUsimGlobalPhoneBookManager.isPbrFilePresent() ||
-+                mUsimLocalPhoneBookManager.isPbrFilePresent());
+     @Override
+     public void onGetCallForwardUncondTimer(int startHour, int endHour, int startMinute,
+             int endMinute, int reason, int status, String number, int service) {
+-        logUnexpectedQtiImsListenerCall("onGetCallForwardUncondTimer");
+     }
+ 
+     @Override
+     public void onUTReqFailed(int errCode, String errString) {
+-        logUnexpectedQtiImsListenerCall("onUTReqFailed");
+     }
+ 
+     @Override
+     public void onGetPacketCount(int status, long packetCount) {
+-        logUnexpectedQtiImsListenerCall("onGetPacketCount");
+     }
+ 
+     @Override
+     public void onGetPacketErrorCount(int status, long packetErrorCount) {
+-        logUnexpectedQtiImsListenerCall("onGetPacketErrorCount");
+     }
+ 
+     @Override
+     public void receiveCallDeflectResponse(int result) {
+-        logUnexpectedQtiImsListenerCall("receiveCallDeflectResponse");
+     }
+ 
+     @Override
+     public void notifyRefreshViceInfo(QtiViceInfo viceInfo) {
+-        logUnexpectedQtiImsListenerCall("notifyRefreshViceInfo");
+     }
+ 
+-    private static void logUnexpectedQtiImsListenerCall(String name)
+-    {
+-        Rlog.e(LOG_TAG, "Error! " + name + "() in QtiImsInterfaceListener should not be " +
+-                "called, Default Implementation.");
++    @Override
++    public void receiveCallTransferResponse(int result) {
 +    }
++
++    @Override
++    public void notifyVopsStatus(boolean vopsStatus) {
+     }
++
++    @Override
++    public void notifySsacStatus(boolean ssacStatusResponse) {
++    }
++
+ }
+ 
+diff --git a/src/java/org/codeaurora/ims/qtiims/QtiImsInterfaceUtils.java b/src/java/org/codeaurora/ims/qtiims/QtiImsInterfaceUtils.java
+index de017dc..e594209 100644
+--- a/src/java/org/codeaurora/ims/qtiims/QtiImsInterfaceUtils.java
++++ b/src/java/org/codeaurora/ims/qtiims/QtiImsInterfaceUtils.java
+@@ -1,5 +1,5 @@
+ /**
+- * Copyright (c) 2015, The Linux Foundation. All rights reserved.
++ * Copyright (c) 2015, 2016 The Linux Foundation. All rights reserved.
+  *
+  * Redistribution and use in source and binary forms, with or without
+  * modification, are permitted provided that the following conditions are
+@@ -30,6 +30,8 @@
+ package org.codeaurora.ims.qtiims;
+ 
+ import android.content.ContentResolver;
++import android.content.Context;
++import com.android.internal.telephony.ConfigResourceUtil;
+ 
+ /**
+  * This class contains QtiImsInterface specific utiltity functions.
+@@ -50,8 +52,40 @@ public class QtiImsInterfaceUtils {
+     /* Default error value */
+     public static final int QTI_IMS_REQUEST_ERROR = 1;
+ 
+-    /* Call RAT extra key */
+-    public static final String QTI_IMS_CALL_RAT_EXTRA_KEY = "callRadioTech";
++    /**
++     * Definitions for the call transfer type. For easier implementation,
++     * the transfer type is defined as a bit mask value.
++     */
++    //Value representing blind call transfer type
++    public static final int QTI_IMS_BLIND_TRANSFER = 0x01;
++    //Value representing assured call transfer type
++    public static final int QTI_IMS_ASSURED_TRANSFER = 0x02;
++    //Value representing consultative call transfer type
++    public static final int QTI_IMS_CONSULTATIVE_TRANSFER = 0x04;
++
++    /* Call transfer extra key */
++    public static final String QTI_IMS_TRANSFER_EXTRA_KEY = "transferType";
++
++    /* Constants used for VOPS and SSAC feature */
++    // Intent action
++    public static final String ACTION_VOPS_SSAC_STATUS =
++            "org.codeaurora.VOIP_VOPS_SSAC_STATUS";
++    /* Intent extra
++     * if true  : Voice is supported on LTE
++     * if false : Voice is not supported on LTE
++     */
++    public static final String EXTRA_VOPS = "Vops";
++    /* Intent extra
++     * if true  : Access barring factor for voice calls is 0
++     * if false : Access barring factor for voice calls is non-zero
++     *            Range: 0 to 100. Value 100 is used when
++     *            the UE goes to the LTE Connected state
++     */
++    public static final String EXTRA_SSAC = "Ssac";
++
++
++    /* Call encryption status extra key. The value will be a boolean. */
++    public static final String QTI_IMS_CALL_ENCRYPTION_EXTRA_KEY = "CallEncryption";
  
      /**
-      * Responds with exception (in response) if efid is not a known ADN-like
-@@ -485,7 +491,8 @@ public final class AdnRecordCache extends Handler implements IccConstants {
-                         mUsimPhoneBookManager.loadEfFilesFromUsim().set(index - 1, adn);
-                     }
-                     if (adn != null && adn.hasExtendedRecord()
--                            && adn.mExtRecord > 0) {
-+                            && adn.mExtRecord > 0
-+                            && extRecList.get(extensionEf) != null) {
-                         extRecList.get(extensionEf)[adn.mExtRecord - 1] = 1;
-                     }
-                 }
-diff --git a/src/java/com/android/internal/telephony/uicc/AdnRecordLoader.java b/src/java/com/android/internal/telephony/uicc/AdnRecordLoader.java
-index 638f0c9..a0c4b65 100755
---- a/src/java/com/android/internal/telephony/uicc/AdnRecordLoader.java
-+++ b/src/java/com/android/internal/telephony/uicc/AdnRecordLoader.java
-@@ -43,7 +43,7 @@ public class AdnRecordLoader extends Handler {
-     // For "load one"
-     int mRecordNumber;
- 
--    int mNumExtRec;
-+    int mNumExtRec = -1;
- 
-     // for "load all"
-     ArrayList<AdnRecord> mAdns; // only valid after EVENT_ADN_LOAD_ALL_DONE
-@@ -208,7 +208,7 @@ public class AdnRecordLoader extends Handler {
-     handleMessage(Message msg) {
-         AsyncResult ar;
-         byte data[];
--        int[] extRecord;
-+        int[] extRecord = null;
-         AdnRecord adn;
- 
-         try {
-@@ -256,21 +256,20 @@ public class AdnRecordLoader extends Handler {
-                     String path = (String)(ar.userObj);
- 
-                     if (ar.exception != null) {
--                        throw new RuntimeException("get EF record size failed",
--                                ar.exception);
--                    }
--
--                    int[] extRecordSize = (int[])ar.result;
--                    // extRecordSize is int[3] array
--                    // int[0]  is the record length
--                    // int[1]  is the total length of the EF file
--                    // int[2]  is the number of records in the EF file
--                    // So int[0] * int[2] = int[1]
--                    if (extRecordSize.length != 3) {
--                        throw new RuntimeException("get wrong EF record size format",
--                                ar.exception);
-+                        Rlog.d(LOG_TAG, "Exception occured while fetching record size for EFEXT1");
-+                    } else {
-+                        int[] extRecordSize = (int[])ar.result;
-+                        // extRecordSize is int[3] array
-+                        // int[0]  is the record length
-+                        // int[1]  is the total length of the EF file
-+                        // int[2]  is the number of records in the EF file
-+                        // So int[0] * int[2] = int[1]
-+                        if (extRecordSize.length != 3) {
-+                            throw new RuntimeException("get wrong EF record size format",
-+                                    ar.exception);
-+                        }
-+                        mNumExtRec = extRecordSize[2]; //Number of EXT records.
-                     }
--                    mNumExtRec = extRecordSize[2]; //Number of EXT records.
-                     mPendingExtLoads = 1;
- 
-                     /* If we are loading from EF_ADN, specifically
-@@ -377,12 +376,14 @@ public class AdnRecordLoader extends Handler {
-                     mPendingExtLoads = 0;
- 
-                     // extRecord has the details of used/free EXT1 records.
--                    extRecord = new int[mNumExtRec];
--                    for (int i = 0; i < mNumExtRec; i++) {
--                        extRecord[i] = 0;
-+                    if (mNumExtRec != -1) {
-+                        extRecord = new int[mNumExtRec];
-+                        for (int i = 0; i < mNumExtRec; i++) {
-+                            extRecord[i] = 0;
-+                        }
-                     }
- 
--                    for(int i = 0, s = datas.size() ; i < s ; i++) {
-+                    for (int i = 0, s = datas.size() ; i < s ; i++) {
-                         adn = new AdnRecord(mEf, 1 + i, datas.get(i));
-                         mAdns.add(adn);
- 
-diff --git a/src/java/com/android/internal/telephony/uicc/SIMRecords.java b/src/java/com/android/internal/telephony/uicc/SIMRecords.java
-index 1ac262b..8b6f743 100644
---- a/src/java/com/android/internal/telephony/uicc/SIMRecords.java
-+++ b/src/java/com/android/internal/telephony/uicc/SIMRecords.java
-@@ -1429,11 +1429,14 @@ public class SIMRecords extends IccRecords {
-         if (!TextUtils.isEmpty(operator)) {
-             log("onAllRecordsLoaded set 'gsm.sim.operator.numeric' to operator='" +
-                     operator + "'");
--            log("update icc_operator_numeric=" + operator);
-             mTelephonyManager.setSimOperatorNumericForPhone(
-                     mParentApp.getPhoneId(), operator);
-             final SubscriptionController subController = SubscriptionController.getInstance();
--            subController.setMccMnc(operator, subController.getDefaultSmsSubId());
-+            int[] subId = subController.getSubId(mParentApp.getPhoneId());
-+            if (subId != null && subId.length > 0) {
-+                subController.setMccMnc(operator, subId[0]);
-+                log("update icc_operator_numeric = " + operator + " subId = " + subId[0]);
-+            }
-         } else {
-             log("onAllRecordsLoaded empty 'gsm.sim.operator.numeric' skipping");
-         }
+      * Private constructor for QtiImsInterfaceUtils as we don't want to instantiate this class
+@@ -86,4 +120,13 @@ public class QtiImsInterfaceUtils {
+         android.provider.Settings.Global.putString(contentResolver,
+                 QTI_IMS_CALL_DEFLECT_NUMBER, deflectNum);
+     }
++
++    /***
++     * Checks if the IMS call transfer property is enabled or not.
++     * Returns true if enabled, or false otherwise.
++     */
++    public static boolean isCallTransferEnabled(Context context) {
++        ConfigResourceUtil mConfigResUtil = new ConfigResourceUtil();
++        return mConfigResUtil.getBooleanValue(context, "config_enable_calltransfer_over_ims");
++    }
+ }
 -- 
 2.7.4
 
