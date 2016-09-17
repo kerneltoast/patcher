@@ -60,6 +60,7 @@ cd $ROM_TREE
 
 ### Useful upstream patches not present on the branch in use
 patch -d build					-p1 -s -N --no-backup-if-mismatch < $BRANCH/build0.patch
+patch -d build					-p1 -s -N --no-backup-if-mismatch < $BRANCH/build1.patch
 patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $BRANCH/frameworks-base0.patch
 patch -d frameworks/native			-p1 -s -N --no-backup-if-mismatch < $BRANCH/frameworks-native0.patch
 patch -d frameworks/opt/telephony		-p1 -s -N --no-backup-if-mismatch < $BRANCH/frameworks-opt-telephony0.patch
