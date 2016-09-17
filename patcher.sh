@@ -31,6 +31,7 @@ git clean -f -d && git reset --hard
 cd $ROM_TREE
 
 ### Useful upstream patches not present on the branch in use
+patch -d build					-p1 -s -N --no-backup-if-mismatch < $BRANCH/build0.patch
 patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $BRANCH/frameworks-base0.patch
 patch -d packages/apps/Nfc			-p1 -s -N --no-backup-if-mismatch < $BRANCH/packages-apps-Nfc0.patch
 
