@@ -1,0 +1,175 @@
+From 9e6738014aa08f1e2cf94dd582b5f13b08ba8834 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Sat, 17 Sep 2016 09:47:09 -0700
+Subject: [PATCH] Fingerprint: Speed up wake-and-unlock scenario
+
+*Directly dismiss keyguard instead of using a fade-out animation
+*Don't try to show the keyguard on screen wake if it's been requested to
+ be dismissed
+*Don't block screen wake (our amoled screen can be kept at 0 brightness
+ instead, as the wake blocker is blocking way too long)
+*Skip virtual navigation button animation on wake
+
+Change-Id: Iee6368b201339e5814c38139efd522a5e66c1e18
+Signed-off-by: Sultanxda <sultanxda@gmail.com>
+---
+ .../com/android/systemui/keyguard/KeyguardViewMediator.java    |  6 +++++-
+ .../systemui/statusbar/phone/FingerprintUnlockController.java  |  2 +-
+ .../android/systemui/statusbar/phone/NavigationBarView.java    |  2 +-
+ .../com/android/systemui/statusbar/phone/PhoneStatusBar.java   |  5 +++--
+ .../systemui/statusbar/phone/StatusBarKeyguardViewManager.java | 10 ++++++++++
+ .../com/android/server/display/DisplayPowerController.java     |  2 +-
+ .../server/policy/keyguard/KeyguardServiceDelegate.java        |  9 ++++++++-
+ 7 files changed, 29 insertions(+), 7 deletions(-)
+
+diff --git a/packages/SystemUI/src/com/android/systemui/keyguard/KeyguardViewMediator.java b/packages/SystemUI/src/com/android/systemui/keyguard/KeyguardViewMediator.java
+index 2833759..66efce4 100755
+--- a/packages/SystemUI/src/com/android/systemui/keyguard/KeyguardViewMediator.java
++++ b/packages/SystemUI/src/com/android/systemui/keyguard/KeyguardViewMediator.java
+@@ -1750,7 +1750,11 @@ public class KeyguardViewMediator extends SystemUI {
+             }
+ 
+             setShowingLocked(false);
+-            mStatusBarKeyguardViewManager.hide(startTime, fadeoutDuration);
++            if (mWakeAndUnlocking) {
++                mStatusBarKeyguardViewManager.hideNoAnimation();
++            } else {
++                mStatusBarKeyguardViewManager.hide(startTime, fadeoutDuration);
++            }
+             resetKeyguardDonePendingLocked();
+             mHideAnimationRun = false;
+             updateActivityLockScreenState();
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/FingerprintUnlockController.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/FingerprintUnlockController.java
+index 7135836..af7433d 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/FingerprintUnlockController.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/FingerprintUnlockController.java
+@@ -196,7 +196,7 @@ public class FingerprintUnlockController extends KeyguardUpdateMonitorCallback {
+                 mStatusBarWindowManager.setStatusBarFocusable(false);
+                 mDozeScrimController.abortPulsing();
+                 mKeyguardViewMediator.onWakeAndUnlocking();
+-                mScrimController.setWakeAndUnlocking();
++                mScrimController.forceHideScrims(true);
+                 if (mPhoneStatusBar.getNavigationBarView() != null) {
+                     mPhoneStatusBar.getNavigationBarView().setWakeAndUnlocking(true);
+                 }
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/NavigationBarView.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/NavigationBarView.java
+index c10f45b..d2f197b 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/NavigationBarView.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/NavigationBarView.java
+@@ -506,7 +506,7 @@ public class NavigationBarView extends LinearLayout {
+     }
+ 
+     public void setWakeAndUnlocking(boolean wakeAndUnlocking) {
+-        setUseFadingAnimations(wakeAndUnlocking);
++        setUseFadingAnimations(!wakeAndUnlocking);
+         mWakeAndUnlocking = wakeAndUnlocking;
+         updateLayoutTransitionsEnabled();
+     }
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java
+index 44f7b83..362973e 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java
+@@ -2295,8 +2295,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
+                 if (DEBUG_MEDIA) {
+                     Log.v(TAG, "DEBUG_MEDIA: Fading out album artwork");
+                 }
+-                if (mFingerprintUnlockController.getMode()
+-                        == FingerprintUnlockController.MODE_WAKE_AND_UNLOCK_PULSING) {
++                int fpMode = mFingerprintUnlockController.getMode();
++                if (fpMode == FingerprintUnlockController.MODE_WAKE_AND_UNLOCK_PULSING ||
++                        fpMode == FingerprintUnlockController.MODE_WAKE_AND_UNLOCK) {
+ 
+                     // We are unlocking directly - no animation!
+                     mBackdrop.setVisibility(View.GONE);
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarKeyguardViewManager.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarKeyguardViewManager.java
+index 96cf093..3142950 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarKeyguardViewManager.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarKeyguardViewManager.java
+@@ -358,6 +358,16 @@ public class StatusBarKeyguardViewManager {
+         }
+     }
+ 
++    public void hideNoAnimation() {
++        mShowing = false;
++        mPhoneStatusBar.hideKeyguard();
++        mStatusBarWindowManager.setKeyguardShowing(false);
++        mBouncer.hide(true /* destroyView */);
++        mViewMediatorCallback.keyguardGone();
++        mFingerprintUnlockController.finishKeyguardFadingAway();
++        updateStates();
++    }
++
+     private void animateScrimControllerKeyguardFadingOut(long delay, long duration,
+             boolean skipFirstFrame) {
+         animateScrimControllerKeyguardFadingOut(delay, duration, null /* endRunnable */,
+diff --git a/services/core/java/com/android/server/display/DisplayPowerController.java b/services/core/java/com/android/server/display/DisplayPowerController.java
+index ae596cb..60dde32 100644
+--- a/services/core/java/com/android/server/display/DisplayPowerController.java
++++ b/services/core/java/com/android/server/display/DisplayPowerController.java
+@@ -821,7 +821,7 @@ final class DisplayPowerController implements AutomaticBrightnessController.Call
+             mWindowManagerPolicy.screenTurnedOff();
+         } else if (!isOff && mReportedScreenStateToPolicy == REPORTED_TO_POLICY_SCREEN_OFF) {
+             mReportedScreenStateToPolicy = REPORTED_TO_POLICY_SCREEN_TURNING_ON;
+-            if (mPowerState.getColorFadeLevel() == 0.0f) {
++            if (USE_COLOR_FADE_ON_ANIMATION && mPowerState.getColorFadeLevel() == 0.0f) {
+                 blockScreenOn();
+             } else {
+                 unblockScreenOn();
+diff --git a/services/core/java/com/android/server/policy/keyguard/KeyguardServiceDelegate.java b/services/core/java/com/android/server/policy/keyguard/KeyguardServiceDelegate.java
+index a223d05..ec5c0e3 100644
+--- a/services/core/java/com/android/server/policy/keyguard/KeyguardServiceDelegate.java
++++ b/services/core/java/com/android/server/policy/keyguard/KeyguardServiceDelegate.java
+@@ -62,6 +62,7 @@ public class KeyguardServiceDelegate {
+             showingAndNotOccluded = true;
+             secure = true;
+             deviceHasKeyguard = true;
++            keyguardDone = false;
+         }
+         boolean showing;
+         boolean showingAndNotOccluded;
+@@ -77,6 +78,7 @@ public class KeyguardServiceDelegate {
+         public boolean bootCompleted;
+         public int screenState;
+         public int interactiveState;
++        public boolean keyguardDone;
+     };
+ 
+     public interface DrawnListener {
+@@ -222,6 +224,7 @@ public class KeyguardServiceDelegate {
+         if (mKeyguardService != null) {
+             mKeyguardService.keyguardDone(authenticated, wakeup);
+         }
++        mKeyguardState.keyguardDone = true;
+     }
+ 
+     public void setOccluded(boolean isOccluded) {
+@@ -292,7 +295,9 @@ public class KeyguardServiceDelegate {
+     public void onScreenTurnedOn() {
+         if (mKeyguardService != null) {
+             if (DEBUG) Log.v(TAG, "onScreenTurnedOn()");
+-            mKeyguardService.onScreenTurnedOn();
++            if (!mKeyguardState.keyguardDone) {
++                mKeyguardService.onScreenTurnedOn();
++            }
+         }
+         mKeyguardState.screenState = SCREEN_STATE_ON;
+     }
+@@ -317,6 +322,7 @@ public class KeyguardServiceDelegate {
+             mKeyguardService.setKeyguardEnabled(enabled);
+         }
+         mKeyguardState.enabled = enabled;
++        mKeyguardState.keyguardDone = !enabled;
+     }
+ 
+     public void onSystemReady() {
+@@ -433,6 +439,7 @@ public class KeyguardServiceDelegate {
+     }
+ 
+     public void showKeyguard() {
++        mKeyguardState.keyguardDone = false;
+         mKeyguardService.showKeyguard();
+     }
+ 
+-- 
+2.7.4
+
