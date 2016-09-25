@@ -3,7 +3,7 @@
 # Apply these patches before compilation:
 
 ROM_TREE=$PWD
-BRANCH=$ROM_TREE/patcher/ZNH2K
+BRANCH=$ROM_TREE/patcher/ZNH5Y
 CUSTOM=$ROM_TREE/patcher/sultan
 
 APN_LIST_URL=https://raw.githubusercontent.com/CyanogenMod/android_vendor_cm/cm-13.0/prebuilt/common/etc/apns-conf.xml
@@ -17,10 +17,6 @@ cd $ROM_TREE/frameworks/base
 git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Eleven
 git clean -f -d && git reset --hard
-cd $ROM_TREE/packages/apps/Messaging
-git clean -f -d && git reset --hard
-cd $ROM_TREE/packages/apps/Nfc
-git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Settings
 git clean -f -d && git reset --hard
 cd $ROM_TREE/system/core
@@ -32,13 +28,6 @@ cd $ROM_TREE
 
 ### Useful upstream patches not present on the branch in use
 patch -d build					-p1 -s -N --no-backup-if-mismatch < $BRANCH/build0.patch
-patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $BRANCH/frameworks-base0.patch
-patch -d packages/apps/Nfc			-p1 -s -N --no-backup-if-mismatch < $BRANCH/packages-apps-Nfc0.patch
-
-# Special git binary diff patch
-cd packages/apps/Messaging
-git apply $BRANCH/packages-apps-Messaging0.patch
-cd $ROM_TREE
 
 ### Custom patches
 patch -d build					-p1 -s -N --no-backup-if-mismatch < $CUSTOM/build0.patch
