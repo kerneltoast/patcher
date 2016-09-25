@@ -1,0 +1,26 @@
+From 1bd794227778497ca8b1a4bc250890a84a08b902 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Sun, 25 Sep 2016 00:50:05 -0700
+Subject: [PATCH] qcom: Hack around project pathmap hack
+
+Change-Id: I0dbf0b6d4c4102458c4dfba0e0e9444754f45d35
+---
+ core/qcom_target.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/core/qcom_target.mk b/core/qcom_target.mk
+index 2dde2d9..e2524ac 100644
+--- a/core/qcom_target.mk
++++ b/core/qcom_target.mk
+@@ -75,7 +75,7 @@ ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
+ 
+ # HACK: check to see if build uses standard QC HAL paths by checking for CM path structure
+ AOSP_VARIANT_MAKEFILE := $(wildcard hardware/qcom/audio/default/Android.mk)
+-ifeq ("$(AOSP_VARIANT_MAKEFILE)","")
++ifneq ("$(AOSP_VARIANT_MAKEFILE)","")
+ $(call project-set-path,qcom-audio,hardware/qcom/audio)
+ $(call project-set-path,qcom-display,hardware/qcom/display)
+ $(call project-set-path,qcom-media,hardware/qcom/media)
+-- 
+2.7.4
+

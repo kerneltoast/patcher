@@ -38,6 +38,7 @@ cd $ROM_TREE
 ### Custom patches
 patch -d build					-p1 -s -N --no-backup-if-mismatch < $CUSTOM/build0.patch
 patch -d build					-p1 -s -N --no-backup-if-mismatch < $CUSTOM/build1.patch
+patch -d build					-p1 -s -N --no-backup-if-mismatch < $CUSTOM/build2.patch
 patch -d frameworks/av				-p1 -s -N --no-backup-if-mismatch < $CUSTOM/frameworks-av0.patch
 patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $CUSTOM/frameworks-base0.patch
 patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $CUSTOM/frameworks-base1.patch
