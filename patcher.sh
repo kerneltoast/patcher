@@ -63,3 +63,8 @@ git revert --no-edit --no-commit 675ece946691185f1a2877b2880f933a417f03df
 git revert --no-edit --no-commit c7f1f86ff59b739af1193df837b0aadf7a2386ce
 git revert --no-edit --no-commit 815e4d86dc19e623b32366b035d027a3ffa169fa
 cd $ROM_TREE
+
+# Revert change that disables proximity check for power button
+cd $ROM_TREE/frameworks/base
+git revert --no-edit --no-commit 545dc46798d26328b6dc503663a771b37797eca5
+cd $ROM_TREE
