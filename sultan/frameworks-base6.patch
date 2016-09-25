@@ -1,6 +1,6 @@
-From 9e6738014aa08f1e2cf94dd582b5f13b08ba8834 Mon Sep 17 00:00:00 2001
+From 9d574ebab8c611af92ca77abb8c58f9b16b6c847 Mon Sep 17 00:00:00 2001
 From: Sultanxda <sultanxda@gmail.com>
-Date: Sat, 17 Sep 2016 09:47:09 -0700
+Date: Sun, 25 Sep 2016 00:17:29 -0700
 Subject: [PATCH] Fingerprint: Speed up wake-and-unlock scenario
 
 *Directly dismiss keyguard instead of using a fade-out animation
@@ -13,14 +13,14 @@ Subject: [PATCH] Fingerprint: Speed up wake-and-unlock scenario
 Change-Id: Iee6368b201339e5814c38139efd522a5e66c1e18
 Signed-off-by: Sultanxda <sultanxda@gmail.com>
 ---
- .../com/android/systemui/keyguard/KeyguardViewMediator.java    |  6 +++++-
- .../systemui/statusbar/phone/FingerprintUnlockController.java  |  2 +-
- .../android/systemui/statusbar/phone/NavigationBarView.java    |  2 +-
- .../com/android/systemui/statusbar/phone/PhoneStatusBar.java   |  5 +++--
- .../systemui/statusbar/phone/StatusBarKeyguardViewManager.java | 10 ++++++++++
- .../com/android/server/display/DisplayPowerController.java     |  2 +-
- .../server/policy/keyguard/KeyguardServiceDelegate.java        |  9 ++++++++-
- 7 files changed, 29 insertions(+), 7 deletions(-)
+ .../systemui/keyguard/KeyguardViewMediator.java    |  6 +++-
+ .../phone/FingerprintUnlockController.java         |  6 ++--
+ .../statusbar/phone/NavigationBarView.java         |  2 +-
+ .../systemui/statusbar/phone/PhoneStatusBar.java   |  5 ++--
+ .../phone/StatusBarKeyguardViewManager.java        | 10 +++++++
+ .../server/display/DisplayPowerController.java     |  2 +-
+ .../policy/keyguard/KeyguardServiceDelegate.java   | 32 ++++++++++++++--------
+ 7 files changed, 43 insertions(+), 20 deletions(-)
 
 diff --git a/packages/SystemUI/src/com/android/systemui/keyguard/KeyguardViewMediator.java b/packages/SystemUI/src/com/android/systemui/keyguard/KeyguardViewMediator.java
 index 2833759..66efce4 100755
@@ -40,7 +40,7 @@ index 2833759..66efce4 100755
              mHideAnimationRun = false;
              updateActivityLockScreenState();
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/FingerprintUnlockController.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/FingerprintUnlockController.java
-index 7135836..af7433d 100644
+index 7135836..4e900db 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/FingerprintUnlockController.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/FingerprintUnlockController.java
 @@ -196,7 +196,7 @@ public class FingerprintUnlockController extends KeyguardUpdateMonitorCallback {
@@ -52,6 +52,17 @@ index 7135836..af7433d 100644
                  if (mPhoneStatusBar.getNavigationBarView() != null) {
                      mPhoneStatusBar.getNavigationBarView().setWakeAndUnlocking(true);
                  }
+@@ -205,9 +205,7 @@ public class FingerprintUnlockController extends KeyguardUpdateMonitorCallback {
+             case MODE_NONE:
+                 break;
+         }
+-        if (mMode != MODE_WAKE_AND_UNLOCK_PULSING) {
+-            mStatusBarWindowManager.setForceDozeBrightness(false);
+-        }
++        mStatusBarWindowManager.setForceDozeBrightness(false);
+         mPhoneStatusBar.notifyFpAuthModeChanged();
+     }
+ 
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/NavigationBarView.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/NavigationBarView.java
 index c10f45b..d2f197b 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/NavigationBarView.java
@@ -66,7 +77,7 @@ index c10f45b..d2f197b 100644
          updateLayoutTransitionsEnabled();
      }
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java
-index 44f7b83..362973e 100644
+index 7df8346..7122fd7 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java
 @@ -2295,8 +2295,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
@@ -103,10 +114,10 @@ index 96cf093..3142950 100644
              boolean skipFirstFrame) {
          animateScrimControllerKeyguardFadingOut(delay, duration, null /* endRunnable */,
 diff --git a/services/core/java/com/android/server/display/DisplayPowerController.java b/services/core/java/com/android/server/display/DisplayPowerController.java
-index ae596cb..60dde32 100644
+index 25e59d5..f3def8a 100644
 --- a/services/core/java/com/android/server/display/DisplayPowerController.java
 +++ b/services/core/java/com/android/server/display/DisplayPowerController.java
-@@ -821,7 +821,7 @@ final class DisplayPowerController implements AutomaticBrightnessController.Call
+@@ -813,7 +813,7 @@ final class DisplayPowerController implements AutomaticBrightnessController.Call
              mWindowManagerPolicy.screenTurnedOff();
          } else if (!isOff && mReportedScreenStateToPolicy == REPORTED_TO_POLICY_SCREEN_OFF) {
              mReportedScreenStateToPolicy = REPORTED_TO_POLICY_SCREEN_TURNING_ON;
@@ -116,7 +127,7 @@ index ae596cb..60dde32 100644
              } else {
                  unblockScreenOn();
 diff --git a/services/core/java/com/android/server/policy/keyguard/KeyguardServiceDelegate.java b/services/core/java/com/android/server/policy/keyguard/KeyguardServiceDelegate.java
-index a223d05..ec5c0e3 100644
+index a223d05..0d376fe 100644
 --- a/services/core/java/com/android/server/policy/keyguard/KeyguardServiceDelegate.java
 +++ b/services/core/java/com/android/server/policy/keyguard/KeyguardServiceDelegate.java
 @@ -62,6 +62,7 @@ public class KeyguardServiceDelegate {
@@ -135,15 +146,45 @@ index a223d05..ec5c0e3 100644
      };
  
      public interface DrawnListener {
-@@ -222,6 +224,7 @@ public class KeyguardServiceDelegate {
+@@ -222,6 +224,8 @@ public class KeyguardServiceDelegate {
          if (mKeyguardService != null) {
              mKeyguardService.keyguardDone(authenticated, wakeup);
          }
 +        mKeyguardState.keyguardDone = true;
++        hideScrim();
      }
  
      public void setOccluded(boolean isOccluded) {
-@@ -292,7 +295,9 @@ public class KeyguardServiceDelegate {
+@@ -275,16 +279,18 @@ public class KeyguardServiceDelegate {
+     }
+ 
+     public void onScreenTurningOn(final DrawnListener drawnListener) {
+-        if (mKeyguardService != null) {
+-            if (DEBUG) Log.v(TAG, "onScreenTurnedOn(showListener = " + drawnListener + ")");
+-            mKeyguardService.onScreenTurningOn(new KeyguardShowDelegate(drawnListener));
+-        } else {
+-            // try again when we establish a connection
+-            Slog.w(TAG, "onScreenTurningOn(): no keyguard service!");
+-            // This shouldn't happen, but if it does, show the scrim immediately and
+-            // invoke the listener's callback after the service actually connects.
+-            mDrawnListenerWhenConnect = drawnListener;
+-            showScrim();
++        if (!mKeyguardState.keyguardDone) {
++            if (mKeyguardService != null) {
++                if (DEBUG) Log.v(TAG, "onScreenTurnedOn(showListener = " + drawnListener + ")");
++                mKeyguardService.onScreenTurningOn(new KeyguardShowDelegate(drawnListener));
++            } else {
++                // try again when we establish a connection
++                Slog.w(TAG, "onScreenTurningOn(): no keyguard service!");
++                // This shouldn't happen, but if it does, show the scrim immediately and
++                // invoke the listener's callback after the service actually connects.
++                mDrawnListenerWhenConnect = drawnListener;
++                showScrim();
++            }
+         }
+         mKeyguardState.screenState = SCREEN_STATE_TURNING_ON;
+     }
+@@ -292,7 +298,9 @@ public class KeyguardServiceDelegate {
      public void onScreenTurnedOn() {
          if (mKeyguardService != null) {
              if (DEBUG) Log.v(TAG, "onScreenTurnedOn()");
@@ -154,7 +195,7 @@ index a223d05..ec5c0e3 100644
          }
          mKeyguardState.screenState = SCREEN_STATE_ON;
      }
-@@ -317,6 +322,7 @@ public class KeyguardServiceDelegate {
+@@ -317,6 +325,7 @@ public class KeyguardServiceDelegate {
              mKeyguardService.setKeyguardEnabled(enabled);
          }
          mKeyguardState.enabled = enabled;
@@ -162,7 +203,7 @@ index a223d05..ec5c0e3 100644
      }
  
      public void onSystemReady() {
-@@ -433,6 +439,7 @@ public class KeyguardServiceDelegate {
+@@ -433,6 +442,7 @@ public class KeyguardServiceDelegate {
      }
  
      public void showKeyguard() {
