@@ -15,6 +15,8 @@ cd $ROM_TREE/frameworks/av
 git clean -f -d && git reset --hard
 cd $ROM_TREE/frameworks/base
 git clean -f -d && git reset --hard
+cd $ROM_TREE/hardware/cyanogen
+git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Eleven
 git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/LockClock
@@ -31,6 +33,7 @@ cd $ROM_TREE
 ### Useful upstream patches not present on the branch in use
 patch -d build					-p1 -s -N --no-backup-if-mismatch < $BRANCH/build0.patch
 patch -d build					-p1 -s -N --no-backup-if-mismatch < $BRANCH/build1.patch
+patch -d hardware/cyanogen			-p1 -s -N --no-backup-if-mismatch < $BRANCH/hardware-cyanogen0.patch
 
 # Special git binary diff patches
 cd vendor/cm
