@@ -1,0 +1,73 @@
+From 4dd5a58a0f2d04c25727c94f4e51273ac45e87d0 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Mon, 26 Sep 2016 21:16:38 -0700
+Subject: [PATCH] LockClock: Remove wakelock
+
+A weather widget does not deserve a wakelock. This went wild and killed
+battery, but instead of finding out why the wakelock was not released,
+just remove it because having a wakelock for this does not make much sense.
+
+Change-Id: I0e9d1560988fdb90a61d7b9a09f72bffa50cf40c
+---
+ AndroidManifest.xml                                           |  1 -
+ .../cyanogenmod/lockclock/weather/WeatherUpdateService.java   | 11 -----------
+ 2 files changed, 12 deletions(-)
+
+diff --git a/AndroidManifest.xml b/AndroidManifest.xml
+index d4255e8..6501fa0 100644
+--- a/AndroidManifest.xml
++++ b/AndroidManifest.xml
+@@ -32,7 +32,6 @@
+ 
+     <!-- General -->
+     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+ 
+     <uses-permission android:name="cyanogenmod.permission.ACCESS_WEATHER_MANAGER" />
+     <uses-permission android:name="cyanogenmod.permission.READ_WEATHER" />
+diff --git a/src/com/cyanogenmod/lockclock/weather/WeatherUpdateService.java b/src/com/cyanogenmod/lockclock/weather/WeatherUpdateService.java
+index 1fd6f70..36d0b0c 100644
+--- a/src/com/cyanogenmod/lockclock/weather/WeatherUpdateService.java
++++ b/src/com/cyanogenmod/lockclock/weather/WeatherUpdateService.java
+@@ -32,8 +32,6 @@ import android.os.HandlerThread;
+ import android.os.IBinder;
+ import android.os.Looper;
+ import android.os.Message;
+-import android.os.PowerManager;
+-import android.os.PowerManager.WakeLock;
+ import android.os.SystemClock;
+ import android.text.TextUtils;
+ import android.util.Log;
+@@ -199,7 +197,6 @@ public class WeatherUpdateService extends Service {
+ 
+         private Handler mHandler;
+         private boolean mIsProcessingWeatherUpdate = false;
+-        private WakeLock mWakeLock;
+         private PendingIntent mTimeoutPendingIntent;
+         private int mRequestId;
+         private final CMWeatherManager mWeatherManager;
+@@ -272,12 +269,6 @@ public class WeatherUpdateService extends Service {
+             }
+ 
+             mIsProcessingWeatherUpdate = true;
+-            final PowerManager pm
+-                    = (PowerManager) mContext.getSystemService(POWER_SERVICE);
+-            mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+-            mWakeLock.setReferenceCounted(false);
+-            if (D) Log.v(TAG, "ACQUIRING WAKELOCK");
+-            mWakeLock.acquire();
+ 
+             WeatherLocation customWeatherLocation = null;
+             if (Preferences.useCustomWeatherLocation(mContext)) {
+@@ -404,8 +395,6 @@ public class WeatherUpdateService extends Service {
+             finishedIntent.putExtra(EXTRA_UPDATE_CANCELLED, updateCancelled);
+             mContext.sendBroadcast(finishedIntent);
+ 
+-            if (D) Log.d(TAG, "RELEASING WAKELOCK");
+-            mWakeLock.release();
+             mIsProcessingWeatherUpdate = false;
+             mContext.stopService(new Intent(mContext, WeatherUpdateService.class));
+         }
+-- 
+2.7.4
+
