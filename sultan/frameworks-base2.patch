@@ -1,6 +1,6 @@
-From 1849d8f5b274a69bd3b11566005659e6f94ec25b Mon Sep 17 00:00:00 2001
+From e47acaf07b2413a1ace9251e6680e18d0a247838 Mon Sep 17 00:00:00 2001
 From: Sultanxda <sultanxda@gmail.com>
-Date: Fri, 16 Oct 2015 17:58:18 -0700
+Date: Thu, 6 Oct 2016 21:59:31 -0700
 Subject: [PATCH] telephony: Hack GSM and LTE signal strength
 
 makeSignalStrengthFromRilParcel() is used for both solicited and
@@ -10,24 +10,57 @@ GSM or LTE signal is poor but usable, in which case the modem would often
 disconnect completely or fall back to a lower network mode (resulting in
 poor UX).
 
-Revised to fix the invalid GSM signal strength values (over 31 ASU).
+Also, always report a valid ASU for LTE, even when the signal noise is
+considered to be terrible, and adjust the threshold for terrible signal
+noise in the signal icon as well.
+
+Change-Id: Ia2115a4b1f9e61fdeb75b86ece6fdd77005d2cf6
 ---
- telephony/java/android/telephony/SignalStrength.java | 5 +++++
- 1 file changed, 5 insertions(+)
+ telephony/java/android/telephony/SignalStrength.java | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/telephony/java/android/telephony/SignalStrength.java b/telephony/java/android/telephony/SignalStrength.java
-index c941a28..42381d1 100644
+index 997b6ff..5db6ac8 100644
 --- a/telephony/java/android/telephony/SignalStrength.java
 +++ b/telephony/java/android/telephony/SignalStrength.java
-@@ -326,6 +326,11 @@ public static SignalStrength makeSignalStrengthFromRilParcel(Parcel in) {
+@@ -327,6 +327,11 @@ public class SignalStrength implements Parcelable {
          ss.mLteRssnr = in.readInt();
          ss.mLteCqi = in.readInt();
          ss.mTdScdmaRscp = in.readInt();
 +        /* Hack signal strength */
-+        if (ss.mGsmSignalStrength < 27) ss.mGsmSignalStrength += 3;
-+        if (ss.mLteSignalStrength < 91) ss.mLteSignalStrength += 5;
-+        if (ss.mLteRsrp != ss.INVALID && ss.mLteRsrp > 49) ss.mLteRsrp -= 5;
-+        if (ss.mLteRsrq != ss.INVALID && ss.mLteRsrq > 3) ss.mLteRsrq -= 2;
++        if (ss.mGsmSignalStrength <= 28) ss.mGsmSignalStrength += 3;
++        if (ss.mLteSignalStrength <= 92) ss.mLteSignalStrength += 5;
++        if (ss.mLteRsrp != ss.INVALID && ss.mLteRsrp >= 49) ss.mLteRsrp -= 5;
++        if (ss.mLteRsrq != ss.INVALID && ss.mLteRsrq >= 6) ss.mLteRsrq -= 3;
          return ss;
      }
  
+@@ -554,14 +559,13 @@ public class SignalStrength implements Parcelable {
+         int asuLevel = 0;
+         if (isGsm) {
+             boolean oldRil = needsOldRilFeature("signalstrength");
+-            if (getLteLevel() == SIGNAL_STRENGTH_NONE_OR_UNKNOWN || oldRil) {
++            asuLevel = getLteAsuLevel();
++            if (asuLevel == 255 || oldRil) {
+                 if (getTdScdmaLevel() == SIGNAL_STRENGTH_NONE_OR_UNKNOWN) {
+                     asuLevel = getGsmAsuLevel();
+                 } else {
+                     asuLevel = getTdScdmaAsuLevel();
+                 }
+-            } else {
+-                asuLevel = getLteAsuLevel();
+             }
+         } else {
+             int cdmaAsuLevel = getCdmaAsuLevel();
+@@ -836,7 +840,7 @@ public class SignalStrength implements Parcelable {
+         else if (mLteRssnr >= 130) snrIconLevel = SIGNAL_STRENGTH_GREAT;
+         else if (mLteRssnr >= 45) snrIconLevel = SIGNAL_STRENGTH_GOOD;
+         else if (mLteRssnr >= 10) snrIconLevel = SIGNAL_STRENGTH_MODERATE;
+-        else if (mLteRssnr >= -30) snrIconLevel = SIGNAL_STRENGTH_POOR;
++        else if (mLteRssnr >= -50) snrIconLevel = SIGNAL_STRENGTH_POOR;
+         else if (mLteRssnr >= -200)
+             snrIconLevel = SIGNAL_STRENGTH_NONE_OR_UNKNOWN;
+ 
+-- 
+2.7.4
+
