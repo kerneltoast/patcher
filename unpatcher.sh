@@ -9,8 +9,6 @@ cd $ROM_TREE/frameworks/av
 git clean -f -d && git reset --hard
 cd $ROM_TREE/frameworks/base
 git clean -f -d && git reset --hard
-cd $ROM_TREE/packages/apps/Eleven
-git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/LockClock
 git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Settings
