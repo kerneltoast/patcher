@@ -17,8 +17,6 @@ cd $ROM_TREE/frameworks/base
 git clean -f -d && git reset --hard
 cd $ROM_TREE/hardware/cyanogen
 git clean -f -d && git reset --hard
-cd $ROM_TREE/packages/apps/Eleven
-git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/LockClock
 git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Settings
@@ -60,15 +58,6 @@ patch -d system/core				-p1 -s -N --no-backup-if-mismatch < $CUSTOM/system-core2
 
 # Get APN list from nightly branch and apply patch on top
 curl -s $APN_LIST_URL > vendor/cm/prebuilt/common/etc/apns-conf.xml
-
-# Revert media key patches to Eleven, as Eleven randomly starts playing
-# music with them when no headset is plugged in
-cd $ROM_TREE/packages/apps/Eleven
-git revert --no-edit --no-commit 89f5a4d2c22bd1d2c17500fcee6a37e2754aff49
-git revert --no-edit --no-commit 675ece946691185f1a2877b2880f933a417f03df
-git revert --no-edit --no-commit c7f1f86ff59b739af1193df837b0aadf7a2386ce
-git revert --no-edit --no-commit 815e4d86dc19e623b32366b035d027a3ffa169fa
-cd $ROM_TREE
 
 # Revert change that disables proximity check for power button
 cd $ROM_TREE/frameworks/base
