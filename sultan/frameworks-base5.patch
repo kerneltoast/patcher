@@ -1,32 +1,44 @@
-From 9d574ebab8c611af92ca77abb8c58f9b16b6c847 Mon Sep 17 00:00:00 2001
+From 83e25b611fb0323d30fe2237223c5103dd3b2698 Mon Sep 17 00:00:00 2001
 From: Sultanxda <sultanxda@gmail.com>
-Date: Sun, 25 Sep 2016 00:17:29 -0700
+Date: Sun, 9 Oct 2016 09:27:06 -0700
 Subject: [PATCH] Fingerprint: Speed up wake-and-unlock scenario
 
 *Directly dismiss keyguard instead of using a fade-out animation
-*Don't try to show the keyguard on screen wake if it's been requested to
- be dismissed
-*Don't block screen wake (our amoled screen can be kept at 0 brightness
- instead, as the wake blocker is blocking way too long)
 *Skip virtual navigation button animation on wake
+*Remove hack level over 9000 (_significantly_ slows down wake-and-unlock
+ often)
 
-Change-Id: Iee6368b201339e5814c38139efd522a5e66c1e18
+Change-Id: I224058a3ed6feb495917c22b3f409627617c4912
 Signed-off-by: Sultanxda <sultanxda@gmail.com>
 ---
- .../systemui/keyguard/KeyguardViewMediator.java    |  6 +++-
- .../phone/FingerprintUnlockController.java         |  6 ++--
- .../statusbar/phone/NavigationBarView.java         |  2 +-
- .../systemui/statusbar/phone/PhoneStatusBar.java   |  5 ++--
- .../phone/StatusBarKeyguardViewManager.java        | 10 +++++++
- .../server/display/DisplayPowerController.java     |  2 +-
- .../policy/keyguard/KeyguardServiceDelegate.java   | 32 ++++++++++++++--------
- 7 files changed, 43 insertions(+), 20 deletions(-)
+ .../systemui/keyguard/KeyguardViewMediator.java     | 21 ++++++---------------
+ .../phone/FingerprintUnlockController.java          |  6 ++----
+ .../systemui/statusbar/phone/NavigationBarView.java |  2 +-
+ .../systemui/statusbar/phone/PhoneStatusBar.java    |  5 +++--
+ .../phone/StatusBarKeyguardViewManager.java         | 10 ++++++++++
+ 5 files changed, 22 insertions(+), 22 deletions(-)
 
 diff --git a/packages/SystemUI/src/com/android/systemui/keyguard/KeyguardViewMediator.java b/packages/SystemUI/src/com/android/systemui/keyguard/KeyguardViewMediator.java
-index 2833759..66efce4 100755
+index 2833759..3f451db 100755
 --- a/packages/SystemUI/src/com/android/systemui/keyguard/KeyguardViewMediator.java
 +++ b/packages/SystemUI/src/com/android/systemui/keyguard/KeyguardViewMediator.java
-@@ -1750,7 +1750,11 @@ public class KeyguardViewMediator extends SystemUI {
+@@ -1732,15 +1732,6 @@ public class KeyguardViewMediator extends SystemUI {
+             }
+             mHiding = false;
+ 
+-            if (mWakeAndUnlocking && mDrawnCallback != null) {
+-
+-                // Hack level over 9000: To speed up wake-and-unlock sequence, force it to report
+-                // the next draw from here so we don't have to wait for window manager to signal
+-                // this to our ViewRootImpl.
+-                mStatusBarKeyguardViewManager.getViewRootImpl().setReportNextDraw();
+-                notifyDrawn(mDrawnCallback);
+-            }
+-
+             // only play "unlock" noises if not on a call (since the incall UI
+             // disables the keyguard)
+             if (TelephonyManager.EXTRA_STATE_IDLE.equals(mPhoneState)) {
+@@ -1750,7 +1741,11 @@ public class KeyguardViewMediator extends SystemUI {
              }
  
              setShowingLocked(false);
@@ -39,6 +51,19 @@ index 2833759..66efce4 100755
              resetKeyguardDonePendingLocked();
              mHideAnimationRun = false;
              updateActivityLockScreenState();
+@@ -1846,11 +1841,7 @@ public class KeyguardViewMediator extends SystemUI {
+             if (DEBUG) Log.d(TAG, "handleNotifyScreenTurningOn");
+             mStatusBarKeyguardViewManager.onScreenTurningOn();
+             if (callback != null) {
+-                if (mWakeAndUnlocking) {
+-                    mDrawnCallback = callback;
+-                } else {
+-                    notifyDrawn(callback);
+-                }
++                notifyDrawn(callback);
+             }
+         }
+     }
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/FingerprintUnlockController.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/FingerprintUnlockController.java
 index 7135836..4e900db 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/FingerprintUnlockController.java
@@ -102,9 +127,9 @@ index 96cf093..3142950 100644
  
 +    public void hideNoAnimation() {
 +        mShowing = false;
++        mBouncer.hide(true /* destroyView */);
 +        mPhoneStatusBar.hideKeyguard();
 +        mStatusBarWindowManager.setKeyguardShowing(false);
-+        mBouncer.hide(true /* destroyView */);
 +        mViewMediatorCallback.keyguardGone();
 +        mFingerprintUnlockController.finishKeyguardFadingAway();
 +        updateStates();
@@ -113,104 +138,6 @@ index 96cf093..3142950 100644
      private void animateScrimControllerKeyguardFadingOut(long delay, long duration,
              boolean skipFirstFrame) {
          animateScrimControllerKeyguardFadingOut(delay, duration, null /* endRunnable */,
-diff --git a/services/core/java/com/android/server/display/DisplayPowerController.java b/services/core/java/com/android/server/display/DisplayPowerController.java
-index 25e59d5..f3def8a 100644
---- a/services/core/java/com/android/server/display/DisplayPowerController.java
-+++ b/services/core/java/com/android/server/display/DisplayPowerController.java
-@@ -813,7 +813,7 @@ final class DisplayPowerController implements AutomaticBrightnessController.Call
-             mWindowManagerPolicy.screenTurnedOff();
-         } else if (!isOff && mReportedScreenStateToPolicy == REPORTED_TO_POLICY_SCREEN_OFF) {
-             mReportedScreenStateToPolicy = REPORTED_TO_POLICY_SCREEN_TURNING_ON;
--            if (mPowerState.getColorFadeLevel() == 0.0f) {
-+            if (USE_COLOR_FADE_ON_ANIMATION && mPowerState.getColorFadeLevel() == 0.0f) {
-                 blockScreenOn();
-             } else {
-                 unblockScreenOn();
-diff --git a/services/core/java/com/android/server/policy/keyguard/KeyguardServiceDelegate.java b/services/core/java/com/android/server/policy/keyguard/KeyguardServiceDelegate.java
-index a223d05..0d376fe 100644
---- a/services/core/java/com/android/server/policy/keyguard/KeyguardServiceDelegate.java
-+++ b/services/core/java/com/android/server/policy/keyguard/KeyguardServiceDelegate.java
-@@ -62,6 +62,7 @@ public class KeyguardServiceDelegate {
-             showingAndNotOccluded = true;
-             secure = true;
-             deviceHasKeyguard = true;
-+            keyguardDone = false;
-         }
-         boolean showing;
-         boolean showingAndNotOccluded;
-@@ -77,6 +78,7 @@ public class KeyguardServiceDelegate {
-         public boolean bootCompleted;
-         public int screenState;
-         public int interactiveState;
-+        public boolean keyguardDone;
-     };
- 
-     public interface DrawnListener {
-@@ -222,6 +224,8 @@ public class KeyguardServiceDelegate {
-         if (mKeyguardService != null) {
-             mKeyguardService.keyguardDone(authenticated, wakeup);
-         }
-+        mKeyguardState.keyguardDone = true;
-+        hideScrim();
-     }
- 
-     public void setOccluded(boolean isOccluded) {
-@@ -275,16 +279,18 @@ public class KeyguardServiceDelegate {
-     }
- 
-     public void onScreenTurningOn(final DrawnListener drawnListener) {
--        if (mKeyguardService != null) {
--            if (DEBUG) Log.v(TAG, "onScreenTurnedOn(showListener = " + drawnListener + ")");
--            mKeyguardService.onScreenTurningOn(new KeyguardShowDelegate(drawnListener));
--        } else {
--            // try again when we establish a connection
--            Slog.w(TAG, "onScreenTurningOn(): no keyguard service!");
--            // This shouldn't happen, but if it does, show the scrim immediately and
--            // invoke the listener's callback after the service actually connects.
--            mDrawnListenerWhenConnect = drawnListener;
--            showScrim();
-+        if (!mKeyguardState.keyguardDone) {
-+            if (mKeyguardService != null) {
-+                if (DEBUG) Log.v(TAG, "onScreenTurnedOn(showListener = " + drawnListener + ")");
-+                mKeyguardService.onScreenTurningOn(new KeyguardShowDelegate(drawnListener));
-+            } else {
-+                // try again when we establish a connection
-+                Slog.w(TAG, "onScreenTurningOn(): no keyguard service!");
-+                // This shouldn't happen, but if it does, show the scrim immediately and
-+                // invoke the listener's callback after the service actually connects.
-+                mDrawnListenerWhenConnect = drawnListener;
-+                showScrim();
-+            }
-         }
-         mKeyguardState.screenState = SCREEN_STATE_TURNING_ON;
-     }
-@@ -292,7 +298,9 @@ public class KeyguardServiceDelegate {
-     public void onScreenTurnedOn() {
-         if (mKeyguardService != null) {
-             if (DEBUG) Log.v(TAG, "onScreenTurnedOn()");
--            mKeyguardService.onScreenTurnedOn();
-+            if (!mKeyguardState.keyguardDone) {
-+                mKeyguardService.onScreenTurnedOn();
-+            }
-         }
-         mKeyguardState.screenState = SCREEN_STATE_ON;
-     }
-@@ -317,6 +325,7 @@ public class KeyguardServiceDelegate {
-             mKeyguardService.setKeyguardEnabled(enabled);
-         }
-         mKeyguardState.enabled = enabled;
-+        mKeyguardState.keyguardDone = !enabled;
-     }
- 
-     public void onSystemReady() {
-@@ -433,6 +442,7 @@ public class KeyguardServiceDelegate {
-     }
- 
-     public void showKeyguard() {
-+        mKeyguardState.keyguardDone = false;
-         mKeyguardService.showKeyguard();
-     }
- 
 -- 
 2.7.4
 
