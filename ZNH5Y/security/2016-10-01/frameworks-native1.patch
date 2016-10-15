@@ -1,0 +1,56 @@
+From 2f2de7479538e05af5b7a99b7cc674f6cfbb45d1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Arve=20Hj=C3=B8nnev=C3=A5g?= <arve@android.com>
+Date: Thu, 18 Aug 2016 15:42:35 -0700
+Subject: [PATCH] ServiceManager: Allow system services running as secondary
+ users to add services
+
+This should be reverted when all system services have been cleaned up to not
+do this. A process looking up a service while running in the background will
+see the service registered by the active user (assuming the service is
+registered on every user switch), not the service registered by the user that
+the process itself belongs to.
+
+CYNGNOS-3286
+BUG: 30795333
+Change-Id: I1b74d58be38ed358f43c163692f9e704f8f31dbe
+(cherry picked from commit e6bbe69ba739c8a08837134437aaccfea5f1d943)
+---
+ cmds/servicemanager/Android.mk        | 2 +-
+ cmds/servicemanager/service_manager.c | 4 +++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/cmds/servicemanager/Android.mk b/cmds/servicemanager/Android.mk
+index 155cfc5..5bafd53 100644
+--- a/cmds/servicemanager/Android.mk
++++ b/cmds/servicemanager/Android.mk
+@@ -18,7 +18,7 @@ LOCAL_MODULE_TAGS := optional
+ include $(BUILD_EXECUTABLE)
+ 
+ include $(CLEAR_VARS)
+-LOCAL_SHARED_LIBRARIES := liblog libselinux
++LOCAL_SHARED_LIBRARIES := liblog libcutils libselinux
+ LOCAL_SRC_FILES := service_manager.c binder.c
+ LOCAL_CFLAGS += $(svc_c_flags)
+ LOCAL_MODULE := servicemanager
+diff --git a/cmds/servicemanager/service_manager.c b/cmds/servicemanager/service_manager.c
+index 4c993c2..031f848 100644
+--- a/cmds/servicemanager/service_manager.c
++++ b/cmds/servicemanager/service_manager.c
+@@ -8,6 +8,8 @@
+ #include <stdlib.h>
+ #include <string.h>
+ 
++#include <cutils/multiuser.h>
++
+ #include <private/android_filesystem_config.h>
+ 
+ #include <selinux/android.h>
+@@ -111,7 +113,7 @@ static int svc_can_register(const uint16_t *name, size_t name_len, pid_t spid, u
+ {
+     const char *perm = "add";
+ 
+-    if (uid >= AID_APP) {
++    if (multiuser_get_app_id(uid) >= AID_APP) {
+         return 0; /* Don't allow apps to register services */
+     }
+ 

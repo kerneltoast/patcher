@@ -1,0 +1,105 @@
+From 2cd5941654652d0875e5c9db5652f7ac1de5a416 Mon Sep 17 00:00:00 2001
+From: Chien-Yu Chen <cychen@google.com>
+Date: Fri, 12 Aug 2016 15:40:16 -0700
+Subject: [PATCH] Camera: Prevent data size overflow
+
+Add a function to check overflow when calculating metadata
+data size.
+
+CYNGNOS-3286
+Bug: 30741779
+Change-Id: I6405fe608567a4f4113674050f826f305ecae030
+(cherry picked from commit 97a9cd6748fb7d5ef99e7d68c346ecaba1318e94)
+---
+ camera/src/camera_metadata.c | 57 +++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 43 insertions(+), 14 deletions(-)
+
+diff --git a/camera/src/camera_metadata.c b/camera/src/camera_metadata.c
+index eb914eb..9bb58cb 100644
+--- a/camera/src/camera_metadata.c
++++ b/camera/src/camera_metadata.c
+@@ -25,9 +25,10 @@
+ #include <stdlib.h>
+ #include <errno.h>
+ 
+-#define OK         0
+-#define ERROR      1
+-#define NOT_FOUND -ENOENT
++#define OK              0
++#define ERROR           1
++#define NOT_FOUND       -ENOENT
++#define SN_EVENT_LOG_ID 0x534e4554
+ 
+ #define ALIGN_TO(val, alignment) \
+     (((uintptr_t)(val) + ((alignment) - 1)) & ~((alignment) - 1))
+@@ -299,6 +300,38 @@ camera_metadata_t* copy_camera_metadata(void *dst, size_t dst_size,
+     return metadata;
+ }
+ 
++// This method should be used when the camera metadata cannot be trusted. For example, when it's
++// read from Parcel.
++static int validate_and_calculate_camera_metadata_entry_data_size(size_t *data_size, uint8_t type,
++        size_t data_count) {
++    if (type >= NUM_TYPES) return ERROR;
++
++    // Check for overflow
++    if (data_count != 0 &&
++            camera_metadata_type_size[type] > (SIZE_MAX - DATA_ALIGNMENT + 1) / data_count) {
++        android_errorWriteLog(SN_EVENT_LOG_ID, "30741779");
++        return ERROR;
++    }
++
++    size_t data_bytes = data_count * camera_metadata_type_size[type];
++
++    if (data_size) {
++        *data_size = data_bytes <= 4 ? 0 : ALIGN_TO(data_bytes, DATA_ALIGNMENT);
++    }
++
++    return OK;
++}
++
++size_t calculate_camera_metadata_entry_data_size(uint8_t type,
++        size_t data_count) {
++    if (type >= NUM_TYPES) return 0;
++
++    size_t data_bytes = data_count *
++            camera_metadata_type_size[type];
++
++    return data_bytes <= 4 ? 0 : ALIGN_TO(data_bytes, DATA_ALIGNMENT);
++}
++
+ int validate_camera_metadata_structure(const camera_metadata_t *metadata,
+                                        const size_t *expected_size) {
+ 
+@@ -414,9 +447,13 @@ int validate_camera_metadata_structure(const camera_metadata_t *metadata,
+             return ERROR;
+         }
+ 
+-        size_t data_size =
+-                calculate_camera_metadata_entry_data_size(entry.type,
+-                                                          entry.count);
++        size_t data_size;
++        if (validate_and_calculate_camera_metadata_entry_data_size(&data_size, entry.type,
++                entry.count) != OK) {
++            ALOGE("%s: Entry data size is invalid. type: %u count: %u", __FUNCTION__, entry.type,
++                    entry.count);
++            return ERROR;
++        }
+ 
+         if (data_size != 0) {
+             camera_metadata_data_t *data =
+@@ -508,14 +545,6 @@ camera_metadata_t *clone_camera_metadata(const camera_metadata_t *src) {
+     return clone;
+ }
+ 
+-size_t calculate_camera_metadata_entry_data_size(uint8_t type,
+-        size_t data_count) {
+-    if (type >= NUM_TYPES) return 0;
+-    size_t data_bytes = data_count *
+-            camera_metadata_type_size[type];
+-    return data_bytes <= 4 ? 0 : ALIGN_TO(data_bytes, DATA_ALIGNMENT);
+-}
+-
+ static int add_camera_metadata_entry_raw(camera_metadata_t *dst,
+         uint32_t tag,
+         uint8_t  type,

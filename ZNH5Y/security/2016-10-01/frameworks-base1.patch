@@ -1,0 +1,71 @@
+From 36b0fb3bfd48af62cf05c784c8946a82a704d791 Mon Sep 17 00:00:00 2001
+From: Narayan Kamath <narayan@google.com>
+Date: Tue, 9 Aug 2016 17:00:25 +0100
+Subject: [PATCH] Process: Fix communication with zygote.
+
+Don't write partial requests, and don't return (or throw) early after
+partially reading a response.
+
+CYNGNOS-3286
+bug: 30143607
+
+(cherry-picked from commit 448be0a62209c977593d81617853a8a428d013df)
+
+Change-Id: I5881fdd5e81023cd21fb4d23a471a5031987a1f1
+(cherry picked from commit e29c6493c07acf1a0b706917e9af0c8d761c8ae9)
+---
+ core/java/android/os/Process.java | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
+
+diff --git a/core/java/android/os/Process.java b/core/java/android/os/Process.java
+index 65b09eb..02466cc 100644
+--- a/core/java/android/os/Process.java
++++ b/core/java/android/os/Process.java
+@@ -539,6 +539,15 @@ private static ProcessStartResult zygoteSendArgsAndGetResult(
+             ZygoteState zygoteState, ArrayList<String> args)
+             throws ZygoteStartFailedEx {
+         try {
++            // Throw early if any of the arguments are malformed. This means we can
++            // avoid writing a partial response to the zygote.
++            int sz = args.size();
++            for (int i = 0; i < sz; i++) {
++                if (args.get(i).indexOf('\n') >= 0) {
++                    throw new ZygoteStartFailedEx("embedded newlines not allowed");
++                }
++            }
++
+             /**
+              * See com.android.internal.os.ZygoteInit.readArgumentList()
+              * Presently the wire format to the zygote process is:
+@@ -555,13 +564,8 @@ private static ProcessStartResult zygoteSendArgsAndGetResult(
+             writer.write(Integer.toString(args.size()));
+             writer.newLine();
+ 
+-            int sz = args.size();
+             for (int i = 0; i < sz; i++) {
+                 String arg = args.get(i);
+-                if (arg.indexOf('\n') >= 0) {
+-                    throw new ZygoteStartFailedEx(
+-                            "embedded newlines not allowed");
+-                }
+                 writer.write(arg);
+                 writer.newLine();
+             }
+@@ -570,11 +574,16 @@ private static ProcessStartResult zygoteSendArgsAndGetResult(
+ 
+             // Should there be a timeout on this?
+             ProcessStartResult result = new ProcessStartResult();
++
++            // Always read the entire result from the input stream to avoid leaving
++            // bytes in the stream for future process starts to accidentally stumble
++            // upon.
+             result.pid = inputStream.readInt();
++            result.usingWrapper = inputStream.readBoolean();
++
+             if (result.pid < 0) {
+                 throw new ZygoteStartFailedEx("fork() failed");
+             }
+-            result.usingWrapper = inputStream.readBoolean();
+             return result;
+         } catch (IOException ex) {
+             zygoteState.close();
