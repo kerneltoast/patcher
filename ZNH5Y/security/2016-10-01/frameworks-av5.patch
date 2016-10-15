@@ -1,0 +1,27 @@
+From b0a4c57714b835953d565ccfa39764fd2083c00b Mon Sep 17 00:00:00 2001
+From: Pawin Vongmasa <pawin@google.com>
+Date: Fri, 19 Aug 2016 02:07:33 -0700
+Subject: [PATCH] Fix build breakage caused by commit
+ 940829f69b52d6038db66a9c727534636ecc456d.
+
+CYNGNOS-3286
+Change-Id: I4776db4a26fb3c31bb994d48788373fe569c812a
+---
+ media/libstagefright/codecs/m4v_h263/dec/SoftMPEG4.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/media/libstagefright/codecs/m4v_h263/dec/SoftMPEG4.cpp b/media/libstagefright/codecs/m4v_h263/dec/SoftMPEG4.cpp
+index e1cfc06..1dd631a 100644
+--- a/media/libstagefright/codecs/m4v_h263/dec/SoftMPEG4.cpp
++++ b/media/libstagefright/codecs/m4v_h263/dec/SoftMPEG4.cpp
+@@ -213,8 +213,8 @@ void SoftMPEG4::onQueueFilled(OMX_U32 /* portIndex */) {
+             OMX_U32 yFrameSize = sizeof(uint8) * mHandle->size;
+             if ((outHeader->nAllocLen < yFrameSize) ||
+                     (outHeader->nAllocLen - yFrameSize < yFrameSize / 2)) {
+-                ALOGE("Too small output buffer for reference frame: %zu bytes",
+-                        outHeader->nAllocLen);
++                ALOGE("Too small output buffer for reference frame: %lu bytes",
++                        (unsigned long)outHeader->nAllocLen);
+                 android_errorWriteLog(0x534e4554, "30033990");
+                 notify(OMX_EventError, OMX_ErrorUndefined, 0, NULL);
+                 mSignalledError = true;

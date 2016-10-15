@@ -1,0 +1,24 @@
+From efee034f32aaab16db2198d7f2a95afca87c49b3 Mon Sep 17 00:00:00 2001
+From: Feng Yu <feny@google.com>
+Date: Wed, 24 Aug 2016 14:19:55 -0700
+Subject: [PATCH] Fix build break from SoftMPEG4Encoder.cpp
+
+CYNGNOS-3286
+Change-Id: I9b337a5ec8dd3997af274a7038aef19d0f2154bd
+---
+ media/libstagefright/codecs/m4v_h263/enc/SoftMPEG4Encoder.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/media/libstagefright/codecs/m4v_h263/enc/SoftMPEG4Encoder.cpp b/media/libstagefright/codecs/m4v_h263/enc/SoftMPEG4Encoder.cpp
+index 2a949e0..2eb51c9 100644
+--- a/media/libstagefright/codecs/m4v_h263/enc/SoftMPEG4Encoder.cpp
++++ b/media/libstagefright/codecs/m4v_h263/enc/SoftMPEG4Encoder.cpp
+@@ -116,7 +116,7 @@ OMX_ERRORTYPE SoftMPEG4Encoder::initEncParams() {
+         ALOGE("Failed to get default encoding parameters");
+         return OMX_ErrorUndefined;
+     }
+-    if (mVideoFrameRate == 0) {
++    if (mFramerate == 0) {
+         ALOGE("Framerate should not be 0");
+         return OMX_ErrorUndefined;
+     }
