@@ -34,8 +34,6 @@ cd $ROM_TREE/packages/providers/TelephonyProvider
 git clean -f -d && git reset --hard
 cd $ROM_TREE/system/core
 git clean -f -d && git reset --hard
-cd $ROM_TREE/system/media
-git clean -f -d && git reset --hard
 cd $ROM_TREE/vendor/cm
 git clean -f -d && git reset --hard
 
@@ -100,6 +98,4 @@ patch -d frameworks/opt/net/wifi		-p1 -s -N --no-backup-if-mismatch < $SECURITY_
 patch -d packages/apps/Email			-p1 -s -N --no-backup-if-mismatch < $SECURITY_OCT16/packages-apps-Email0.patch
 patch -d packages/providers/TelephonyProvider	-p1 -s -N --no-backup-if-mismatch < $SECURITY_OCT16/packages-providers-TelephonyProvider0.patch
 patch -d system/core				-p1 -s -N --no-backup-if-mismatch < $SECURITY_OCT16/system-core0.patch
-patch -d system/media				-p1 -s -N --no-backup-if-mismatch < $SECURITY_OCT16/system-media0.patch
-patch -d system/media				-p1 -s -N --no-backup-if-mismatch < $SECURITY_OCT16/system-media1.patch
 

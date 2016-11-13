@@ -25,8 +25,6 @@ cd $ROM_TREE/packages/providers/TelephonyProvider
 git clean -f -d && git reset --hard
 cd $ROM_TREE/system/core
 git clean -f -d && git reset --hard
-cd $ROM_TREE/system/media
-git clean -f -d && git reset --hard
 cd $ROM_TREE/vendor/cm
 git clean -f -d && git reset --hard
 
