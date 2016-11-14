@@ -1,0 +1,43 @@
+From 8cbd1c5cb14e771982965a530b34282effc39b8c Mon Sep 17 00:00:00 2001
+From: Lajos Molnar <lajos@google.com>
+Date: Wed, 14 Sep 2016 10:01:37 -0700
+Subject: [PATCH] IOMX: allow configuration after going to loaded state
+
+This was disallowed recently but we still use it as MediaCodcec.stop
+only goes to loaded state, and does not free component.
+
+Bug: 31450460
+Change-Id: I72e092e4e55c9f23b1baee3e950d76e84a5ef28d
+(cherry picked from commit e03b22839d78c841ce0a1a0a1ee1960932188b0b)
+---
+ media/libstagefright/omx/OMXNodeInstance.cpp | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/media/libstagefright/omx/OMXNodeInstance.cpp b/media/libstagefright/omx/OMXNodeInstance.cpp
+index 13b7cbb..b86611f 100644
+--- a/media/libstagefright/omx/OMXNodeInstance.cpp
++++ b/media/libstagefright/omx/OMXNodeInstance.cpp
+@@ -391,8 +391,7 @@ status_t OMXNodeInstance::freeNode(OMXMaster *master) {
+ status_t OMXNodeInstance::sendCommand(
+         OMX_COMMANDTYPE cmd, OMX_S32 param) {
+     if (cmd == OMX_CommandStateSet) {
+-        // We do not support returning from unloaded state, so there are no configurations past
+-        // first StateSet command.
++        // There are no configurations past first StateSet command.
+         mSailed = true;
+     }
+     const sp<GraphicBufferSource> bufferSource(getGraphicBufferSource());
+@@ -1689,6 +1688,13 @@ void OMXNodeInstance::onEvent(
+             && arg2 == OMX_StateExecuting) {
+         bufferSource->omxExecuting();
+     }
++
++    // allow configuration if we return to the loaded state
++    if (event == OMX_EventCmdComplete
++            && arg1 == OMX_CommandStateSet
++            && arg2 == OMX_StateLoaded) {
++        mSailed = false;
++    }
+ }
+ 
+ // static

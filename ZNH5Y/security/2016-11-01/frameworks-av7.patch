@@ -1,0 +1,27 @@
+From c2a27ba1c949d1409f75bfef5cc052b7d88e4610 Mon Sep 17 00:00:00 2001
+From: Chong Zhang <chz@google.com>
+Date: Mon, 19 Sep 2016 15:29:04 -0700
+Subject: [PATCH] IOMX: do not clear buffer if it's allocated by component
+
+The component might depends on their buffers to be initialized
+in certain ways to work. Don't clear unless we're allocating it.
+
+bug: 31586647
+Change-Id: Ia0a125797e414998ef0cd8ce03672f5b1e0bbf7a
+(cherry picked from commit ea76573aa276f51950007217a97903c4fe64f685)
+---
+ media/libstagefright/omx/OMXNodeInstance.cpp | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/media/libstagefright/omx/OMXNodeInstance.cpp b/media/libstagefright/omx/OMXNodeInstance.cpp
+index b86611f..1e76e01 100644
+--- a/media/libstagefright/omx/OMXNodeInstance.cpp
++++ b/media/libstagefright/omx/OMXNodeInstance.cpp
+@@ -1184,7 +1184,6 @@ status_t OMXNodeInstance::allocateBufferWithBackup(
+     }
+ 
+     CHECK_EQ(header->pAppPrivate, buffer_meta);
+-    memset(header->pBuffer, 0, header->nAllocLen);
+ 
+     *buffer = makeBufferID(header);
+ 

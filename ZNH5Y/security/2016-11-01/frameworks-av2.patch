@@ -1,0 +1,61 @@
+From 128035617a8cafd4ea717ceb8d6fe56564b07262 Mon Sep 17 00:00:00 2001
+From: Eric Laurent <elaurent@google.com>
+Date: Wed, 7 Sep 2016 16:58:39 -0700
+Subject: [PATCH] Radio: get service by value.
+
+Get strong pointer to service interface by value and not reference to
+prevent race conditions where the service pointer can be cleared
+by another thread while in use.
+
+Bug: 30907212
+Change-Id: Iae838b3b672562c1d0cd63968399a6bfdda7f5ab
+(cherry picked from commit 28a0e9ec74e5192aacffb279c80619ef284062b0)
+---
+ include/radio/Radio.h | 2 +-
+ radio/Radio.cpp       | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/include/radio/Radio.h b/include/radio/Radio.h
+index 302bf16..a4dfdd1 100644
+--- a/include/radio/Radio.h
++++ b/include/radio/Radio.h
+@@ -75,7 +75,7 @@ class Radio : public BnRadioClient,
+ private:
+             Radio(radio_handle_t handle,
+                             const sp<RadioCallback>&);
+-            static const sp<IRadioService>& getRadioService();
++            static const sp<IRadioService> getRadioService();
+ 
+             Mutex                   mLock;
+             sp<IRadio>              mIRadio;
+diff --git a/radio/Radio.cpp b/radio/Radio.cpp
+index e3554c2..3c04fb0 100644
+--- a/radio/Radio.cpp
++++ b/radio/Radio.cpp
+@@ -55,7 +55,7 @@ namespace {
+     sp<DeathNotifier>         gDeathNotifier;
+ }; // namespace anonymous
+ 
+-const sp<IRadioService>& Radio::getRadioService()
++const sp<IRadioService> Radio::getRadioService()
+ {
+     Mutex::Autolock _l(gLock);
+     if (gRadioService.get() == 0) {
+@@ -84,7 +84,7 @@ status_t Radio::listModules(struct radio_properties *properties,
+                             uint32_t *numModules)
+ {
+     ALOGV("listModules()");
+-    const sp<IRadioService>& service = getRadioService();
++    const sp<IRadioService> service = getRadioService();
+     if (service == 0) {
+         return NO_INIT;
+     }
+@@ -98,7 +98,7 @@ sp<Radio> Radio::attach(radio_handle_t handle,
+ {
+     ALOGV("attach()");
+     sp<Radio> radio;
+-    const sp<IRadioService>& service = getRadioService();
++    const sp<IRadioService> service = getRadioService();
+     if (service == 0) {
+         return radio;
+     }

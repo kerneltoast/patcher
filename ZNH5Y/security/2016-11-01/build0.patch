@@ -1,0 +1,24 @@
+From 54e0e325e5b4f3ba3bdcad42256de452a10bed56 Mon Sep 17 00:00:00 2001
+From: Adam Seaton <aseaton@google.com>
+Date: Tue, 20 Sep 2016 10:06:50 -0700
+Subject: [PATCH] Updating Security String to 2016-11-06 on mnc-dev b/31618336
+
+Change-Id: I3c9459553fdc89cacdf74d5e5801871b7192bc51
+(cherry picked from commit dcfd738833ea0c6d271b45d50a652191e6c345f0)
+---
+ core/version_defaults.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/core/version_defaults.mk b/core/version_defaults.mk
+index ac017a2..1b3c7d8 100644
+--- a/core/version_defaults.mk
++++ b/core/version_defaults.mk
+@@ -103,7 +103,7 @@ ifeq "" "$(PLATFORM_SECURITY_PATCH)"
+   # Can be an arbitrary string, but must be a single word.
+   #
+   # If there is no $PLATFORM_SECURITY_PATCH set, keep it empty.
+-  PLATFORM_SECURITY_PATCH := 2016-10-01
++  PLATFORM_SECURITY_PATCH := 2016-11-06
+ endif
+ 
+ ifeq "" "$(PLATFORM_BASE_OS)"

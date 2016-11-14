@@ -1,0 +1,99 @@
+From d9bcf017e554b84306da4002b0ac97c45afd9f63 Mon Sep 17 00:00:00 2001
+From: Harish Mahendrakar <harish.mahendrakar@ittiam.com>
+Date: Sat, 17 Sep 2016 17:00:37 +0530
+Subject: [PATCH] Decoder: Fixes for handling errors in multi-slice MB Aff
+ streams
+
+Initialize default reference buffer for erroneous interlaced clips
+Pick slice_type from decode thread slice structure
+Call start_of_pic only once
+
+Bug: 30822755
+Change-Id: I553c646446d99a626d62351aa1b385355191cdc3
+(cherry picked from commit bc71ad2d43dc03b2a71e3423da5385ed3cb9799a)
+---
+ decoder/ih264d_inter_pred.c   | 7 +++----
+ decoder/ih264d_parse_pslice.c | 5 ++++-
+ decoder/ih264d_parse_slice.c  | 7 +++++++
+ 3 files changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/decoder/ih264d_inter_pred.c b/decoder/ih264d_inter_pred.c
+index 01f2e01..b99a77c 100644
+--- a/decoder/ih264d_inter_pred.c
++++ b/decoder/ih264d_inter_pred.c
+@@ -474,7 +474,7 @@ WORD32 ih264d_form_mb_part_info_mp(pred_info_pkd_t *ps_pred_pkd,
+     UWORD8 i1_mc_wd, u1_dma_ht, u1_dma_wd, u1_dx, u1_dy;
+     pred_info_t * ps_pred ;
+     dec_slice_params_t * const ps_cur_slice = ps_dec->ps_cur_slice;
+-    const UWORD8 u1_slice_type = ps_cur_slice->u1_slice_type;
++    const UWORD8 u1_slice_type = ps_dec->ps_decode_cur_slice->slice_type;
+     UWORD8 u1_pod_bot, u1_pod_top;
+ 
+     /* load the pictype for pod u4_flag & chroma motion vector derivation */
+@@ -1013,7 +1013,7 @@ void ih264d_motion_compensate_mp(dec_struct_t * ps_dec, dec_mb_info_t *ps_cur_mb
+     UWORD32 u2_dest_wd_y, u2_dest_wd_uv;
+     UWORD32 u2_row_buf_wd_y = 0;
+     UWORD32 u2_row_buf_wd_uv = 0;
+-    UWORD32 u2_log2Y_crwd = ps_dec->ps_cur_slice->u2_log2Y_crwd;
++    UWORD32 u2_log2Y_crwd;
+     UWORD32 u4_wd_y, u4_ht_y, u1_dir, u4_wd_uv;
+     UWORD32 u4_ht_uv;
+     UWORD8 *pu1_temp_mc_buffer = ps_dec->pu1_temp_mc_buffer;
+@@ -1039,8 +1039,7 @@ void ih264d_motion_compensate_mp(dec_struct_t * ps_dec, dec_mb_info_t *ps_cur_mb
+     ps_pred_y_back = ps_pred;
+     ps_pred_cr_forw = ps_pred;
+ 
+-    if(ps_dec->u1_separate_parse)
+-        u2_log2Y_crwd = ps_dec->ps_decode_cur_slice->u2_log2Y_crwd;
++    u2_log2Y_crwd = ps_dec->ps_decode_cur_slice->u2_log2Y_crwd;
+ 
+     if(!u1_pic_fld)
+     {
+diff --git a/decoder/ih264d_parse_pslice.c b/decoder/ih264d_parse_pslice.c
+index 8f9949f..f64ee0c 100644
+--- a/decoder/ih264d_parse_pslice.c
++++ b/decoder/ih264d_parse_pslice.c
+@@ -1508,6 +1508,8 @@ WORD32 ih264d_mark_err_slice_skip(dec_struct_t * ps_dec,
+                 return ERROR_INV_SPS_PPS_T;
+             }
+ 
++            /* call ih264d_start_of_pic only if it was not called earlier*/
++            if(ps_dec->u4_pic_buf_got == 0)
+             {
+                 //initialize slice params required by ih264d_start_of_pic to valid values
+                 ps_dec->ps_cur_slice->u1_slice_type = P_SLICE;
+@@ -1578,7 +1580,8 @@ WORD32 ih264d_mark_err_slice_skip(dec_struct_t * ps_dec,
+             && ps_parse_cur_slice == ps_dec->ps_parse_cur_slice)
+         {
+             // Slice data corrupted
+-            u1_num_mbs = ps_dec->u4_num_mbs_cur_nmb;
++            // in the case of mbaff, conceal from the even mb.
++            u1_num_mbs = (ps_dec->u4_num_mbs_cur_nmb >> u1_mbaff ) << u1_mbaff;
+ 
+             if(u1_num_mbs)
+             {
+diff --git a/decoder/ih264d_parse_slice.c b/decoder/ih264d_parse_slice.c
+index 911b11d..05a82a6 100644
+--- a/decoder/ih264d_parse_slice.c
++++ b/decoder/ih264d_parse_slice.c
+@@ -441,6 +441,8 @@ WORD32 ih264d_start_of_pic(dec_struct_t *ps_dec,
+             /*make first entry of list0 point to cur pic,so that if first Islice is in error, ref pic struct will have valid entries*/
+             ps_dec->ps_ref_pic_buf_lx[0] = ps_dec->ps_dpb_mgr->ps_init_dpb[0];
+             *(ps_dec->ps_dpb_mgr->ps_init_dpb[0][0]) = *ps_cur_pic;
++            /* Initialize for field reference as well */
++            *(ps_dec->ps_dpb_mgr->ps_init_dpb[0][MAX_REF_BUFS]) = *ps_cur_pic;
+         }
+ 
+         if(!ps_dec->ps_cur_pic)
+@@ -1429,6 +1431,11 @@ WORD32 ih264d_parse_decode_slice(UWORD8 u1_is_idr_slice,
+         ps_dec->u2_cur_slice_num++;
+     }
+ 
++    // in the case of single core increment ps_decode_cur_slice
++    if((ps_dec->u1_separate_parse == 0) && (ps_dec->u4_first_slice_in_pic == 0))
++    {
++        ps_dec->ps_decode_cur_slice++;
++    }
+     ps_dec->u1_slice_header_done = 0;
+ 
+     /*--------------------------------------------------------------------*/

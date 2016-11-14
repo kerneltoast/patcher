@@ -1,0 +1,32 @@
+From 0665d10ab564a373ee235b90af96f589dc455068 Mon Sep 17 00:00:00 2001
+From: Ajay Panicker <apanicke@google.com>
+Date: Thu, 8 Sep 2016 10:55:51 -0700
+Subject: [PATCH] Fix setPairingConfirmation permissions issue (1/2)
+
+setPairingConfirmation was set to only require BLUETOOTH_ADMIN
+permission which shouldn't be able to set the confirmation itself.
+
+This is restricted to BLUETOOTH_PRIVILEGED permission.
+
+Bug: 29043989
+Change-Id: Iae8e31b25795989446265fdcc5eb27e6ffaf29aa
+(cherry picked from commit df3304a333d8c385f9d5cb0e691fb72d940ec273)
+---
+ src/com/android/bluetooth/btservice/AdapterService.java | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/com/android/bluetooth/btservice/AdapterService.java b/src/com/android/bluetooth/btservice/AdapterService.java
+index 3b96b7f..3ac242c 100644
+--- a/src/com/android/bluetooth/btservice/AdapterService.java
++++ b/src/com/android/bluetooth/btservice/AdapterService.java
+@@ -1758,8 +1758,8 @@ boolean setPasskey(BluetoothDevice device, boolean accept, int len, byte[] passk
+     }
+ 
+      boolean setPairingConfirmation(BluetoothDevice device, boolean accept) {
+-        enforceCallingOrSelfPermission(BLUETOOTH_ADMIN_PERM,
+-                                       "Need BLUETOOTH ADMIN permission");
++        enforceCallingOrSelfPermission(BLUETOOTH_PRIVILEGED,
++                                       "Need BLUETOOTH PRIVILEGED permission");
+         DeviceProperties deviceProp = mRemoteDevices.getDeviceProperties(device);
+         if (deviceProp == null || deviceProp.getBondState() != BluetoothDevice.BOND_BONDING) {
+             return false;

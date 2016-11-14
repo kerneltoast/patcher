@@ -1,0 +1,26 @@
+From 31f351160cdfd9dbe9919682ebe41bde3bcf91c6 Mon Sep 17 00:00:00 2001
+From: Paul Jensen <pauljensen@google.com>
+Date: Mon, 19 Sep 2016 08:53:20 -0400
+Subject: [PATCH] Fix build break due to automerge of 7d2198b5
+
+Bug: 30100884
+
+Change-Id: I8fa379a74b5d9467b5b9498bd18de2a043963c6f
+(cherry picked from commit baae57ab24db7d3b0bf7f84c05954173f1ee15fe)
+---
+ services/core/java/com/android/server/connectivity/PacManager.java | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/services/core/java/com/android/server/connectivity/PacManager.java b/services/core/java/com/android/server/connectivity/PacManager.java
+index 758646f..58c76ec 100644
+--- a/services/core/java/com/android/server/connectivity/PacManager.java
++++ b/services/core/java/com/android/server/connectivity/PacManager.java
+@@ -293,7 +293,7 @@ private void bind() {
+         intent.setClassName(PAC_PACKAGE, PAC_SERVICE);
+         if ((mProxyConnection != null) && (mConnection != null)) {
+             // Already bound no need to bind again, just download the new file.
+-            IoThread.getHandler().post(mPacDownloader);
++            mNetThreadHandler.post(mPacDownloader);
+             return;
+         }
+         mConnection = new ServiceConnection() {

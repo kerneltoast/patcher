@@ -1,0 +1,32 @@
+From fdb1b40e7bb147c07bda988c9501ad223795d12d Mon Sep 17 00:00:00 2001
+From: Vignesh Venkatasubramanian <vigneshv@google.com>
+Date: Fri, 19 Aug 2016 09:09:11 -0700
+Subject: [PATCH] DO NOT MERGE libvpx: Cherry-pick 8b4c315 from upstream
+
+Description from upstream:
+vp9_alloc_context_buffers: clear cm->mi* on failure
+
+this fixes a crash in vp9_dec_setup_mi() via
+vp9_init_context_buffers() should decoding continue and the decoder
+resyncs on a smaller frame
+
+Bug: 30593752
+Change-Id: Iafbf1c4114062bf796f51a6b03be71328f7bcc69
+(cherry picked from commit 737c8493693243838128788fe9c3abc51f17338e)
+(cherry picked from commit 3e88ffac8c80b76e15286ef8a7b3bd8fa246c761)
+---
+ libvpx/vp9/common/vp9_alloccommon.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libvpx/vp9/common/vp9_alloccommon.c b/libvpx/vp9/common/vp9_alloccommon.c
+index ac417b6..ed337a0 100644
+--- a/libvpx/vp9/common/vp9_alloccommon.c
++++ b/libvpx/vp9/common/vp9_alloccommon.c
+@@ -152,6 +152,7 @@ int vp9_alloc_context_buffers(VP9_COMMON *cm, int width, int height) {
+   return 0;
+ 
+  fail:
++  vp9_set_mb_mi(cm, 0, 0);
+   vp9_free_context_buffers(cm);
+   return 1;
+ }

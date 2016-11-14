@@ -1,0 +1,25 @@
+From ace612c5f838944d1b88be18e317709e640becc2 Mon Sep 17 00:00:00 2001
+From: Jeff Tinker <jtinker@google.com>
+Date: Fri, 2 Sep 2016 11:36:46 -0700
+Subject: [PATCH] Fix stack content leak vulnerability in mediaserver
+
+bug: 30875060
+Change-Id: I03f4d08b7b31ac5b507cfc9e65e5607c73972d95
+(cherry picked from commit 9a6861cbd3bb0e1b8fe4c105795256ee032f9664)
+---
+ media/libmedia/IDrm.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/media/libmedia/IDrm.cpp b/media/libmedia/IDrm.cpp
+index 7c709cd..6f6530b 100644
+--- a/media/libmedia/IDrm.cpp
++++ b/media/libmedia/IDrm.cpp
+@@ -912,7 +912,7 @@ status_t BnDrm::onTransact(
+             readVector(data, keyId);
+             readVector(data, message);
+             readVector(data, signature);
+-            bool match;
++            bool match = false;
+             uint32_t result = verify(sessionId, keyId, message, signature, match);
+             reply->writeInt32(match);
+             reply->writeInt32(result);

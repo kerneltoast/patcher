@@ -1,0 +1,40 @@
+From 23ffe421812180b20043b8a108a72b2e95ef1f0c Mon Sep 17 00:00:00 2001
+From: rago <rago@google.com>
+Date: Mon, 22 Aug 2016 17:20:26 -0700
+Subject: [PATCH] Fix potential overflow in Visualizer effect
+
+Bug: 30229821
+Change-Id: Idd3c1563dc9d3261e6e168e945005bf133ab2cdb
+(cherry picked from commit 099ab280775946e7c36c73fde47f2ee5a2579f53)
+(cherry picked from commit 46dc714d523a41a4f886eecbe5b9947a4c900510)
+---
+ media/libeffects/visualizer/EffectVisualizer.cpp | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/media/libeffects/visualizer/EffectVisualizer.cpp b/media/libeffects/visualizer/EffectVisualizer.cpp
+index 0c310c5..91f9fc7 100644
+--- a/media/libeffects/visualizer/EffectVisualizer.cpp
++++ b/media/libeffects/visualizer/EffectVisualizer.cpp
+@@ -25,6 +25,7 @@
+ #include <time.h>
+ #include <math.h>
+ #include <audio_effects/effect_visualizer.h>
++#include <cutils/log.h>
+ 
+ 
+ extern "C" {
+@@ -599,6 +600,14 @@ int Visualizer_command(effect_handle_t self, uint32_t cmdCode, uint32_t cmdSize,
+         } break;
+ 
+     case VISUALIZER_CMD_MEASURE: {
++        if (pReplyData == NULL || replySize == NULL ||
++                *replySize < (sizeof(int32_t) * MEASUREMENT_COUNT)) {
++            ALOGV("VISUALIZER_CMD_MEASURE() error *replySize %" PRIu32
++                    " < (sizeof(int32_t) * MEASUREMENT_COUNT) %" PRIu32, *replySize,
++                    sizeof(int32_t) * MEASUREMENT_COUNT);
++            android_errorWriteLog(0x534e4554, "30229821");
++            return -EINVAL;
++        }
+         uint16_t peakU16 = 0;
+         float sumRmsSquared = 0.0f;
+         uint8_t nbValidMeasurements = 0;
