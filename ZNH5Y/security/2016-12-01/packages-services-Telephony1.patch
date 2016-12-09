@@ -1,0 +1,33 @@
+From 61d9f0e5c7c6d8df1895d8683c340478cd31bf2a Mon Sep 17 00:00:00 2001
+From: Ta-wei Yen <twyen@google.com>
+Date: Mon, 10 Oct 2016 14:43:27 -0700
+Subject: [PATCH] Unexport OmtpMessageReceiver
+
+Introduced in
+https://partner-android-review.googlesource.com/#/c/204705/
+
+Receivers do not need to be exported to receive system broadcasts.
+OmtpMessageReceiver should also check the intent action, but least
+possible scope of change is preferred.
+
+CYNGNOS-3312
+Bug: 31566390
+Change-Id: I83f3d42ba185c072357ec6f18b99c3f12f452eb9
+(cherry picked from commit a39ff9526aee6f2ea4f6e02412db7b33d486fd7d)
+---
+ AndroidManifest.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/AndroidManifest.xml b/AndroidManifest.xml
+index 7a0f562..25d80c0 100644
+--- a/AndroidManifest.xml
++++ b/AndroidManifest.xml
+@@ -695,7 +695,7 @@
+             </intent-filter>
+         </provider>
+         <receiver android:name="com.android.phone.vvm.omtp.sms.OmtpMessageReceiver"
+-            android:exported="true">
++            android:exported="false">
+             <intent-filter>
+                 <action android:name="android.intent.action.DATA_SMS_RECEIVED" />
+                 <data android:scheme="sms" />

@@ -1,0 +1,66 @@
+From b78161c05533f6648eaff6602b9ec51efe2d3655 Mon Sep 17 00:00:00 2001
+From: Harish Mahendrakar <harish.mahendrakar@ittiam.com>
+Date: Fri, 14 Oct 2016 17:19:53 +0530
+Subject: [PATCH] Decoder: Fixes in handling errors in Mbaff clips.
+
+Fixes mb_x, mb_y and first_mb_in_slice for Mbaff error streams
+
+CYNGNOS-3312
+Bug: 30481714
+
+Change-Id: Ie99f3b57e48a620a4bc7aee88031955a2e1b6753
+---
+ decoder/ih264d_parse_pslice.c | 9 +++++++--
+ decoder/ih264d_utils.c        | 6 +-----
+ 2 files changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/decoder/ih264d_parse_pslice.c b/decoder/ih264d_parse_pslice.c
+index dfd1ba8..1134ef0 100644
+--- a/decoder/ih264d_parse_pslice.c
++++ b/decoder/ih264d_parse_pslice.c
+@@ -1693,14 +1693,14 @@ WORD32 ih264d_mark_err_slice_skip(dec_struct_t * ps_dec,
+         ps_dec->ps_parse_cur_slice->ppv_map_ref_idx_to_poc = (volatile void **)pu1_buf;
+     }
+ 
+-    ps_dec->ps_cur_slice->u2_first_mb_in_slice = ps_dec->u2_total_mbs_coded << u1_mbaff;
++    ps_dec->ps_cur_slice->u2_first_mb_in_slice = ps_dec->u2_total_mbs_coded >> u1_mbaff;
+     ps_dec->ps_cur_slice->i1_slice_alpha_c0_offset = 0;
+     ps_dec->ps_cur_slice->i1_slice_beta_offset = 0;
+ 
+     if(ps_dec->ps_cur_slice->u1_field_pic_flag)
+         ps_dec->u2_prv_frame_num = ps_dec->ps_cur_slice->u2_frame_num;
+ 
+-    ps_dec->ps_parse_cur_slice->u4_first_mb_in_slice = ps_dec->u2_total_mbs_coded << u1_mbaff;
++    ps_dec->ps_parse_cur_slice->u4_first_mb_in_slice = ps_dec->u2_total_mbs_coded >> u1_mbaff;
+     ps_dec->ps_parse_cur_slice->u2_log2Y_crwd =    ps_dec->ps_cur_slice->u2_log2Y_crwd;
+ 
+ 
+@@ -1723,6 +1723,11 @@ WORD32 ih264d_mark_err_slice_skip(dec_struct_t * ps_dec,
+     ps_dec->ps_parse_cur_slice->slice_type = P_SLICE;
+     ps_dec->pf_mvpred_ref_tfr_nby2mb = ih264d_mv_pred_ref_tfr_nby2_pmb;
+     ps_dec->ps_part = ps_dec->ps_parse_part_params;
++    ps_dec->u2_mbx =
++                    (MOD(ps_dec->ps_cur_slice->u2_first_mb_in_slice - 1, ps_dec->u2_frm_wd_in_mbs));
++    ps_dec->u2_mby =
++                    (DIV(ps_dec->ps_cur_slice->u2_first_mb_in_slice - 1, ps_dec->u2_frm_wd_in_mbs));
++    ps_dec->u2_mby <<= u1_mbaff;
+ 
+     /******************************************************/
+     /* Parsing / decoding the slice                       */
+diff --git a/decoder/ih264d_utils.c b/decoder/ih264d_utils.c
+index 77c1733..d356c0d 100644
+--- a/decoder/ih264d_utils.c
++++ b/decoder/ih264d_utils.c
+@@ -676,11 +676,7 @@ WORD32 ih264d_init_dec_mb_grp(dec_struct_t *ps_dec)
+     dec_seq_params_t *ps_seq = ps_dec->ps_cur_sps;
+     UWORD8 u1_frm = ps_seq->u1_frame_mbs_only_flag;
+ 
+-    ps_dec->u1_recon_mb_grp = PARSE_MB_GROUP_4;
+-
+-    //NMB set to width in MBs for non-mbaff cases
+-    if(0 == ps_seq->u1_mb_aff_flag)
+-        ps_dec->u1_recon_mb_grp = ps_dec->u2_frm_wd_in_mbs;
++    ps_dec->u1_recon_mb_grp = ps_dec->u2_frm_wd_in_mbs << ps_seq->u1_mb_aff_flag;
+ 
+     ps_dec->u1_recon_mb_grp_pair = ps_dec->u1_recon_mb_grp >> 1;
+ 

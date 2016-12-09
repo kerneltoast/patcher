@@ -1,0 +1,91 @@
+From 5345d564d80af9ac832925c68f41ea60c5a8a458 Mon Sep 17 00:00:00 2001
+From: Brad Ebinger <breadley@google.com>
+Date: Fri, 7 Oct 2016 10:39:33 -0700
+Subject: [PATCH] Restrict SipProfiles to profiles directory
+
+We now check SIP profile names to ensure that they do not attempt file
+traversal when being saved. They are now restricted to be children of
+the profiles/ directory.
+
+CYNGNOS-3312
+BUG: 31530456
+Change-Id: I9c9bce59d852e8a1cf500be6ca59b5e303877180
+(cherry picked from commit 4c761b96c2ee36410603df8e8a4fb4e07c12ede0)
+---
+ .../android/services/telephony/sip/SipEditor.java  |  2 +-
+ .../services/telephony/sip/SipProfileDb.java       | 29 +++++++++++++++++++---
+ 2 files changed, 27 insertions(+), 4 deletions(-)
+
+diff --git a/sip/src/com/android/services/telephony/sip/SipEditor.java b/sip/src/com/android/services/telephony/sip/SipEditor.java
+index 6304220..8512fe3 100644
+--- a/sip/src/com/android/services/telephony/sip/SipEditor.java
++++ b/sip/src/com/android/services/telephony/sip/SipEditor.java
+@@ -259,7 +259,7 @@ private void saveAndRegisterProfile(SipProfile p, boolean enableProfile) throws
+      *
+      * @param p The {@link SipProfile} to delete.
+      */
+-    private void deleteAndUnregisterProfile(SipProfile p) {
++    private void deleteAndUnregisterProfile(SipProfile p) throws IOException {
+         if (p == null) return;
+         mProfileDb.deleteProfile(p);
+         mSipAccountRegistry.stopSipService(this, p.getProfileName());
+diff --git a/sip/src/com/android/services/telephony/sip/SipProfileDb.java b/sip/src/com/android/services/telephony/sip/SipProfileDb.java
+index 578c683..5ead30b 100644
+--- a/sip/src/com/android/services/telephony/sip/SipProfileDb.java
++++ b/sip/src/com/android/services/telephony/sip/SipProfileDb.java
+@@ -21,6 +21,7 @@
+ import android.content.Context;
+ import android.net.sip.SipProfile;
+ import android.text.TextUtils;
++import android.util.EventLog;
+ import android.util.Log;
+ 
+ import java.io.File;
+@@ -54,9 +55,13 @@ public SipProfileDb(Context context) {
+         mSipSharedPreferences = new SipSharedPreferences(context);
+     }
+ 
+-    public void deleteProfile(SipProfile p) {
++    public void deleteProfile(SipProfile p) throws IOException {
+         synchronized(SipProfileDb.class) {
+-            deleteProfile(new File(mProfilesDirectory + p.getProfileName()));
++            File profileFile = new File(mProfilesDirectory, p.getProfileName());
++            if (!isChild(new File(mProfilesDirectory), profileFile)) {
++                throw new IOException("Invalid Profile Credentials!");
++            }
++            deleteProfile(profileFile);
+             if (mProfilesCount < 0) retrieveSipProfileListInternal();
+             mSipSharedPreferences.setProfilesCount(--mProfilesCount);
+         }
+@@ -72,7 +77,10 @@ private void deleteProfile(File file) {
+     public void saveProfile(SipProfile p) throws IOException {
+         synchronized(SipProfileDb.class) {
+             if (mProfilesCount < 0) retrieveSipProfileListInternal();
+-            File f = new File(mProfilesDirectory + p.getProfileName());
++            File f = new File(mProfilesDirectory, p.getProfileName());
++            if (!isChild(new File(mProfilesDirectory), f)) {
++                throw new IOException("Invalid Profile Credentials!");
++            }
+             if (!f.exists()) f.mkdirs();
+             AtomicFile atomicFile = new AtomicFile(new File(f, PROFILE_OBJ_FILE));
+             FileOutputStream fos = null;
+@@ -158,4 +166,19 @@ private SipProfile deserialize(File profileObjectFile) throws IOException {
+     private static void log(String msg) {
+         Log.d(SipUtil.LOG_TAG, PREFIX + msg);
+     }
++
++    /**
++     * Verifies that the file is a direct child of the base directory.
++     */
++    private boolean isChild(File base, File file) {
++        if (base == null || file == null) {
++            return false;
++        }
++        if (!base.equals(file.getAbsoluteFile().getParentFile())) {
++            Log.w(SipUtil.LOG_TAG, "isChild, file is not a child of the base dir.");
++            EventLog.writeEvent(0x534e4554, "31530456", -1, "");
++            return false;
++        }
++        return true;
++    }
+ }

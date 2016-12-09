@@ -1,0 +1,31 @@
+From 83ff6f1c0c33986c512d5dffb2754dc276725d00 Mon Sep 17 00:00:00 2001
+From: Ningyuan Wang <nywang@google.com>
+Date: Tue, 11 Oct 2016 11:42:12 -0700
+Subject: [PATCH] resolve merge conflicts of 849c5c7 to mnc-dev
+
+This resovles the merge conflict for ag/1514448/
+After Android M, this function uses num_bssid instead of num_ap.
+Both are prone to stack overflow attacks.
+
+CYNGNOS-3312
+Bug: 31856351
+Test: compile, unit tests, manual test
+
+Change-Id: I194850a4c79ddf478d98e750f65b24e82d99ebc0
+---
+ service/jni/com_android_server_wifi_WifiNative.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/service/jni/com_android_server_wifi_WifiNative.cpp b/service/jni/com_android_server_wifi_WifiNative.cpp
+index dc0aad0..4a08b8c 100644
+--- a/service/jni/com_android_server_wifi_WifiNative.cpp
++++ b/service/jni/com_android_server_wifi_WifiNative.cpp
+@@ -892,7 +892,7 @@ static jboolean android_net_wifi_setHotlist(
+         return false;
+     }
+ 
+-    if (params.num_ap >
++    if (params.num_bssid >
+             static_cast<int>(sizeof(params.ap) / sizeof(params.ap[0]))) {
+         ALOGE("setHotlist array length is too long");
+         android_errorWriteLog(0x534e4554, "31856351");

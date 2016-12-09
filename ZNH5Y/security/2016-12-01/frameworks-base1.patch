@@ -1,0 +1,37 @@
+From 110711273c3049872a9f533eed5f81feba94fb6b Mon Sep 17 00:00:00 2001
+From: Sungsoo <sungsoo@google.com>
+Date: Tue, 18 Oct 2016 14:12:00 +0900
+Subject: [PATCH] DO NOT MERGE) ExifInterface: Close the file when an exception
+ happens
+
+CYNGNOS-3312
+Bug: 32068647, Bug: 30936376
+Change-Id: I22fa2384348c890ca726d2b1632cd54e59d25a8f
+(cherry picked from commit cb17930077de640411407636eebc000e2d06dd9c)
+---
+ media/java/android/media/ExifInterface.java | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/media/java/android/media/ExifInterface.java b/media/java/android/media/ExifInterface.java
+index a2ccdc8..bb75547 100644
+--- a/media/java/android/media/ExifInterface.java
++++ b/media/java/android/media/ExifInterface.java
+@@ -1335,8 +1335,9 @@ private void loadAttributes() throws IOException {
+         for (int i = 0; i < EXIF_TAGS.length; ++i) {
+             mAttributes[i] = new HashMap();
+         }
++        InputStream in = null;
+         try {
+-            InputStream in = new FileInputStream(mFilename);
++            in = new FileInputStream(mFilename);
+             getJpegAttributes(in);
+             mIsSupportedFile = true;
+         } catch (IOException e) {
+@@ -1349,6 +1350,7 @@ private void loadAttributes() throws IOException {
+             if (DEBUG) {
+                 printAttributes();
+             }
++            IoUtils.closeQuietly(in);
+         }
+     }
+ 

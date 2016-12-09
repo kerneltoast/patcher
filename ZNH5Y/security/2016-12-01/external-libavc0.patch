@@ -1,0 +1,123 @@
+From 28afe7bdfa7e5ff91bf9d3629604c17e01975878 Mon Sep 17 00:00:00 2001
+From: Harish Mahendrakar <harish.mahendrakar@ittiam.com>
+Date: Tue, 26 Apr 2016 17:23:03 +0530
+Subject: [PATCH] Decoder: Ignore few dpb errors
+
+Ignore dpb errors, where decoder fails to release a non-existing picture
+from reference lists. This is needed to decode streams where few pictures
+are missing.
+
+CYNGNOS-3312
+Change-Id: I8ece68cb1fa22473029e16158cd86ce7a197027a
+---
+ decoder/ih264d_dpb_mgr.c | 11 ++++++++++-
+ decoder/ih264d_utils.c   | 45 ++++++++++++++++++---------------------------
+ 2 files changed, 28 insertions(+), 28 deletions(-)
+
+diff --git a/decoder/ih264d_dpb_mgr.c b/decoder/ih264d_dpb_mgr.c
+index 7c4305b..a75aeee 100644
+--- a/decoder/ih264d_dpb_mgr.c
++++ b/decoder/ih264d_dpb_mgr.c
+@@ -374,7 +374,16 @@ WORD32 ih264d_insert_st_node(dpb_manager_t *ps_dpb_mgr,
+         {
+             /* Can occur only for field bottom pictures */
+             ps_dpb_info[i].s_bot_field.u1_reference_info = IS_SHORT_TERM;
+-            return 0;
++
++            /*signal an error in the case of frame pic*/
++            if(ps_dpb_info[i].ps_pic_buf->u1_pic_type == FRM_PIC)
++            {
++                return ERROR_DBP_MANAGER_T;
++            }
++            else
++            {
++                return OK;
++            }
+         }
+ 
+         if((ps_dpb_info[i].u1_used_as_ref == UNUSED_FOR_REF)
+diff --git a/decoder/ih264d_utils.c b/decoder/ih264d_utils.c
+index acca990..77c1733 100644
+--- a/decoder/ih264d_utils.c
++++ b/decoder/ih264d_utils.c
+@@ -451,7 +451,6 @@ WORD32 ih264d_end_of_pic_processing(dec_struct_t *ps_dec)
+ {
+     UWORD8 u1_pic_type, u1_nal_ref_idc;
+     dec_slice_params_t *ps_cur_slice = ps_dec->ps_cur_slice;
+-    WORD32 ret;
+ 
+     /* If nal_ref_idc is equal to 0 for one slice or slice data partition NAL
+      unit of a particular picture, it shall be equal to 0 for all slice and
+@@ -475,34 +474,29 @@ WORD32 ih264d_end_of_pic_processing(dec_struct_t *ps_dec)
+             if(ps_dec->ps_dpb_cmds->u1_long_term_reference_flag == 0)
+             {
+                 ih264d_reset_ref_bufs(ps_dec->ps_dpb_mgr);
+-
+-                {
+-                    ret = ih264d_insert_st_node(ps_dec->ps_dpb_mgr,
+-                                          ps_dec->ps_cur_pic,
+-                                          ps_dec->u1_pic_buf_id,
+-                                          ps_cur_slice->u2_frame_num);
+-                    if(ret != OK)
+-                        return ret;
+-                }
++                /* ignore DPB errors */
++                ih264d_insert_st_node(ps_dec->ps_dpb_mgr,
++                                      ps_dec->ps_cur_pic,
++                                      ps_dec->u1_pic_buf_id,
++                                      ps_cur_slice->u2_frame_num);
+             }
+             else
+             {
+                 /* Equivalent of inserting a pic directly as longterm Pic */
+ 
+                 {
+-                    ret = ih264d_insert_st_node(ps_dec->ps_dpb_mgr,
++                    /* ignore DPB errors */
++                    ih264d_insert_st_node(ps_dec->ps_dpb_mgr,
+                                           ps_dec->ps_cur_pic,
+                                           ps_dec->u1_pic_buf_id,
+                                           ps_cur_slice->u2_frame_num);
+-                    if(ret != OK)
+-                        return ret;
++
+                     /* Set longTermIdx = 0, MaxLongTermFrameIdx = 0 */
+-                    ret = ih264d_delete_st_node_or_make_lt(
++                    ih264d_delete_st_node_or_make_lt(
+                                     ps_dec->ps_dpb_mgr,
+                                     ps_cur_slice->u2_frame_num, 0,
+                                     ps_cur_slice->u1_field_pic_flag);
+-                    if(ret != OK)
+-                        return ret;
++
+                     ps_dec->ps_dpb_mgr->u1_max_lt_pic_idx_plus1 = 1;
+                 }
+             }
+@@ -513,19 +507,16 @@ WORD32 ih264d_end_of_pic_processing(dec_struct_t *ps_dec)
+             {
+                 UWORD16 u2_pic_num = ps_cur_slice->u2_frame_num;
+ 
++                /* ignore DPB errors */
++                ih264d_do_mmco_buffer(ps_dec->ps_dpb_cmds, ps_dec->ps_dpb_mgr,
++                              ps_dec->ps_cur_sps->u1_num_ref_frames, u2_pic_num,
++                              (ps_dec->ps_cur_sps->u2_u4_max_pic_num_minus1),
++                              ps_dec->u1_nal_unit_type, ps_dec->ps_cur_pic,
++                              ps_dec->u1_pic_buf_id,
++                              ps_cur_slice->u1_field_pic_flag,
++                              ps_dec->e_dec_status);
+ 
+ 
+-                ret = ih264d_do_mmco_buffer(
+-                                ps_dec->ps_dpb_cmds, ps_dec->ps_dpb_mgr,
+-                                ps_dec->ps_cur_sps->u1_num_ref_frames,
+-                                u2_pic_num,
+-                                (ps_dec->ps_cur_sps->u2_u4_max_pic_num_minus1),
+-                                ps_dec->u1_nal_unit_type, ps_dec->ps_cur_pic,
+-                                ps_dec->u1_pic_buf_id,
+-                                ps_cur_slice->u1_field_pic_flag,
+-                                ps_dec->e_dec_status);
+-                if(ret != OK)
+-                    return ret;
+             }
+         }
+         ih264d_update_default_index_list(ps_dec->ps_dpb_mgr);

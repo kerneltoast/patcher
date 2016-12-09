@@ -1,0 +1,38 @@
+From bda7bdb3b33520ed2928f1722e75929544a9582c Mon Sep 17 00:00:00 2001
+From: rago <rago@google.com>
+Date: Fri, 7 Oct 2016 18:16:09 -0700
+Subject: [PATCH] Fix potential NULL dereference in Visualizer effect
+
+CYNGNOS-3312
+Bug: 30229821
+
+Test: fixing CL. Existing unit tests still pass.
+
+Change-Id: I6e4abd759d5d2abc3b391e92e2e18f060cab7af0
+(cherry picked from commit 874f9e0b8eb0cbe508d15c8c03796c863851f21f)
+---
+ media/libeffects/visualizer/EffectVisualizer.cpp | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/media/libeffects/visualizer/EffectVisualizer.cpp b/media/libeffects/visualizer/EffectVisualizer.cpp
+index 91f9fc7..21fddb1 100644
+--- a/media/libeffects/visualizer/EffectVisualizer.cpp
++++ b/media/libeffects/visualizer/EffectVisualizer.cpp
+@@ -602,9 +602,14 @@ int Visualizer_command(effect_handle_t self, uint32_t cmdCode, uint32_t cmdSize,
+     case VISUALIZER_CMD_MEASURE: {
+         if (pReplyData == NULL || replySize == NULL ||
+                 *replySize < (sizeof(int32_t) * MEASUREMENT_COUNT)) {
+-            ALOGV("VISUALIZER_CMD_MEASURE() error *replySize %" PRIu32
+-                    " < (sizeof(int32_t) * MEASUREMENT_COUNT) %" PRIu32, *replySize,
+-                    sizeof(int32_t) * MEASUREMENT_COUNT);
++            if (replySize == NULL) {
++                ALOGV("VISUALIZER_CMD_MEASURE() error replySize NULL");
++            } else {
++                ALOGV("VISUALIZER_CMD_MEASURE() error *replySize %" PRIu32
++                        " < (sizeof(int32_t) * MEASUREMENT_COUNT) %" PRIu32,
++                        *replySize,
++                        uint32_t(sizeof(int32_t)) * MEASUREMENT_COUNT);
++            }
+             android_errorWriteLog(0x534e4554, "30229821");
+             return -EINVAL;
+         }
