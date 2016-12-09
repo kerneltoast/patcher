@@ -41,6 +41,7 @@ cd $ROM_TREE
 
 ### Useful upstream patches not present on the branch in use
 patch -d vendor/cm				-p1 -s -N --no-backup-if-mismatch < $BRANCH/vendor-cm0.patch
+chmod a+x vendor/cm/gello/fix_gello.sh
 
 ### Custom patches
 patch -d build					-p1 -s -N --no-backup-if-mismatch < $CUSTOM/build0.patch
