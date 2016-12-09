@@ -39,6 +39,9 @@ git clean -f -d && git reset --hard
 
 cd $ROM_TREE
 
+### Useful upstream patches not present on the branch in use
+patch -d vendor/cm				-p1 -s -N --no-backup-if-mismatch < $BRANCH/vendor-cm0.patch
+
 ### Custom patches
 patch -d build					-p1 -s -N --no-backup-if-mismatch < $CUSTOM/build0.patch
 patch -d build					-p1 -s -N --no-backup-if-mismatch < $CUSTOM/build1.patch
