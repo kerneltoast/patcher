@@ -64,8 +64,3 @@ patch -d system/core				-p1 -s -N --no-backup-if-mismatch < $CUSTOM/system-core2
 
 # Get APN list from nightly branch and apply patch on top
 curl -s $APN_LIST_URL > vendor/cm/prebuilt/common/etc/apns-conf.xml
-
-# Revert change that disables proximity check for power button
-cd $ROM_TREE/frameworks/base
-git revert --no-edit --no-commit 545dc46798d26328b6dc503663a771b37797eca5
-cd $ROM_TREE
