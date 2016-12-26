@@ -1,0 +1,44 @@
+From d9c881243ead9a7f755da22ff9e9668e64f76859 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Sun, 25 Dec 2016 19:45:32 -0800
+Subject: [PATCH] PowerProfile: Return correct battery capacity based on device
+ ID
+
+The OnePlus 3T has a 3400 mAh battery, while the OnePlus 3 has a 3000 mAh
+battery.
+
+Change-Id: I66d86fe2dff29d39ae1fbc54a5d91441cecf64c1
+---
+ core/java/com/android/internal/os/PowerProfile.java | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/core/java/com/android/internal/os/PowerProfile.java b/core/java/com/android/internal/os/PowerProfile.java
+index aaa9f73..f23aff8 100644
+--- a/core/java/com/android/internal/os/PowerProfile.java
++++ b/core/java/com/android/internal/os/PowerProfile.java
+@@ -20,6 +20,7 @@ package com.android.internal.os;
+ import android.content.Context;
+ import android.content.res.Resources;
+ import android.content.res.XmlResourceParser;
++import android.os.SystemProperties;
+ 
+ import com.android.internal.util.XmlUtils;
+ 
+@@ -408,6 +409,14 @@ public class PowerProfile {
+      * @return the battery capacity in mAh
+      */
+     public double getBatteryCapacity() {
++        String model = SystemProperties.get("ro.boot.project_name", null);
++        if (model != null) {
++            if (model.equals("15811")) {
++                return 3400.0;
++            } else {
++                return 3000.0;
++            }
++        }
+         return getAveragePower(POWER_BATTERY_CAPACITY);
+     }
+ }
+-- 
+2.9.3
+
