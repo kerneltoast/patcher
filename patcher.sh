@@ -3,8 +3,9 @@
 # Apply these patches before compilation:
 
 ROM_TREE=$PWD
-BRANCH=$ROM_TREE/patcher/ZNH5Y
-CUSTOM=$ROM_TREE/patcher/sultan
+PATCHER_PATH=$ROM_TREE/patcher
+BRANCH=$PATCHER_PATH/ZNH5Y
+CUSTOM=$PATCHER_PATH/sultan
 
 APN_LIST_URL=https://raw.githubusercontent.com/CyanogenMod/android_vendor_cm/cm-13.0/prebuilt/common/etc/apns-conf.xml
 
@@ -36,9 +37,10 @@ git clean -f -d && git reset --hard
 
 cd $ROM_TREE
 
-### Useful upstream patches not present on the branch in use
-patch -d vendor/cm				-p1 -s -N --no-backup-if-mismatch < $BRANCH/vendor-cm0.patch
-chmod a+x vendor/cm/gello/fix_gello.sh
+# Prebuilt Gello APK
+rm -rf ~/.m2/repository/org/cyanogenmod/gello
+mkdir -p ~/.m2/repository/org/cyanogenmod
+cp -R $PATCHER_PATH/gello ~/.m2/repository/org/cyanogenmod
 
 ### Custom patches
 patch -d build					-p1 -s -N --no-backup-if-mismatch < $CUSTOM/build0.patch
