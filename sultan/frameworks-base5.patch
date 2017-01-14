@@ -1,6 +1,6 @@
-From a5146979601e17e1c7cbbbc72306651d5ca2a255 Mon Sep 17 00:00:00 2001
+From c3ed69b29df7c42ebdd34a706877030973b35d6f Mon Sep 17 00:00:00 2001
 From: Sultanxda <sultanxda@gmail.com>
-Date: Sat, 5 Nov 2016 11:42:06 -0700
+Date: Sat, 14 Jan 2017 14:31:20 -0800
 Subject: [PATCH] Fingerprint: Speed up wake-and-unlock scenario
 
 *Directly dismiss keyguard instead of using a fade-out animation
@@ -8,12 +8,12 @@ Subject: [PATCH] Fingerprint: Speed up wake-and-unlock scenario
 
 Change-Id: Ic0bc19164eeca7254d72a09314391ecd3c750e50
 ---
- .../com/android/systemui/keyguard/KeyguardViewMediator.java    |  6 +++++-
- .../systemui/statusbar/phone/FingerprintUnlockController.java  |  6 ++----
- .../android/systemui/statusbar/phone/NavigationBarView.java    |  2 +-
- .../com/android/systemui/statusbar/phone/PhoneStatusBar.java   |  5 +++--
- .../systemui/statusbar/phone/StatusBarKeyguardViewManager.java | 10 ++++++++++
- 5 files changed, 21 insertions(+), 8 deletions(-)
+ .../android/systemui/keyguard/KeyguardViewMediator.java  |  6 +++++-
+ .../statusbar/phone/FingerprintUnlockController.java     |  6 ++----
+ .../systemui/statusbar/phone/NavigationBarView.java      |  2 +-
+ .../android/systemui/statusbar/phone/PhoneStatusBar.java |  5 +++--
+ .../statusbar/phone/StatusBarKeyguardViewManager.java    | 16 ++++++++++++++++
+ 5 files changed, 27 insertions(+), 8 deletions(-)
 
 diff --git a/packages/SystemUI/src/com/android/systemui/keyguard/KeyguardViewMediator.java b/packages/SystemUI/src/com/android/systemui/keyguard/KeyguardViewMediator.java
 index 2833759..66efce4 100755
@@ -86,20 +86,26 @@ index 7df8346..7122fd7 100644
                      // We are unlocking directly - no animation!
                      mBackdrop.setVisibility(View.GONE);
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarKeyguardViewManager.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarKeyguardViewManager.java
-index 96cf093..3142950 100644
+index 96cf093..08b91c2 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarKeyguardViewManager.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarKeyguardViewManager.java
-@@ -358,6 +358,16 @@ public class StatusBarKeyguardViewManager {
+@@ -358,6 +358,22 @@ public class StatusBarKeyguardViewManager {
          }
      }
  
 +    public void hideNoAnimation() {
 +        mShowing = false;
++        mFingerprintUnlockController.startKeyguardFadingAway();
++        mPhoneStatusBar.setKeyguardFadingAway(SystemClock.uptimeMillis(), 0, 0);
 +        mPhoneStatusBar.hideKeyguard();
++        mStatusBarWindowManager.setKeyguardFadingAway(true);
++        mStatusBarWindowManager.setKeyguardFadingAway(false);
++        mPhoneStatusBar.finishKeyguardFadingAway();
++        mFingerprintUnlockController.finishKeyguardFadingAway();
 +        mStatusBarWindowManager.setKeyguardShowing(false);
 +        mBouncer.hide(true /* destroyView */);
 +        mViewMediatorCallback.keyguardGone();
-+        mFingerprintUnlockController.finishKeyguardFadingAway();
++        executeAfterKeyguardGoneAction();
 +        updateStates();
 +    }
 +
