@@ -1,34 +1,33 @@
-From 77879838383f0ab86f3c19938f05444d8f6e1c38 Mon Sep 17 00:00:00 2001
+From edb13e8b5e9d10f14f0941884a748cc86e8b40f3 Mon Sep 17 00:00:00 2001
 From: Sultanxda <sultanxda@gmail.com>
-Date: Sun, 13 Nov 2016 09:24:15 -0800
-Subject: [PATCH] DispSync: Use boottime to fix timestamp mismatch
+Date: Sun, 15 Jan 2017 13:40:41 -0800
+Subject: [PATCH] sf: Silence 'Timestamp x seems implausible' logspam
 
-Monotonic time does not include suspend time, causing the expected
-timestamps to be skewed. This results in the following being spammed to
-the log:
-SurfaceFlinger: [SurfaceView] Timestamp 2913013563839 seems implausible
-relative to expectedPresent 1640907033276
+Something is funky with the timestamps used in our camera's EIS routines;
+they're using CLOCK_BOOTTIME instead of CLOCK_MONOTONIC, which causes
+these surfaceflinger warnings to be spammed to the log. These warnings are
+not fatal and there are no a/v sync issues in the camera, so silence them
+in order to cut out their unneeded overhead.
 
-Use boottime instead of monotonic to fix the timestamp skew.
-
-Change-Id: Ie5ef2dd778c514a16ecf000580dabefbecedb800
+Change-Id: I798d34d05139e810f9c0bdc1188e2e5cb3de8ede
 ---
- services/surfaceflinger/DispSync.cpp | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ services/surfaceflinger/Layer.cpp | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/services/surfaceflinger/DispSync.cpp b/services/surfaceflinger/DispSync.cpp
-index 192d746..e7b3c4a 100644
---- a/services/surfaceflinger/DispSync.cpp
-+++ b/services/surfaceflinger/DispSync.cpp
-@@ -518,7 +518,7 @@ void DispSync::resetErrorLocked() {
+diff --git a/services/surfaceflinger/Layer.cpp b/services/surfaceflinger/Layer.cpp
+index 6a9cdb7..c1a3184 100644
+--- a/services/surfaceflinger/Layer.cpp
++++ b/services/surfaceflinger/Layer.cpp
+@@ -1196,9 +1196,6 @@ bool Layer::shouldPresentNow(const DispSync& dispSync) const {
  
- nsecs_t DispSync::computeNextRefresh(int periodOffset) const {
-     Mutex::Autolock lock(mMutex);
--    nsecs_t now = systemTime(SYSTEM_TIME_MONOTONIC);
-+    nsecs_t now = systemTime(SYSTEM_TIME_BOOTTIME);
-     nsecs_t phase = mReferenceTime + mPhase;
-     return (((now - phase) / mPeriod) + periodOffset + 1) * mPeriod + phase;
- }
+     // Ignore timestamps more than a second in the future
+     bool isPlausible = timestamp < (expectedPresent + s2ns(1));
+-    ALOGW_IF(!isPlausible, "[%s] Timestamp %" PRId64 " seems implausible "
+-            "relative to expectedPresent %" PRId64, mName.string(), timestamp,
+-            expectedPresent);
+ 
+     bool isDue = timestamp < expectedPresent;
+     return isDue || !isPlausible;
 -- 
 2.9.3
 
