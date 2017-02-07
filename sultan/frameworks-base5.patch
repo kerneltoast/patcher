@@ -1,113 +1,44 @@
-From 8cc1f2c4be1d9fffd1a09e7a25439876578fd6df Mon Sep 17 00:00:00 2001
+From d9c881243ead9a7f755da22ff9e9668e64f76859 Mon Sep 17 00:00:00 2001
 From: Sultanxda <sultanxda@gmail.com>
-Date: Sat, 21 Jan 2017 17:21:51 -0800
-Subject: [PATCH] Fingerprint: Speed up wake-and-unlock scenario
+Date: Sun, 25 Dec 2016 19:45:32 -0800
+Subject: [PATCH] PowerProfile: Return correct battery capacity based on device
+ ID
 
-*Directly dismiss keyguard instead of using a fade-out animation
-*Skip virtual navigation button animation on wake
+The OnePlus 3T has a 3400 mAh battery, while the OnePlus 3 has a 3000 mAh
+battery.
 
-Change-Id: Ic0bc19164eeca7254d72a09314391ecd3c750e50
+Change-Id: I66d86fe2dff29d39ae1fbc54a5d91441cecf64c1
 ---
- .../com/android/systemui/keyguard/KeyguardViewMediator.java  |  6 +++++-
- .../statusbar/phone/FingerprintUnlockController.java         |  6 ++----
- .../android/systemui/statusbar/phone/NavigationBarView.java  |  2 +-
- .../com/android/systemui/statusbar/phone/PhoneStatusBar.java |  5 +++--
- .../statusbar/phone/StatusBarKeyguardViewManager.java        | 12 ++++++++++++
- 5 files changed, 23 insertions(+), 8 deletions(-)
+ core/java/com/android/internal/os/PowerProfile.java | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/packages/SystemUI/src/com/android/systemui/keyguard/KeyguardViewMediator.java b/packages/SystemUI/src/com/android/systemui/keyguard/KeyguardViewMediator.java
-index 2833759..66efce4 100755
---- a/packages/SystemUI/src/com/android/systemui/keyguard/KeyguardViewMediator.java
-+++ b/packages/SystemUI/src/com/android/systemui/keyguard/KeyguardViewMediator.java
-@@ -1750,7 +1750,11 @@ public class KeyguardViewMediator extends SystemUI {
-             }
+diff --git a/core/java/com/android/internal/os/PowerProfile.java b/core/java/com/android/internal/os/PowerProfile.java
+index aaa9f73..f23aff8 100644
+--- a/core/java/com/android/internal/os/PowerProfile.java
++++ b/core/java/com/android/internal/os/PowerProfile.java
+@@ -20,6 +20,7 @@ package com.android.internal.os;
+ import android.content.Context;
+ import android.content.res.Resources;
+ import android.content.res.XmlResourceParser;
++import android.os.SystemProperties;
  
-             setShowingLocked(false);
--            mStatusBarKeyguardViewManager.hide(startTime, fadeoutDuration);
-+            if (mWakeAndUnlocking) {
-+                mStatusBarKeyguardViewManager.hideNoAnimation();
+ import com.android.internal.util.XmlUtils;
+ 
+@@ -408,6 +409,14 @@ public class PowerProfile {
+      * @return the battery capacity in mAh
+      */
+     public double getBatteryCapacity() {
++        String model = SystemProperties.get("ro.boot.project_name", null);
++        if (model != null) {
++            if (model.equals("15811")) {
++                return 3400.0;
 +            } else {
-+                mStatusBarKeyguardViewManager.hide(startTime, fadeoutDuration);
++                return 3000.0;
 +            }
-             resetKeyguardDonePendingLocked();
-             mHideAnimationRun = false;
-             updateActivityLockScreenState();
-diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/FingerprintUnlockController.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/FingerprintUnlockController.java
-index 7135836..4e900db 100644
---- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/FingerprintUnlockController.java
-+++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/FingerprintUnlockController.java
-@@ -196,7 +196,7 @@ public class FingerprintUnlockController extends KeyguardUpdateMonitorCallback {
-                 mStatusBarWindowManager.setStatusBarFocusable(false);
-                 mDozeScrimController.abortPulsing();
-                 mKeyguardViewMediator.onWakeAndUnlocking();
--                mScrimController.setWakeAndUnlocking();
-+                mScrimController.forceHideScrims(true);
-                 if (mPhoneStatusBar.getNavigationBarView() != null) {
-                     mPhoneStatusBar.getNavigationBarView().setWakeAndUnlocking(true);
-                 }
-@@ -205,9 +205,7 @@ public class FingerprintUnlockController extends KeyguardUpdateMonitorCallback {
-             case MODE_NONE:
-                 break;
-         }
--        if (mMode != MODE_WAKE_AND_UNLOCK_PULSING) {
--            mStatusBarWindowManager.setForceDozeBrightness(false);
--        }
-+        mStatusBarWindowManager.setForceDozeBrightness(false);
-         mPhoneStatusBar.notifyFpAuthModeChanged();
++        }
+         return getAveragePower(POWER_BATTERY_CAPACITY);
      }
- 
-diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/NavigationBarView.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/NavigationBarView.java
-index c10f45b..d2f197b 100644
---- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/NavigationBarView.java
-+++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/NavigationBarView.java
-@@ -506,7 +506,7 @@ public class NavigationBarView extends LinearLayout {
-     }
- 
-     public void setWakeAndUnlocking(boolean wakeAndUnlocking) {
--        setUseFadingAnimations(wakeAndUnlocking);
-+        setUseFadingAnimations(!wakeAndUnlocking);
-         mWakeAndUnlocking = wakeAndUnlocking;
-         updateLayoutTransitionsEnabled();
-     }
-diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java
-index 7df8346..7122fd7 100644
---- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java
-+++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java
-@@ -2295,8 +2295,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
-                 if (DEBUG_MEDIA) {
-                     Log.v(TAG, "DEBUG_MEDIA: Fading out album artwork");
-                 }
--                if (mFingerprintUnlockController.getMode()
--                        == FingerprintUnlockController.MODE_WAKE_AND_UNLOCK_PULSING) {
-+                int fpMode = mFingerprintUnlockController.getMode();
-+                if (fpMode == FingerprintUnlockController.MODE_WAKE_AND_UNLOCK_PULSING ||
-+                        fpMode == FingerprintUnlockController.MODE_WAKE_AND_UNLOCK) {
- 
-                     // We are unlocking directly - no animation!
-                     mBackdrop.setVisibility(View.GONE);
-diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarKeyguardViewManager.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarKeyguardViewManager.java
-index 96cf093..dc67559 100644
---- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarKeyguardViewManager.java
-+++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarKeyguardViewManager.java
-@@ -358,6 +358,18 @@ public class StatusBarKeyguardViewManager {
-         }
-     }
- 
-+    public void hideNoAnimation() {
-+        mShowing = false;
-+        mPhoneStatusBar.setKeyguardFadingAway(SystemClock.uptimeMillis(), 0, 0);
-+        mPhoneStatusBar.hideKeyguard();
-+        mPhoneStatusBar.finishKeyguardFadingAway();
-+        mStatusBarWindowManager.setKeyguardShowing(false);
-+        mBouncer.hide(true /* destroyView */);
-+        mViewMediatorCallback.keyguardGone();
-+        mFingerprintUnlockController.finishKeyguardFadingAway();
-+        updateStates();
-+    }
-+
-     private void animateScrimControllerKeyguardFadingOut(long delay, long duration,
-             boolean skipFirstFrame) {
-         animateScrimControllerKeyguardFadingOut(delay, duration, null /* endRunnable */,
+ }
 -- 
 2.9.3
 
