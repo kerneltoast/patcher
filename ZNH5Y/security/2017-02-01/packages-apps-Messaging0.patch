@@ -1,0 +1,49 @@
+From eacf8a0b4377614332f582aca27e58a02a78319c Mon Sep 17 00:00:00 2001
+From: Tom Taylor <tomtaylor@google.com>
+Date: Tue, 6 Dec 2016 16:26:14 -0800
+Subject: [PATCH] resolve merge conflicts of eafd58a to nyc-dev
+
+Change-Id: I58151ca0c248dd4b84c78c8e7ca73d5a80bbd962
+(cherry picked from commit a43c5c5f18d966355a63db194c931e02267a2695)
+(cherry picked from commit b5ef5630a7b05676ef9c48d43c3752712cefd814)
+---
+ .../messaging/ui/mediapicker/DocumentImagePicker.java       | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/src/com/android/messaging/ui/mediapicker/DocumentImagePicker.java b/src/com/android/messaging/ui/mediapicker/DocumentImagePicker.java
+index 2c36752..bb267da 100644
+--- a/src/com/android/messaging/ui/mediapicker/DocumentImagePicker.java
++++ b/src/com/android/messaging/ui/mediapicker/DocumentImagePicker.java
+@@ -24,6 +24,8 @@
+ import com.android.messaging.Factory;
+ import com.android.messaging.datamodel.data.PendingAttachmentData;
+ import com.android.messaging.ui.UIIntents;
++import com.android.messaging.util.LogUtil;
++import com.android.messaging.util.FileUtil;
+ import com.android.messaging.util.ImageUtils;
+ import com.android.messaging.util.SafeAsyncTask;
+ 
+@@ -111,12 +113,23 @@ private void prepareDocumentForAttachment(final Uri documentUri) {
+         new SafeAsyncTask<Void, Void, String>() {
+             @Override
+             protected String doInBackgroundTimed(final Void... params) {
++                if (FileUtil.isInPrivateDir(documentUri)) {
++                    // hacker sending private app data. Bail out
++                    if (LogUtil.isLoggable(LogUtil.BUGLE_TAG, LogUtil.ERROR)) {
++                        LogUtil.e(LogUtil.BUGLE_TAG, "Aborting attach of private app data ("
++                                + documentUri + ")");
++                    }
++                    return null;
++                }
+                 return ImageUtils.getContentType(
+                         Factory.get().getApplicationContext().getContentResolver(), documentUri);
+             }
+ 
+             @Override
+             protected void onPostExecute(final String contentType) {
++                if (contentType == null) {
++                    return;     // bad uri on input
++                }
+                 // Ask the listener to create a temporary placeholder item to show the progress.
+                 final PendingAttachmentData pendingItem =
+                         PendingAttachmentData.createPendingAttachmentData(contentType,
