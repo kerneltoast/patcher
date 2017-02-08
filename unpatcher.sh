@@ -3,6 +3,8 @@
 ROM_TREE=$PWD
 
 # Clean up
+cd $ROM_TREE/bionic
+git clean -f -d && git reset --hard
 cd $ROM_TREE/build
 git clean -f -d && git reset --hard
 cd $ROM_TREE/external/libavc
@@ -29,9 +31,17 @@ cd $ROM_TREE/frameworks/native
 git clean -f -d && git reset --hard
 cd $ROM_TREE/frameworks/opt/net/wifi
 git clean -f -d && git reset --hard
+cd $ROM_TREE/hardware/libhardware
+git clean -f -d && git reset --hard
+cd $ROM_TREE/packages/apps/Bluetooth
+git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/LockClock
 git clean -f -d && git reset --hard
+cd $ROM_TREE/packages/apps/Messaging
+git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Settings
+git clean -f -d && git reset --hard
+cd $ROM_TREE/packages/apps/UnifiedEmail
 git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/services/Telephony
 git clean -f -d && git reset --hard

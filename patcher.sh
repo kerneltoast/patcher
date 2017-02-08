@@ -9,10 +9,13 @@ CUSTOM=$PATCHER_PATH/sultan
 
 SECURITY=$ROM_TREE/patcher/ZNH5Y/security
 SECURITY_JAN17=$SECURITY/2017-01-01
+SECURITY_FEB17=$SECURITY/2017-02-01
 
 APN_LIST_URL=https://raw.githubusercontent.com/CyanogenMod/android_vendor_cm/cm-13.0/prebuilt/common/etc/apns-conf.xml
 
 # Clean up first
+cd $ROM_TREE/bionic
+git clean -f -d && git reset --hard
 cd $ROM_TREE/build
 git clean -f -d && git reset --hard
 cd $ROM_TREE/external/libavc
@@ -39,9 +42,17 @@ cd $ROM_TREE/frameworks/native
 git clean -f -d && git reset --hard
 cd $ROM_TREE/frameworks/opt/net/wifi
 git clean -f -d && git reset --hard
+cd $ROM_TREE/hardware/libhardware
+git clean -f -d && git reset --hard
+cd $ROM_TREE/packages/apps/Bluetooth
+git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/LockClock
 git clean -f -d && git reset --hard
+cd $ROM_TREE/packages/apps/Messaging
+git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Settings
+git clean -f -d && git reset --hard
+cd $ROM_TREE/packages/apps/UnifiedEmail
 git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/services/Telephony
 git clean -f -d && git reset --hard
@@ -98,3 +109,18 @@ patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SECURITY_JAN17/f
 patch -d frameworks/ex				-p1 -s -N --no-backup-if-mismatch < $SECURITY_JAN17/frameworks-ex0.patch
 patch -d frameworks/native			-p1 -s -N --no-backup-if-mismatch < $SECURITY_JAN17/frameworks-native0.patch
 patch -d packages/services/Telephony		-p1 -s -N --no-backup-if-mismatch < $SECURITY_JAN17/packages-services-Telephony0.patch
+
+# 2017-02-01
+patch -d bionic					-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/bionic0.patch
+patch -d build					-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/build0.patch
+patch -d frameworks/av				-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/frameworks-av0.patch
+patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/frameworks-base0.patch
+patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/frameworks-base1.patch
+patch -d frameworks/native			-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/frameworks-native0.patch
+patch -d frameworks/native			-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/frameworks-native1.patch
+patch -d hardware/libhardware			-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/hardware-libhardware0.patch
+patch -d packages/apps/Bluetooth		-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/packages-apps-Bluetooth0.patch
+patch -d packages/apps/Messaging		-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/packages-apps-Messaging0.patch
+patch -d packages/apps/Messaging		-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/packages-apps-Messaging1.patch
+patch -d packages/apps/Messaging		-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/packages-apps-Messaging2.patch
+patch -d packages/apps/UnifiedEmail		-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/packages-apps-UnifiedEmail0.patch
