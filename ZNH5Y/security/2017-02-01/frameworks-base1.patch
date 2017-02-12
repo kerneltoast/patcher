@@ -1,4 +1,4 @@
-From 1e3e90cc41ca11d29d310dc45bf371acb95134ba Mon Sep 17 00:00:00 2001
+From 0f39805940a263c3315635ab4ddb4739e994ff67 Mon Sep 17 00:00:00 2001
 From: Jeff Sharkey <jsharkey@android.com>
 Date: Wed, 16 Nov 2016 17:22:48 -0700
 Subject: [PATCH] DO NOT MERGE: Check provider access for content changes.
@@ -18,9 +18,9 @@ Change-Id: If2dcd45cb0a9f1fb3b93e39fc7b8ae9c34c2fdef
 mh0rst: Backport from android-7.1.1_r21
 ---
  core/java/android/app/ActivityManagerInternal.java |  6 ++
- .../android/server/am/ActivityManagerService.java  | 45 +++++++++++++
- .../com/android/server/content/ContentService.java | 78 +++++++++++++---------
- 3 files changed, 98 insertions(+), 31 deletions(-)
+ .../android/server/am/ActivityManagerService.java  | 43 ++++++++++++
+ .../com/android/server/content/ContentService.java | 79 +++++++++++++---------
+ 3 files changed, 97 insertions(+), 31 deletions(-)
 
 diff --git a/core/java/android/app/ActivityManagerInternal.java b/core/java/android/app/ActivityManagerInternal.java
 index 40eb799..8e7c607 100644
@@ -40,10 +40,10 @@ index 40eb799..8e7c607 100644
      public abstract void onWakefulnessChanged(int wakefulness);
  
 diff --git a/services/core/java/com/android/server/am/ActivityManagerService.java b/services/core/java/com/android/server/am/ActivityManagerService.java
-index 23f34e6..6a80d30 100755
+index 23f34e6..317dea4 100755
 --- a/services/core/java/com/android/server/am/ActivityManagerService.java
 +++ b/services/core/java/com/android/server/am/ActivityManagerService.java
-@@ -9623,6 +9623,46 @@ public void showLockTaskEscapeMessage(IBinder token) {
+@@ -9623,6 +9623,44 @@ public void showLockTaskEscapeMessage(IBinder token) {
      }
  
      /**
@@ -60,9 +60,7 @@ index 23f34e6..6a80d30 100755
 +        ProviderInfo cpi = null;
 +        try {
 +            cpi = AppGlobals.getPackageManager().resolveContentProvider(authority,
-+                    STOCK_PM_FLAGS | PackageManager.GET_URI_PERMISSION_PATTERNS
-+                            | PackageManager.MATCH_DIRECT_BOOT_AWARE
-+                            | PackageManager.MATCH_DIRECT_BOOT_UNAWARE,
++                    STOCK_PM_FLAGS | PackageManager.GET_URI_PERMISSION_PATTERNS,
 +                    userId);
 +        } catch (RemoteException ignored) {
 +        }
@@ -90,7 +88,7 @@ index 23f34e6..6a80d30 100755
       * Check if {@link ProcessRecord} has a possible chance at accessing the
       * given {@link ProviderInfo}. Final permission checking is always done
       * in {@link ContentProvider}.
-@@ -21136,6 +21176,11 @@ ActivityInfo getActivityInfoForUser(ActivityInfo aInfo, int userId) {
+@@ -21136,6 +21174,11 @@ ActivityInfo getActivityInfoForUser(ActivityInfo aInfo, int userId) {
  
      private final class LocalService extends ActivityManagerInternal {
          @Override
@@ -103,18 +101,19 @@ index 23f34e6..6a80d30 100755
              ActivityManagerService.this.onWakefulnessChanged(wakefulness);
          }
 diff --git a/services/core/java/com/android/server/content/ContentService.java b/services/core/java/com/android/server/content/ContentService.java
-index f581a7f8..3aa7d60 100644
+index f581a7f8..1db31c9 100644
 --- a/services/core/java/com/android/server/content/ContentService.java
 +++ b/services/core/java/com/android/server/content/ContentService.java
-@@ -19,6 +19,7 @@
+@@ -19,6 +19,8 @@
  import android.Manifest;
  import android.accounts.Account;
  import android.app.ActivityManager;
 +import android.app.ActivityManagerInternal;
++import android.app.ActivityManagerNative;
  import android.content.ComponentName;
  import android.content.ContentResolver;
  import android.content.Context;
-@@ -51,7 +52,6 @@
+@@ -51,7 +53,6 @@
  
  import java.io.FileDescriptor;
  import java.io.PrintWriter;
@@ -122,7 +121,7 @@ index f581a7f8..3aa7d60 100644
  import java.util.ArrayList;
  import java.util.Collections;
  import java.util.Comparator;
-@@ -190,23 +190,15 @@ public void registerContentObserver(Uri uri, boolean notifyForDescendants,
+@@ -190,23 +191,15 @@ public void registerContentObserver(Uri uri, boolean notifyForDescendants,
  
          final int uid = Binder.getCallingUid();
          final int pid = Binder.getCallingPid();
@@ -154,7 +153,7 @@ index f581a7f8..3aa7d60 100644
          }
  
          synchronized (mRootNode) {
-@@ -253,21 +245,15 @@ public void notifyChange(Uri uri, IContentObserver observer,
+@@ -253,21 +246,15 @@ public void notifyChange(Uri uri, IContentObserver observer,
          final int uid = Binder.getCallingUid();
          final int pid = Binder.getCallingPid();
          final int callingUserHandle = UserHandle.getCallingUserId();
@@ -184,7 +183,7 @@ index f581a7f8..3aa7d60 100644
          }
  
          // This makes it so that future permission checks will be in the context of this
-@@ -317,6 +303,15 @@ public void notifyChange(Uri uri, IContentObserver observer,
+@@ -317,6 +304,15 @@ public void notifyChange(Uri uri, IContentObserver observer,
          }
      }
  
@@ -200,7 +199,7 @@ index f581a7f8..3aa7d60 100644
      public void notifyChange(Uri uri, IContentObserver observer,
              boolean observerWantsSelfNotifications, boolean syncToNetwork) {
          notifyChange(uri, observer, observerWantsSelfNotifications, syncToNetwork,
-@@ -924,6 +919,27 @@ public static ContentService main(Context context, boolean factoryTest) {
+@@ -924,6 +920,27 @@ public static ContentService main(Context context, boolean factoryTest) {
          return service;
      }
  
