@@ -49,5 +49,7 @@ cd $ROM_TREE/system/core
 git clean -f -d && git reset --hard
 cd $ROM_TREE/vendor/cm
 git clean -f -d && git reset --hard
+cd $ROM_TREE/vendor/cmsdk
+git clean -f -d && git reset --hard
 
 cd $ROM_TREE
