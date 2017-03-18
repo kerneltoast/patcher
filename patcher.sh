@@ -60,6 +60,8 @@ cd $ROM_TREE/system/core
 git clean -f -d && git reset --hard
 cd $ROM_TREE/vendor/cm
 git clean -f -d && git reset --hard
+cd $ROM_TREE/vendor/cmsdk
+git clean -f -d && git reset --hard
 
 cd $ROM_TREE
 
@@ -124,3 +126,4 @@ patch -d packages/apps/Messaging		-p1 -s -N --no-backup-if-mismatch < $SECURITY_
 patch -d packages/apps/Messaging		-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/packages-apps-Messaging1.patch
 patch -d packages/apps/Messaging		-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/packages-apps-Messaging2.patch
 patch -d packages/apps/UnifiedEmail		-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/packages-apps-UnifiedEmail0.patch
+patch -d vendor/cmsdk				-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/vendor-cmsdk0.patch
