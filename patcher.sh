@@ -117,6 +117,7 @@ patch -d bionic					-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/bionic0.
 patch -d build					-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/build0.patch
 patch -d frameworks/av				-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/frameworks-av0.patch
 patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/frameworks-base0.patch
+patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/frameworks-base1.patch
 patch -d frameworks/native			-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/frameworks-native0.patch
 patch -d frameworks/native			-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/frameworks-native1.patch
 patch -d hardware/libhardware			-p1 -s -N --no-backup-if-mismatch < $SECURITY_FEB17/hardware-libhardware0.patch
