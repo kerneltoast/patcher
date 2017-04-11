@@ -1,6 +1,6 @@
-From 8cc1f2c4be1d9fffd1a09e7a25439876578fd6df Mon Sep 17 00:00:00 2001
+From 5a35e9edca75e699944a8e72cd26c2626be12f67 Mon Sep 17 00:00:00 2001
 From: Sultanxda <sultanxda@gmail.com>
-Date: Sat, 21 Jan 2017 17:21:51 -0800
+Date: Tue, 11 Apr 2017 00:56:26 -0700
 Subject: [PATCH] Fingerprint: Speed up wake-and-unlock scenario
 
 *Directly dismiss keyguard instead of using a fade-out animation
@@ -11,17 +11,17 @@ Change-Id: Ic0bc19164eeca7254d72a09314391ecd3c750e50
  .../com/android/systemui/keyguard/KeyguardViewMediator.java  |  6 +++++-
  .../statusbar/phone/FingerprintUnlockController.java         |  6 ++----
  .../android/systemui/statusbar/phone/NavigationBarView.java  |  2 +-
- .../com/android/systemui/statusbar/phone/PhoneStatusBar.java |  5 +++--
+ .../com/android/systemui/statusbar/phone/PhoneStatusBar.java |  7 ++++---
  .../statusbar/phone/StatusBarKeyguardViewManager.java        | 12 ++++++++++++
- 5 files changed, 23 insertions(+), 8 deletions(-)
+ 5 files changed, 24 insertions(+), 9 deletions(-)
 
 diff --git a/packages/SystemUI/src/com/android/systemui/keyguard/KeyguardViewMediator.java b/packages/SystemUI/src/com/android/systemui/keyguard/KeyguardViewMediator.java
-index 2833759..66efce4 100755
+index 9e0406a..22ce1d9 100755
 --- a/packages/SystemUI/src/com/android/systemui/keyguard/KeyguardViewMediator.java
 +++ b/packages/SystemUI/src/com/android/systemui/keyguard/KeyguardViewMediator.java
-@@ -1750,7 +1750,11 @@ public class KeyguardViewMediator extends SystemUI {
-             }
+@@ -1785,7 +1785,11 @@ public class KeyguardViewMediator extends SystemUI {
  
+             mWakeAndUnlocking = false;
              setShowingLocked(false);
 -            mStatusBarKeyguardViewManager.hide(startTime, fadeoutDuration);
 +            if (mWakeAndUnlocking) {
@@ -33,10 +33,10 @@ index 2833759..66efce4 100755
              mHideAnimationRun = false;
              updateActivityLockScreenState();
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/FingerprintUnlockController.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/FingerprintUnlockController.java
-index 7135836..4e900db 100644
+index 2c3e805..66078e0 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/FingerprintUnlockController.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/FingerprintUnlockController.java
-@@ -196,7 +196,7 @@ public class FingerprintUnlockController extends KeyguardUpdateMonitorCallback {
+@@ -213,7 +213,7 @@ public class FingerprintUnlockController extends KeyguardUpdateMonitorCallback {
                  mStatusBarWindowManager.setStatusBarFocusable(false);
                  mDozeScrimController.abortPulsing();
                  mKeyguardViewMediator.onWakeAndUnlocking();
@@ -45,7 +45,7 @@ index 7135836..4e900db 100644
                  if (mPhoneStatusBar.getNavigationBarView() != null) {
                      mPhoneStatusBar.getNavigationBarView().setWakeAndUnlocking(true);
                  }
-@@ -205,9 +205,7 @@ public class FingerprintUnlockController extends KeyguardUpdateMonitorCallback {
+@@ -223,9 +223,7 @@ public class FingerprintUnlockController extends KeyguardUpdateMonitorCallback {
              case MODE_NONE:
                  break;
          }
@@ -54,13 +54,13 @@ index 7135836..4e900db 100644
 -        }
 +        mStatusBarWindowManager.setForceDozeBrightness(false);
          mPhoneStatusBar.notifyFpAuthModeChanged();
+         Trace.endSection();
      }
- 
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/NavigationBarView.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/NavigationBarView.java
-index c10f45b..d2f197b 100644
+index 050e024..de63359 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/NavigationBarView.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/NavigationBarView.java
-@@ -506,7 +506,7 @@ public class NavigationBarView extends LinearLayout {
+@@ -440,7 +440,7 @@ public class NavigationBarView extends LinearLayout implements TunerService.Tuna
      }
  
      public void setWakeAndUnlocking(boolean wakeAndUnlocking) {
@@ -70,27 +70,29 @@ index c10f45b..d2f197b 100644
          updateLayoutTransitionsEnabled();
      }
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java
-index 7df8346..7122fd7 100644
+index ab9eae0..835698f 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java
-@@ -2295,8 +2295,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
+@@ -2474,9 +2474,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                  if (DEBUG_MEDIA) {
                      Log.v(TAG, "DEBUG_MEDIA: Fading out album artwork");
                  }
 -                if (mFingerprintUnlockController.getMode()
--                        == FingerprintUnlockController.MODE_WAKE_AND_UNLOCK_PULSING) {
+-                        == FingerprintUnlockController.MODE_WAKE_AND_UNLOCK_PULSING
+-                        || hideBecauseOccluded) {
 +                int fpMode = mFingerprintUnlockController.getMode();
 +                if (fpMode == FingerprintUnlockController.MODE_WAKE_AND_UNLOCK_PULSING ||
-+                        fpMode == FingerprintUnlockController.MODE_WAKE_AND_UNLOCK) {
++                        fpMode == FingerprintUnlockController.MODE_WAKE_AND_UNLOCK ||
++                        hideBecauseOccluded) {
  
                      // We are unlocking directly - no animation!
                      mBackdrop.setVisibility(View.GONE);
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarKeyguardViewManager.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarKeyguardViewManager.java
-index 96cf093..dc67559 100644
+index 56f3562..a50e41a 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarKeyguardViewManager.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarKeyguardViewManager.java
-@@ -358,6 +358,18 @@ public class StatusBarKeyguardViewManager {
-         }
+@@ -396,6 +396,18 @@ public class StatusBarKeyguardViewManager implements RemoteInputController.Callb
+         mBouncer.hide(true /* destroyView */);
      }
  
 +    public void hideNoAnimation() {
