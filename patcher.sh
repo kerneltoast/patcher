@@ -13,6 +13,8 @@ cd $ROM_TREE/frameworks/av
 git clean -f -d && git reset --hard
 cd $ROM_TREE/frameworks/base
 git clean -f -d && git reset --hard
+cd $ROM_TREE/packages/apps/Gallery2
+git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/LockClock
 git clean -f -d && git reset --hard
 cd $ROM_TREE/system/core
@@ -30,6 +32,7 @@ patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $CUSTOM/framework
 patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $CUSTOM/frameworks-base2.patch
 patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $CUSTOM/frameworks-base3.patch
 patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $CUSTOM/frameworks-base4.patch
+patch -d packages/apps/Gallery2			-p1 -s -N --no-backup-if-mismatch < $CUSTOM/packages-apps-Gallery20.patch
 patch -d packages/apps/LockClock		-p1 -s -N --no-backup-if-mismatch < $CUSTOM/packages-apps-LockClock0.patch
 patch -d system/core				-p1 -s -N --no-backup-if-mismatch < $CUSTOM/system-core0.patch
 patch -d system/core				-p1 -s -N --no-backup-if-mismatch < $CUSTOM/system-core1.patch
