@@ -1,28 +1,36 @@
-From a1702ced972dff3608d3808cfe61b524af887804 Mon Sep 17 00:00:00 2001
+From 405b38c2260eb9501b0722a5c3cd08256e597500 Mon Sep 17 00:00:00 2001
 From: Sultanxda <sultanxda@gmail.com>
-Date: Wed, 9 Sep 2015 18:23:59 -0700
-Subject: [PATCH] liblog: Silence spammy logs from camera blobs (AEC_PORT and
- mm-camera)
+Date: Tue, 11 Apr 2017 12:32:15 -0700
+Subject: [PATCH] liblog: Silence spammy logs from camera blobs
 
 Log messages under these tags are spammed very hard, destroying logs, and
-the messages that are spammed are not useful for debugging.
+the messages that are spammed are not useful for debugging. They are also
+introducing a lot of unneeded system load, so kill them.
+
+Change-Id: I63407f12278c2ad1b22beb2d6f85a5cfd0e9b3e4
 ---
- liblog/logprint.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ liblog/logprint.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/liblog/logprint.c b/liblog/logprint.c
-index c2f1545..e009b64 100644
+index c8457f4..1aad2b2 100644
 --- a/liblog/logprint.c
 +++ b/liblog/logprint.c
-@@ -178,7 +178,10 @@ static android_LogPriority filterPriForTag(
- int android_log_shouldPrintLine (
-         AndroidLogFormat *p_format, const char *tag, android_LogPriority pri)
+@@ -189,7 +189,14 @@ LIBLOG_ABI_PUBLIC int android_log_shouldPrintLine (
+         const char *tag,
+         android_LogPriority pri)
  {
 -    return pri >= filterPriForTag(p_format, tag);
-+    if (!strncmp(tag, "AEC_PORT", 8) || !strncmp(tag, "mm-camera", 9))
++    if (*tag == '\0' ||
++            !strcmp(tag, "AEC_PORT") ||
++            !strcmp(tag, "mm-camera") ||
++            !strcmp(tag, "mm-3a-core") ||
++            strstr(tag, "VSTAB"))
 +        return 0;
 +    else
 +        return pri >= filterPriForTag(p_format, tag);
  }
  
- AndroidLogFormat *android_log_format_new()
+ LIBLOG_ABI_PUBLIC AndroidLogFormat *android_log_format_new()
+-- 
+2.9.3
