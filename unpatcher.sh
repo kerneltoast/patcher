@@ -11,6 +11,8 @@ cd $ROM_TREE/frameworks/base
 git clean -f -d && git reset --hard
 cd $ROM_TREE/frameworks/native
 git clean -f -d && git reset --hard
+cd $ROM_TREE/packages/apps/Gallery2
+git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/LockClock
 git clean -f -d && git reset --hard
 cd $ROM_TREE/system/core
