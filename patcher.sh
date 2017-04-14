@@ -39,4 +39,5 @@ patch -d system/core				-p1 -s -N --no-backup-if-mismatch < $SULTAN/system-core0
 patch -d system/core				-p1 -s -N --no-backup-if-mismatch < $SULTAN/system-core1.patch
 
 ### Custom patches
+patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $CUSTOM/frameworks-base0.patch
 patch -d packages/apps/Gallery2			-p1 -s -N --no-backup-if-mismatch < $CUSTOM/packages-apps-Gallery20.patch
