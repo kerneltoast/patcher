@@ -1,0 +1,33 @@
+From 08f512182bb4db7d3a55cfb5aaaab3732be3f304 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Sat, 14 Jan 2017 16:10:09 -0800
+Subject: [PATCH] fw: Don't consume home key press when long-press to sleep is
+ used
+
+Consuming the next home key press when long-press to sleep is invoked using
+the home button causes the first home button press after the device wakes
+up to be ignored.
+
+Change-Id: I38759ce1bdce29513577894048a4cabceecb72e2
+---
+ services/core/java/com/android/server/policy/PhoneWindowManager.java | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/services/core/java/com/android/server/policy/PhoneWindowManager.java b/services/core/java/com/android/server/policy/PhoneWindowManager.java
+index 6339007..57349f4 100644
+--- a/services/core/java/com/android/server/policy/PhoneWindowManager.java
++++ b/services/core/java/com/android/server/policy/PhoneWindowManager.java
+@@ -3260,7 +3260,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
+                     mHomePressed = true;
+                     performHapticFeedbackLw(null, HapticFeedbackConstants.LONG_PRESS, false);
+                     performKeyAction(mLongPressOnHomeBehavior, event);
+-                    mHomeConsumed = true;
++                    if (mLongPressOnHomeBehavior != KEY_ACTION_SLEEP) {
++                        mHomeConsumed = true;
++                    }
+                 }
+             }
+             return -1;
+-- 
+2.9.3
+
