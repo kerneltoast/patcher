@@ -15,6 +15,8 @@ cd $ROM_TREE/external/libavc
 git clean -f -d && git reset --hard
 cd $ROM_TREE/external/libhevc
 git clean -f -d && git reset --hard
+cd $ROM_TREE/external/libmpeg2
+git clean -f -d && git reset --hard
 cd $ROM_TREE/external/libnfc-nci
 git clean -f -d && git reset --hard
 cd $ROM_TREE/external/libnl
@@ -22,6 +24,10 @@ git clean -f -d && git reset --hard
 cd $ROM_TREE/external/libopus
 git clean -f -d && git reset --hard
 cd $ROM_TREE/external/libvpx
+git clean -f -d && git reset --hard
+cd $ROM_TREE/external/skia
+git clean -f -d && git reset --hard
+cd $ROM_TREE/external/sonivox
 git clean -f -d && git reset --hard
 cd $ROM_TREE/external/tremolo
 git clean -f -d && git reset --hard
