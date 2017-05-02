@@ -1,0 +1,74 @@
+From 94ed197e94ada6b03f8777f42062ddc589260d6f Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Sun, 30 Apr 2017 20:08:54 -0700
+Subject: [PATCH] Camera: Allow white-listing HAL3 using a predefined package
+ list
+
+There are far more camera apps out there that tend to have issues with HAL3
+than those that are designed to work with it.
+
+Instead of trying to hunt all the camera apps that have issues with HAL3
+and fitting them into camera.hal1.packagelist (which has a character limit),
+introduce a new opt-in property to allow devices to white-list HAL3-capable
+camera apps.
+
+When camera.hal3.packagelist is set, only apps that are defined in it will
+use HAL3 mode. All other apps will be forced to use HAL1.
+
+Change-Id: I6f494391e55552e4ca28922af2701198a98ebdc5
+---
+ core/java/android/hardware/Camera.java | 32 ++++++++++++++++++++++----------
+ 1 file changed, 22 insertions(+), 10 deletions(-)
+
+diff --git a/core/java/android/hardware/Camera.java b/core/java/android/hardware/Camera.java
+index 00e92d2..e115590 100644
+--- a/core/java/android/hardware/Camera.java
++++ b/core/java/android/hardware/Camera.java
+@@ -503,6 +503,18 @@ private Camera(int cameraId, int halVersion) {
+         }
+     }
+ 
++    private boolean isPackageInList(String packageList, String packageName) {
++        TextUtils.StringSplitter splitter = new TextUtils.SimpleStringSplitter(',');
++        splitter.setString(packageList);
++        for (String str : splitter) {
++            if (packageName.equals(str)) {
++                return true;
++            }
++        }
++
++        return false;
++    }
++
+     private int cameraInitVersion(int cameraId, int halVersion) {
+         mShutterCallback = null;
+         mRawImageCallback = null;
+@@ -526,18 +538,18 @@ private int cameraInitVersion(int cameraId, int halVersion) {
+         }
+ 
+         String packageName = ActivityThread.currentOpPackageName();
++        String packageList;
+ 
+         //Force HAL1 if the package name falls in this bucket
+-        String packageList = SystemProperties.get("camera.hal1.packagelist", "");
+-        if (packageList.length() > 0) {
+-            TextUtils.StringSplitter splitter = new TextUtils.SimpleStringSplitter(',');
+-            splitter.setString(packageList);
+-            for (String str : splitter) {
+-                if (packageName.equals(str)) {
+-                    halVersion = CAMERA_HAL_API_VERSION_1_0;
+-                    break;
+-                }
+-            }
++        packageList = SystemProperties.get("camera.hal1.packagelist", "");
++        if (packageList.length() > 0 && isPackageInList(packageList, packageName)) {
++            halVersion = CAMERA_HAL_API_VERSION_1_0;
++        }
++
++        //Force HAL1 if the package name is not in this list
++        packageList = SystemProperties.get("camera.hal3.packagelist", "");
++        if (packageList.length() > 0 && !isPackageInList(packageList, packageName)) {
++            halVersion = CAMERA_HAL_API_VERSION_1_0;
+         }
+         return native_setup(new WeakReference<Camera>(this), cameraId, halVersion, packageName);
+     }
