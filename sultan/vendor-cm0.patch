@@ -1,0 +1,27 @@
+From 3bc549f78d877a267e7c718ec90beb1d65657d63 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Sat, 6 May 2017 14:48:28 -0700
+Subject: [PATCH] init: Disable bugreport button combo
+
+This just gets triggered accidentally all the time.
+
+Change-Id: I3d848cb525859f05fbd6f0103afb025daaa33cb3
+---
+ prebuilt/common/etc/init.local.rc | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/prebuilt/common/etc/init.local.rc b/prebuilt/common/etc/init.local.rc
+index 101280e1..5c01bee7 100644
+--- a/prebuilt/common/etc/init.local.rc
++++ b/prebuilt/common/etc/init.local.rc
+@@ -159,7 +159,6 @@ service bugreport /system/bin/dumpstate -d -p -B -z \
+         -o /data/user_de/0/com.android.shell/files/bugreports/bugreport
+     oneshot
+     disabled
+-    keycodes 114 115 116
+ 
+ # adb over network
+ on property:adb.network.port=*
+-- 
+2.11.0
+
