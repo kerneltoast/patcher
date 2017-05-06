@@ -1,0 +1,1277 @@
+From b521a148bc8c50ebd5a36aa4b4f054f6c3c1323e Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Sat, 6 May 2017 00:56:18 -0700
+Subject: [PATCH] Eleven: Remove music visualization feature
+
+This is a no-op. Music visualization is handled by the framework instead.
+
+Change-Id: I645045e746edce0ccf7e0490786af29dc0f485f7
+---
+ AndroidManifest.xml                                |   4 -
+ res/layout/main_album_flow.xml                     |  10 +-
+ res/values-af/strings.xml                          |   1 -
+ res/values-ar/strings.xml                          |   1 -
+ res/values-as-rIN/strings.xml                      |   1 -
+ res/values-az-rAZ/strings.xml                      |   1 -
+ res/values-be-rBY/strings.xml                      |   1 -
+ res/values-be/strings.xml                          |   1 -
+ res/values-bg/strings.xml                          |   1 -
+ res/values-ca/strings.xml                          |   1 -
+ res/values-cs/strings.xml                          |   1 -
+ res/values-da/strings.xml                          |   1 -
+ res/values-de/strings.xml                          |   1 -
+ res/values-el/strings.xml                          |   1 -
+ res/values-en-rAU/strings.xml                      |   1 -
+ res/values-en-rGB/strings.xml                      |   1 -
+ res/values-en-rIN/strings.xml                      |   1 -
+ res/values-es-rUS/strings.xml                      |   1 -
+ res/values-es/strings.xml                          |   1 -
+ res/values-et-rEE/strings.xml                      |   1 -
+ res/values-eu-rES/strings.xml                      |   1 -
+ res/values-fa/strings.xml                          |   1 -
+ res/values-fi/strings.xml                          |   1 -
+ res/values-fr/strings.xml                          |   1 -
+ res/values-gl-rES/strings.xml                      |   1 -
+ res/values-gu-rIN/strings.xml                      |   1 -
+ res/values-hi/strings.xml                          |   1 -
+ res/values-hr/strings.xml                          |   1 -
+ res/values-hu/strings.xml                          |   1 -
+ res/values-in/strings.xml                          |   1 -
+ res/values-it/strings.xml                          |   1 -
+ res/values-iw/strings.xml                          |   1 -
+ res/values-ja/strings.xml                          |   1 -
+ res/values-kn-rIN/strings.xml                      |   1 -
+ res/values-ko/strings.xml                          |   1 -
+ res/values-lb/strings.xml                          |   1 -
+ res/values-lt/strings.xml                          |   1 -
+ res/values-lv/strings.xml                          |   1 -
+ res/values-ml-rIN/strings.xml                      |   1 -
+ res/values-mr-rIN/strings.xml                      |   1 -
+ res/values-nb/strings.xml                          |   1 -
+ res/values-nl/strings.xml                          |   1 -
+ res/values-or-rIN/strings.xml                      |   1 -
+ res/values-pl/strings.xml                          |   1 -
+ res/values-pt-rBR/strings.xml                      |   1 -
+ res/values-pt-rPT/strings.xml                      |   1 -
+ res/values-ro/strings.xml                          |   1 -
+ res/values-ru/strings.xml                          |   1 -
+ res/values-sk/strings.xml                          |   1 -
+ res/values-sl/strings.xml                          |   1 -
+ res/values-sr/strings.xml                          |   1 -
+ res/values-sv/strings.xml                          |   1 -
+ res/values-ta-rIN/strings.xml                      |   1 -
+ res/values-te-rIN/strings.xml                      |   1 -
+ res/values-th/strings.xml                          |   1 -
+ res/values-tr/strings.xml                          |   1 -
+ res/values-ug/strings.xml                          |   1 -
+ res/values-uk/strings.xml                          |   1 -
+ res/values-vi/strings.xml                          |   1 -
+ res/values-zh-rCN/strings.xml                      |   1 -
+ res/values-zh-rHK/strings.xml                      |   1 -
+ res/values-zh-rTW/strings.xml                      |   1 -
+ res/values/colors.xml                              |   3 -
+ res/values/strings.xml                             |   1 -
+ res/xml/settings.xml                               |   6 -
+ .../eleven/ui/activities/HomeActivity.java         |  17 --
+ .../eleven/ui/activities/SlidingPanelActivity.java |   2 -
+ .../eleven/ui/fragments/AudioPlayerFragment.java   |  28 ---
+ .../cyanogenmod/eleven/utils/PreferenceUtils.java  |   9 +-
+ .../cyanogenmod/eleven/widgets/VisualizerView.java | 224 ---------------------
+ 70 files changed, 2 insertions(+), 362 deletions(-)
+ delete mode 100644 src/com/cyanogenmod/eleven/widgets/VisualizerView.java
+
+diff --git a/AndroidManifest.xml b/AndroidManifest.xml
+index e52f9f9..d0c9d97 100644
+--- a/AndroidManifest.xml
++++ b/AndroidManifest.xml
+@@ -44,10 +44,6 @@
+     <!-- Allows Eleven to read from External Storage -->
+     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+ 
+-    <!-- Audio Visualizer Permissions -->
+-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+-
+     <!-- Accelerometer feature for shake to play -->
+     <uses-feature android:name="android.hardware.sensor.accelerometer" />
+ 
+diff --git a/res/layout/main_album_flow.xml b/res/layout/main_album_flow.xml
+index d2e7cde..58099f6 100644
+--- a/res/layout/main_album_flow.xml
++++ b/res/layout/main_album_flow.xml
+@@ -25,14 +25,6 @@
+         android:layout_height="match_parent" />
+     <include layout="@layout/loading_empty_container" />
+ 
+-    <com.cyanogenmod.eleven.widgets.VisualizerView
+-        android:id="@+id/visualizerView"
+-        android:gravity="bottom"
+-        android:layout_gravity="bottom"
+-        android:layout_width="match_parent"
+-        android:layout_height="match_parent"
+-        android:visibility="visible" />
+-
+     <TextView
+         android:id="@+id/audio_player_lyrics"
+         android:layout_gravity="center"
+@@ -48,4 +40,4 @@
+         android:textColor="@color/audio_player_lyrics_text_color"
+         android:textSize="@dimen/text_size_small"
+         android:alpha="0.0"/>
+-</com.cyanogenmod.eleven.widgets.SquareFrame>
+\ No newline at end of file
++</com.cyanogenmod.eleven.widgets.SquareFrame>
+diff --git a/res/values-af/strings.xml b/res/values-af/strings.xml
+index 91a4f08..8553b0d 100644
+--- a/res/values-af/strings.xml
++++ b/res/values-af/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Laai vermiste albumkuns af</string>
+   <string name="settings_download_artist_images_title">Laai vermiste kunstenaar foto\'s af</string>
+   <string name="settings_general_category">Algemeen</string>
+-  <string name="settings_show_music_visualization_title">Wys musiek visualisering</string>
+   <string name="settings_show_lyrics_title">Wys lirieke van liedjies</string>
+   <string name="settings_show_lyrics_summary">Vir liedjies wat \'n srt lêer het</string>
+   <string name="settings_shake_to_play">Skud</string>
+diff --git a/res/values-ar/strings.xml b/res/values-ar/strings.xml
+index c044047..ac8c587 100644
+--- a/res/values-ar/strings.xml
++++ b/res/values-ar/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">تنزيل صورة الألبوم المفقودة</string>
+   <string name="settings_download_artist_images_title">تحميل صور الفنان المفقودة</string>
+   <string name="settings_general_category">عام</string>
+-  <string name="settings_show_music_visualization_title">إظهار المرئيات مع الموسيقى</string>
+   <string name="settings_show_lyrics_title">عرض كلمات الأغاني</string>
+   <string name="settings_show_lyrics_summary">للأغاني التي تحتوي على ملف srt</string>
+   <string name="settings_shake_to_play">هز للتشغيل</string>
+diff --git a/res/values-as-rIN/strings.xml b/res/values-as-rIN/strings.xml
+index 03c292a..45f4d92 100644
+--- a/res/values-as-rIN/strings.xml
++++ b/res/values-as-rIN/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">হেৰুওৱা এলবাম আৰ্ট ডাউনলোড কৰক</string>
+   <string name="settings_download_artist_images_title">হেৰুওৱা শিল্পীৰ প্ৰতিচ্ছবি ডাউনলোড কৰক</string>
+   <string name="settings_general_category">সাধাৰণ</string>
+-  <string name="settings_show_music_visualization_title">সংগীত ভিজুৱেলাইজেশ্বন প্ৰদৰ্শন কৰক</string>
+   <string name="settings_show_lyrics_title">গীতৰ কথা প্ৰদৰ্শন কৰক</string>
+   <string name="settings_show_lyrics_summary">srt ফাইল থকা গীতৰ বাবে</string>
+   <string name="settings_shake_to_play">প্লে কৰিবলৈ জোকাৰক</string>
+diff --git a/res/values-az-rAZ/strings.xml b/res/values-az-rAZ/strings.xml
+index 0d3709f..96a0180 100644
+--- a/res/values-az-rAZ/strings.xml
++++ b/res/values-az-rAZ/strings.xml
+@@ -126,7 +126,6 @@
+   <string name="settings_download_missing_artwork_title">Əskik albom üz qabıqlarını endir</string>
+   <string name="settings_download_artist_images_title">Əskik sənətkar şəkillərini endir</string>
+   <string name="settings_general_category">Ümumi</string>
+-  <string name="settings_show_music_visualization_title">Musiqi əyaniləşdiricini göstər</string>
+   <string name="settings_show_lyrics_title">Mahnı sözlərini göstər</string>
+   <string name="settings_show_lyrics_summary">srt faylı olan mahnılar üçün</string>
+   <string name="settings_shake_to_play">Oynatmaq üçün silkələyin</string>
+diff --git a/res/values-be-rBY/strings.xml b/res/values-be-rBY/strings.xml
+index 6ea1e41..b20e0fc 100644
+--- a/res/values-be-rBY/strings.xml
++++ b/res/values-be-rBY/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Загружаць вокладкі альбомаў</string>
+   <string name="settings_download_artist_images_title">Загружаць фота выканаўцаў</string>
+   <string name="settings_general_category">Агульнае</string>
+-  <string name="settings_show_music_visualization_title">Паказваць візуалізацыю музыкі</string>
+   <string name="settings_show_lyrics_title">Паказваць тэкст песні</string>
+   <string name="settings_show_lyrics_summary">Для песень, да якіх ёсць файл srt</string>
+   <string name="settings_shake_to_play">Пераключэнне трэкаў падтрасаннем</string>
+diff --git a/res/values-be/strings.xml b/res/values-be/strings.xml
+index 6ea1e41..b20e0fc 100644
+--- a/res/values-be/strings.xml
++++ b/res/values-be/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Загружаць вокладкі альбомаў</string>
+   <string name="settings_download_artist_images_title">Загружаць фота выканаўцаў</string>
+   <string name="settings_general_category">Агульнае</string>
+-  <string name="settings_show_music_visualization_title">Паказваць візуалізацыю музыкі</string>
+   <string name="settings_show_lyrics_title">Паказваць тэкст песні</string>
+   <string name="settings_show_lyrics_summary">Для песень, да якіх ёсць файл srt</string>
+   <string name="settings_shake_to_play">Пераключэнне трэкаў падтрасаннем</string>
+diff --git a/res/values-bg/strings.xml b/res/values-bg/strings.xml
+index a31461f..f321f31 100644
+--- a/res/values-bg/strings.xml
++++ b/res/values-bg/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Изтегли липсващата обложка</string>
+   <string name="settings_download_artist_images_title">Изтегли липсващите изображения на изпълнителите</string>
+   <string name="settings_general_category">Общи</string>
+-  <string name="settings_show_music_visualization_title">Покажи музикална визуализация</string>
+   <string name="settings_show_lyrics_title">Покажи текстовете на песните</string>
+   <string name="settings_show_lyrics_summary">За песни, които имат srt файл</string>
+   <string name="settings_shake_to_play">Разтърсете, за да изпълни</string>
+diff --git a/res/values-ca/strings.xml b/res/values-ca/strings.xml
+index 5537d5b..e378af7 100644
+--- a/res/values-ca/strings.xml
++++ b/res/values-ca/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Baixa les cobertes que faltin</string>
+   <string name="settings_download_artist_images_title">Baixa les imatges dels artistes que faltin</string>
+   <string name="settings_general_category">General</string>
+-  <string name="settings_show_music_visualization_title">Mostra la visualització de la música</string>
+   <string name="settings_show_lyrics_title">Mostra la lletra de les cançons</string>
+   <string name="settings_show_lyrics_summary">Per cançons que tenen un fitxer srt</string>
+   <string name="settings_shake_to_play">Agita per Reproduir</string>
+diff --git a/res/values-cs/strings.xml b/res/values-cs/strings.xml
+index 5fc9910..1ccf8d5 100644
+--- a/res/values-cs/strings.xml
++++ b/res/values-cs/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Stáhnout chybějící obaly alb</string>
+   <string name="settings_download_artist_images_title">Stáhnout chybějící obrázky umělců</string>
+   <string name="settings_general_category">Obecné</string>
+-  <string name="settings_show_music_visualization_title">Zobrazit vizualizaci hudby</string>
+   <string name="settings_show_lyrics_title">Zobrazit text skladby</string>
+   <string name="settings_show_lyrics_summary">U skladeb, které mají soubor srt</string>
+   <string name="settings_shake_to_play">Zatřesením přehrát</string>
+diff --git a/res/values-da/strings.xml b/res/values-da/strings.xml
+index 63261c4..c979dce 100644
+--- a/res/values-da/strings.xml
++++ b/res/values-da/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Download manglende albumcover</string>
+   <string name="settings_download_artist_images_title">Download manglende kunstnerbilleder</string>
+   <string name="settings_general_category">Generelt</string>
+-  <string name="settings_show_music_visualization_title">Vis visualisering af musik</string>
+   <string name="settings_show_lyrics_title">Vis sangtekster</string>
+   <string name="settings_show_lyrics_summary">For sange der har en srt-fil</string>
+   <string name="settings_shake_to_play">Ryst for at afspille</string>
+diff --git a/res/values-de/strings.xml b/res/values-de/strings.xml
+index c384b31..a377150 100644
+--- a/res/values-de/strings.xml
++++ b/res/values-de/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Fehlende Albencover herunterladen</string>
+   <string name="settings_download_artist_images_title">Fehlende Interpretenbilder herunterladen</string>
+   <string name="settings_general_category">Allgemein</string>
+-  <string name="settings_show_music_visualization_title">Musik-Visualisierung anzeigen</string>
+   <string name="settings_show_lyrics_title">Songtexte zeigen</string>
+   <string name="settings_show_lyrics_summary">Für Titel mit einer SRT-Datei</string>
+   <string name="settings_shake_to_play">Zum Abspielen schütteln</string>
+diff --git a/res/values-el/strings.xml b/res/values-el/strings.xml
+index bb56add..61eefd8 100644
+--- a/res/values-el/strings.xml
++++ b/res/values-el/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Λήψη εξωφύλλων άλμπουμ που λείπουν</string>
+   <string name="settings_download_artist_images_title">Λήψη εικόνων καλλιτέχνη που λείπουν</string>
+   <string name="settings_general_category">Γενικά</string>
+-  <string name="settings_show_music_visualization_title">Εμφάνιση οπτικοποίησης μουσικής</string>
+   <string name="settings_show_lyrics_title">Εμφάνιση στίχων τραγουδιών</string>
+   <string name="settings_show_lyrics_summary">Για τραγούδια που έχουν αρχείο srt</string>
+   <string name="settings_shake_to_play">Ανακίνηση για αναπαραγωγή</string>
+diff --git a/res/values-en-rAU/strings.xml b/res/values-en-rAU/strings.xml
+index 86d62d2..2f48f23 100644
+--- a/res/values-en-rAU/strings.xml
++++ b/res/values-en-rAU/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Download missing album art</string>
+   <string name="settings_download_artist_images_title">Download missing artist images</string>
+   <string name="settings_general_category">General</string>
+-  <string name="settings_show_music_visualization_title">Show music visualization</string>
+   <string name="settings_show_lyrics_title">Show song lyrics</string>
+   <string name="settings_show_lyrics_summary">For songs that have an srt file</string>
+   <string name="settings_shake_to_play">Shake to Play</string>
+diff --git a/res/values-en-rGB/strings.xml b/res/values-en-rGB/strings.xml
+index dd6aff3..f9e4abe 100644
+--- a/res/values-en-rGB/strings.xml
++++ b/res/values-en-rGB/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Download missing album art</string>
+   <string name="settings_download_artist_images_title">Download missing artist images</string>
+   <string name="settings_general_category">General</string>
+-  <string name="settings_show_music_visualization_title">Show music visualisation</string>
+   <string name="settings_show_lyrics_title">Show song lyrics</string>
+   <string name="settings_show_lyrics_summary">For songs that have an srt file</string>
+   <string name="settings_shake_to_play">Shake to Play</string>
+diff --git a/res/values-en-rIN/strings.xml b/res/values-en-rIN/strings.xml
+index 751c0c5..49c317d 100644
+--- a/res/values-en-rIN/strings.xml
++++ b/res/values-en-rIN/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Download missing album art</string>
+   <string name="settings_download_artist_images_title">Download missing artist images</string>
+   <string name="settings_general_category">General</string>
+-  <string name="settings_show_music_visualization_title">Show music visualization</string>
+   <string name="settings_show_lyrics_title">Show song lyrics</string>
+   <string name="settings_show_lyrics_summary">For songs that have an srt file</string>
+   <string name="settings_shake_to_play">Shake to Play</string>
+diff --git a/res/values-es-rUS/strings.xml b/res/values-es-rUS/strings.xml
+index daa4081..a521517 100644
+--- a/res/values-es-rUS/strings.xml
++++ b/res/values-es-rUS/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Descargar carátulas faltantes</string>
+   <string name="settings_download_artist_images_title">Obtener fotos faltantes de artistas</string>
+   <string name="settings_general_category">General</string>
+-  <string name="settings_show_music_visualization_title">Mostrar la visualización de música</string>
+   <string name="settings_show_lyrics_title">Mostrar las letras de las canciones</string>
+   <string name="settings_show_lyrics_summary">Para canciones que tienen un archivo srt</string>
+   <string name="settings_shake_to_play">Agitar para reproducir</string>
+diff --git a/res/values-es/strings.xml b/res/values-es/strings.xml
+index 3651d24..79710f7 100644
+--- a/res/values-es/strings.xml
++++ b/res/values-es/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Obtener carátulas</string>
+   <string name="settings_download_artist_images_title">Obtener fotos de artistas</string>
+   <string name="settings_general_category">General</string>
+-  <string name="settings_show_music_visualization_title">Mostrar visualización musical</string>
+   <string name="settings_show_lyrics_title">Mostrar las letras de las canciones</string>
+   <string name="settings_show_lyrics_summary">Para canciones que tienen un archivo srt</string>
+   <string name="settings_shake_to_play">Agitar para reproducir</string>
+diff --git a/res/values-et-rEE/strings.xml b/res/values-et-rEE/strings.xml
+index 082ca5d..33a87c1 100644
+--- a/res/values-et-rEE/strings.xml
++++ b/res/values-et-rEE/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Lae puuduv albumipilt</string>
+   <string name="settings_download_artist_images_title">Lae puuduvad esitaja pildid</string>
+   <string name="settings_general_category">Üldine</string>
+-  <string name="settings_show_music_visualization_title">Näita muusika visualiseerimist</string>
+   <string name="settings_show_lyrics_title">Kuva laulusõnad</string>
+   <string name="settings_show_lyrics_summary">Lauludele, millel on srt-fail</string>
+   <string name="settings_shake_to_play">Raputa mängimiseks</string>
+diff --git a/res/values-eu-rES/strings.xml b/res/values-eu-rES/strings.xml
+index f9da9fe..5df07c7 100644
+--- a/res/values-eu-rES/strings.xml
++++ b/res/values-eu-rES/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Deskargatu falta diren karatulak</string>
+   <string name="settings_download_artist_images_title">Deskargatu falta diren artisten argazkiak</string>
+   <string name="settings_general_category">Orokorra</string>
+-  <string name="settings_show_music_visualization_title">Erakutsi musika irudikatzea</string>
+   <string name="settings_show_lyrics_title">Erakutsi abestien letrak</string>
+   <string name="settings_show_lyrics_summary">str fitxategia duten abestientzat</string>
+   <string name="settings_shake_to_play">Astindu erreproduzitzeko</string>
+diff --git a/res/values-fa/strings.xml b/res/values-fa/strings.xml
+index db33008..f8bd332 100644
+--- a/res/values-fa/strings.xml
++++ b/res/values-fa/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">دانلود تصویر آلبوم‌ها</string>
+   <string name="settings_download_artist_images_title">دانلود تصویر هنرمندان</string>
+   <string name="settings_general_category">عمومي</string>
+-  <string name="settings_show_music_visualization_title">نمایش رقص نور موسیقی</string>
+   <string name="settings_show_lyrics_title">نمایش متن آهنگ</string>
+   <string name="settings_show_lyrics_summary">برای آهنگ‌های دارای فایل srt</string>
+   <string name="settings_shake_to_play">برای پخش بلرزانید</string>
+diff --git a/res/values-fi/strings.xml b/res/values-fi/strings.xml
+index 904854d..b4d069f 100644
+--- a/res/values-fi/strings.xml
++++ b/res/values-fi/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Lataa albumin puuttuva kansikuva</string>
+   <string name="settings_download_artist_images_title">Lataa puuttuvat esittäjän kuvat</string>
+   <string name="settings_general_category">Yleiset</string>
+-  <string name="settings_show_music_visualization_title">Näytä visualisointi</string>
+   <string name="settings_show_lyrics_title">Näytä sanoitukset</string>
+   <string name="settings_show_lyrics_summary">Jos kappaleella on srt-tiedosto</string>
+   <string name="settings_shake_to_play">Toista ravistamalla</string>
+diff --git a/res/values-fr/strings.xml b/res/values-fr/strings.xml
+index 88d1380..9d4ae25 100644
+--- a/res/values-fr/strings.xml
++++ b/res/values-fr/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Télécharger les pochettes manquantes</string>
+   <string name="settings_download_artist_images_title">Télécharger les images d\'artistes manquantes</string>
+   <string name="settings_general_category">Général</string>
+-  <string name="settings_show_music_visualization_title">Voir les animations musicales</string>
+   <string name="settings_show_lyrics_title">Afficher les paroles</string>
+   <string name="settings_show_lyrics_summary">Pour les titres ayant un fichier srt</string>
+   <string name="settings_shake_to_play">Secouer pour lire</string>
+diff --git a/res/values-gl-rES/strings.xml b/res/values-gl-rES/strings.xml
+index aa67995..3100719 100644
+--- a/res/values-gl-rES/strings.xml
++++ b/res/values-gl-rES/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Descargar a cuberta do álbum que falta</string>
+   <string name="settings_download_artist_images_title">Descargar as imaxes do artista que faltan</string>
+   <string name="settings_general_category">Xeral</string>
+-  <string name="settings_show_music_visualization_title">Amosar visualización da música</string>
+   <string name="settings_show_lyrics_title">Amosar as letras das cancións</string>
+   <string name="settings_show_lyrics_summary">Para cancións que teñen un ficheiro srt</string>
+   <string name="settings_shake_to_play">Abanear para reproducir</string>
+diff --git a/res/values-gu-rIN/strings.xml b/res/values-gu-rIN/strings.xml
+index 7c3d7ab..affaf4f 100644
+--- a/res/values-gu-rIN/strings.xml
++++ b/res/values-gu-rIN/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">ગૂમ આલ્બમ આર્ટ ડાઉનલોડ કરો</string>
+   <string name="settings_download_artist_images_title">ગૂમ આર્ટિસ્ટ ઇમેજ ડાઉનલોડ કરો</string>
+   <string name="settings_general_category">સામાન્ય</string>
+-  <string name="settings_show_music_visualization_title">મ્યુઝિક વિઝ્યુઅલાઇઝેશન દર્શાવો</string>
+   <string name="settings_show_lyrics_title">ગીત લિરિક્સ દર્શાવો</string>
+   <string name="settings_show_lyrics_summary">srt ફાઇલ હોય તેવા ગીતો માટે</string>
+   <string name="settings_shake_to_play">પ્લે કરવા હલાવો</string>
+diff --git a/res/values-hi/strings.xml b/res/values-hi/strings.xml
+index 6f9d73e..f0c596b 100644
+--- a/res/values-hi/strings.xml
++++ b/res/values-hi/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">अनुपस्थित एल्बम कला को डाउनलोड करें</string>
+   <string name="settings_download_artist_images_title">कलाकार की अनुपस्थित छवियों को डाउनलोड करें</string>
+   <string name="settings_general_category">सामान्य</string>
+-  <string name="settings_show_music_visualization_title">संगीत दृश्यांकन दिखाएँ</string>
+   <string name="settings_show_lyrics_title">गाने के लिरिक दिखाएँ</string>
+   <string name="settings_show_lyrics_summary">एसआरटी फ़ाइल वाले गानों के लिए</string>
+   <string name="settings_shake_to_play">बजाने के लिए हिलाएँ</string>
+diff --git a/res/values-hr/strings.xml b/res/values-hr/strings.xml
+index 76036fe..0d5e830 100644
+--- a/res/values-hr/strings.xml
++++ b/res/values-hr/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Preuzmi sliku albuma koja nedostaje</string>
+   <string name="settings_download_artist_images_title">Preuzmi slike umjetnika koje nedostaju</string>
+   <string name="settings_general_category">Općenito</string>
+-  <string name="settings_show_music_visualization_title">Pokaži vizualizaciju glazbe</string>
+   <string name="settings_show_lyrics_title">Pokaži tekstove pjesama</string>
+   <string name="settings_show_lyrics_summary">Za pjesme koje imaju srt datoteku</string>
+   <string name="settings_shake_to_play">Protresi za reproduciranje</string>
+diff --git a/res/values-hu/strings.xml b/res/values-hu/strings.xml
+index b3f60ee..741777c 100644
+--- a/res/values-hu/strings.xml
++++ b/res/values-hu/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Hiányzó albumborítók letöltése</string>
+   <string name="settings_download_artist_images_title">Hiányzó előadóképek letöltése</string>
+   <string name="settings_general_category">Általános</string>
+-  <string name="settings_show_music_visualization_title">Zenei vizualizáció megjelenítése</string>
+   <string name="settings_show_lyrics_title">Dalszöveg megjelenítése</string>
+   <string name="settings_show_lyrics_summary">Dalok, melyek rendelkeznek srt fájllal</string>
+   <string name="settings_shake_to_play">Lejátszás indítása rázásra</string>
+diff --git a/res/values-in/strings.xml b/res/values-in/strings.xml
+index 9408446..1e54e57 100644
+--- a/res/values-in/strings.xml
++++ b/res/values-in/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Unduh seni album yang hilang</string>
+   <string name="settings_download_artist_images_title">Unduh gambar artis yang hilang</string>
+   <string name="settings_general_category">Umum</string>
+-  <string name="settings_show_music_visualization_title">Tampilkan visualisasi musik</string>
+   <string name="settings_show_lyrics_title">Tampilkan lirik lagu</string>
+   <string name="settings_show_lyrics_summary">Untuk lagu-lagu yang memiliki berkas srt</string>
+   <string name="settings_shake_to_play">Goyang untuk memutar</string>
+diff --git a/res/values-it/strings.xml b/res/values-it/strings.xml
+index 20b8aee..8ee4990 100644
+--- a/res/values-it/strings.xml
++++ b/res/values-it/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Scarica copertina album mancante</string>
+   <string name="settings_download_artist_images_title">Scarica immagine artista mancante</string>
+   <string name="settings_general_category">Generale</string>
+-  <string name="settings_show_music_visualization_title">Mostra visualizzatore musicale</string>
+   <string name="settings_show_lyrics_title">Visualizza testo canzone</string>
+   <string name="settings_show_lyrics_summary">Per le canzoni che hanno un file srt</string>
+   <string name="settings_shake_to_play">Scuoti per riprodurre</string>
+diff --git a/res/values-iw/strings.xml b/res/values-iw/strings.xml
+index 3257666..e9fbd6c 100644
+--- a/res/values-iw/strings.xml
++++ b/res/values-iw/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">הורד תמונת אלבום חסרה</string>
+   <string name="settings_download_artist_images_title">הורד תמונות אמן חסרות</string>
+   <string name="settings_general_category">כללי</string>
+-  <string name="settings_show_music_visualization_title">הצג אפקטים ויזואליים למוזיקה</string>
+   <string name="settings_show_lyrics_title">הצג את מילות השיר</string>
+   <string name="settings_show_lyrics_summary">עבור שירים עם קובץ srt</string>
+   <string name="settings_shake_to_play">נער כדי לנגן</string>
+diff --git a/res/values-ja/strings.xml b/res/values-ja/strings.xml
+index 91bc19d..59e8d05 100644
+--- a/res/values-ja/strings.xml
++++ b/res/values-ja/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">持っていないアルバムアートをダウンロード</string>
+   <string name="settings_download_artist_images_title">持っていないアーティストの画像をダウンロード</string>
+   <string name="settings_general_category">全般</string>
+-  <string name="settings_show_music_visualization_title">音楽の視覚エフェクトを表示</string>
+   <string name="settings_show_lyrics_title">歌詞を表示</string>
+   <string name="settings_show_lyrics_summary">srtファイルがある曲向け</string>
+   <string name="settings_shake_to_play">シェイクで再生</string>
+diff --git a/res/values-kn-rIN/strings.xml b/res/values-kn-rIN/strings.xml
+index dd2261a..18ce8f8 100644
+--- a/res/values-kn-rIN/strings.xml
++++ b/res/values-kn-rIN/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">ಕಾಣೆಯಾದ ಆಲ್ಬಂ ಆರ್ಟ್ ಡೌನ್‍ಲೋಡ್ ಮಾಡು</string>
+   <string name="settings_download_artist_images_title">ಕಾಣೆಯಾಗಿರುವ ಕಾಲಾವಿದನ ಚಿತ್ರಗಳನ್ನು ಡೌನ್‍ಲೋಡ್ ಮಾಡು</string>
+   <string name="settings_general_category">ಸಾಮಾನ್ಯ</string>
+-  <string name="settings_show_music_visualization_title">ಸಂಗೀತ ದೃಶ್ಯೀಕರಣವನ್ನು ಪ್ರದರ್ಶಿಸು</string>
+   <string name="settings_show_lyrics_title">ಹಾಡಿನ ಸಾಹಿತ್ಯವನ್ನು ಪ್ರದರ್ಶಿಸು</string>
+   <string name="settings_show_lyrics_summary">srt ಕಡತ ಹೊಂದಿರುವ ಹಾಡುಗಳಿಗಾಗಿ</string>
+   <string name="settings_shake_to_play">ಪ್ಲೇ ಮಾಡಲು ಕುಲುಕಿ</string>
+diff --git a/res/values-ko/strings.xml b/res/values-ko/strings.xml
+index fa13bcf..2c63f4e 100644
+--- a/res/values-ko/strings.xml
++++ b/res/values-ko/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">앨범 아트가 없으면 다운로드</string>
+   <string name="settings_download_artist_images_title">아티스트 이미지가 없으면 다운로드</string>
+   <string name="settings_general_category">일반</string>
+-  <string name="settings_show_music_visualization_title">음악 시각화 표시</string>
+   <string name="settings_show_lyrics_title">노래 가사 표시</string>
+   <string name="settings_show_lyrics_summary">SRT 파일이 있는 곡만</string>
+   <string name="settings_shake_to_play">흔들어 재생</string>
+diff --git a/res/values-lb/strings.xml b/res/values-lb/strings.xml
+index 065ff53..8c6635c 100644
+--- a/res/values-lb/strings.xml
++++ b/res/values-lb/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Feelend Album-Coveren eroflueden</string>
+   <string name="settings_download_artist_images_title">Feelend Interpretebiller eroflueden</string>
+   <string name="settings_general_category">Allgemeng</string>
+-  <string name="settings_show_music_visualization_title">Musekvisualiséierung uweisen</string>
+   <string name="settings_show_lyrics_title">Liddertexter uweisen</string>
+   <string name="settings_show_lyrics_summary">Fir Lidder déi en \"srt\"-Fichier hunn</string>
+   <string name="settings_shake_to_play">Rësele fir opzespillen</string>
+diff --git a/res/values-lt/strings.xml b/res/values-lt/strings.xml
+index c290bc7..e74c16d 100644
+--- a/res/values-lt/strings.xml
++++ b/res/values-lt/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Atsisiųsti trūkstamus albumo viršelius</string>
+   <string name="settings_download_artist_images_title">Atsisiųsti trūkstamus atlikėjų vaizdus</string>
+   <string name="settings_general_category">Bendra</string>
+-  <string name="settings_show_music_visualization_title">Rodyti muzikos vizualizaciją</string>
+   <string name="settings_show_lyrics_title">Rodyti dainos žodžius</string>
+   <string name="settings_show_lyrics_summary">Dėl dainų, kurios turi srt failą</string>
+   <string name="settings_shake_to_play">Purtyti, kad paleisti</string>
+diff --git a/res/values-lv/strings.xml b/res/values-lv/strings.xml
+index 86ca985..7c2048f 100644
+--- a/res/values-lv/strings.xml
++++ b/res/values-lv/strings.xml
+@@ -125,7 +125,6 @@
+   <string name="settings_download_missing_artwork_title">Lejuplādēt trūkstošo albuma noformējumu</string>
+   <string name="settings_download_artist_images_title">Lejuplādēt trūkstošos izpildītāju attēlus</string>
+   <string name="settings_general_category">Vispārīgi</string>
+-  <string name="settings_show_music_visualization_title">Rādīt mūzikas vizualizāciju</string>
+   <string name="settings_show_lyrics_title">Rādīt dziesmu vārdus</string>
+   <string name="settings_show_lyrics_summary">Dziesmām kam ir srt fails</string>
+   <!-- App widget -->
+diff --git a/res/values-ml-rIN/strings.xml b/res/values-ml-rIN/strings.xml
+index cbd3e0e..469ea3c 100644
+--- a/res/values-ml-rIN/strings.xml
++++ b/res/values-ml-rIN/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">നഷ്ടപ്പെട്ട ആൽബം ആർട്ട് ഡൗൺലോഡ് ചെയ്യുക</string>
+   <string name="settings_download_artist_images_title">നഷ്ടപ്പെട്ട ആർട്ടിസ്റ്റ് ചിത്രങ്ങൾ ഡൗൺലോഡ് ചെയ്യുക</string>
+   <string name="settings_general_category">പൊതുവായത്</string>
+-  <string name="settings_show_music_visualization_title">സംഗീത ദൃശ്യവത്ക്കരണം കാണിക്കുക</string>
+   <string name="settings_show_lyrics_title">പാട്ടിന്റെ വരികൾ കാണിക്കുക</string>
+   <string name="settings_show_lyrics_summary">srt ഫയൽ ഉള്ള ഗാനങ്ങള്‍ക്ക് വേണ്ടിയുള്ളത്</string>
+   <string name="settings_shake_to_play">പ്ലേ ചെയ്യാന്‍ കുലുക്കുക</string>
+diff --git a/res/values-mr-rIN/strings.xml b/res/values-mr-rIN/strings.xml
+index 7c26d8d..1bf4e50 100644
+--- a/res/values-mr-rIN/strings.xml
++++ b/res/values-mr-rIN/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">गहाळ अल्बमकला डाउनलोड करा</string>
+   <string name="settings_download_artist_images_title">गहाळ कलाकार प्रतिमा डाउनलोड करा</string>
+   <string name="settings_general_category">सामान्य</string>
+-  <string name="settings_show_music_visualization_title">संगीत व्हिज्युअलायझेशन दर्शवा</string>
+   <string name="settings_show_lyrics_title">गाण्याच्या शब्दरचना दर्शवा</string>
+   <string name="settings_show_lyrics_summary">srt फाइल असलेल्या गाण्यांसाठी</string>
+   <string name="settings_shake_to_play">प्ले करण्यासाठी हलवा</string>
+diff --git a/res/values-nb/strings.xml b/res/values-nb/strings.xml
+index cdadaed..0304bae 100644
+--- a/res/values-nb/strings.xml
++++ b/res/values-nb/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Last ned manglende albumcover</string>
+   <string name="settings_download_artist_images_title">Last ned manglende artistbilder</string>
+   <string name="settings_general_category">Generelt</string>
+-  <string name="settings_show_music_visualization_title">Vis musikk visualisering</string>
+   <string name="settings_show_lyrics_title">Vis sangtekst</string>
+   <string name="settings_show_lyrics_summary">For sanger som har en srt fil</string>
+   <string name="settings_shake_to_play">Rist for å spille</string>
+diff --git a/res/values-nl/strings.xml b/res/values-nl/strings.xml
+index 7031110..a53d834 100644
+--- a/res/values-nl/strings.xml
++++ b/res/values-nl/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Albumhoezen downloaden</string>
+   <string name="settings_download_artist_images_title">Artiestenafbeeldingen downloaden</string>
+   <string name="settings_general_category">Algemeen</string>
+-  <string name="settings_show_music_visualization_title">Muziekvisualisaties weergeven</string>
+   <string name="settings_show_lyrics_title">Songteksten weergeven</string>
+   <string name="settings_show_lyrics_summary">Voor nummers met een srt-bestand</string>
+   <string name="settings_shake_to_play">Schudden voor afspelen</string>
+diff --git a/res/values-or-rIN/strings.xml b/res/values-or-rIN/strings.xml
+index 5f15489..916a0c6 100644
+--- a/res/values-or-rIN/strings.xml
++++ b/res/values-or-rIN/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">ହଜିଯାଇଥିବା ଆଲ୍‍ବମ୍‍ ଆର୍ଟ ଡାଉନ୍‍ଲୋଡ୍‍ କରନ୍ତୁ</string>
+   <string name="settings_download_artist_images_title">ହଜିଯାଇଥିବା କଳାକାର ଚିତ୍ର ଡାଉନ୍‍ଲୋଡ୍‍ କରନ୍ତୁ</string>
+   <string name="settings_general_category">ସାଧାରଣ</string>
+-  <string name="settings_show_music_visualization_title">ମ୍ୟୁଜିକ୍‍ ଭିଜୁଆଲାଇଜେସନ୍‍ ଦେଖାନ୍ତୁ</string>
+   <string name="settings_show_lyrics_title">ଗୀତ ଲିରିକ୍ସ ଦେଖାନ୍ତୁ</string>
+   <string name="settings_show_lyrics_summary">ଯେଉଁ ଗୀତଗୁଡିକର srt ଫାଇଲ୍‍ ଅଛି ତାହା ପାଇଁ</string>
+   <string name="settings_shake_to_play">ପ୍ଲେ କରିବା ପାଇଁ ହଲାନ୍ତୁ</string>
+diff --git a/res/values-pl/strings.xml b/res/values-pl/strings.xml
+index 0e3df0d..74defb7 100644
+--- a/res/values-pl/strings.xml
++++ b/res/values-pl/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Pobierz brakujące okładki albumów</string>
+   <string name="settings_download_artist_images_title">Pobierz brakujące zdjęcia wykonawców</string>
+   <string name="settings_general_category">Ogólne</string>
+-  <string name="settings_show_music_visualization_title">Pokaż wizualizacje muzyki</string>
+   <string name="settings_show_lyrics_title">Pokaż teksty piosenek</string>
+   <string name="settings_show_lyrics_summary">Utwory, które mają plik srt</string>
+   <string name="settings_shake_to_play">Potrząśnij, aby rozpocząć odtwarzanie</string>
+diff --git a/res/values-pt-rBR/strings.xml b/res/values-pt-rBR/strings.xml
+index e199478..da54579 100644
+--- a/res/values-pt-rBR/strings.xml
++++ b/res/values-pt-rBR/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Baixar a arte dos álbuns que faltam</string>
+   <string name="settings_download_artist_images_title">Baixar imagens dos artistas que faltam</string>
+   <string name="settings_general_category">Geral</string>
+-  <string name="settings_show_music_visualization_title">Mostrar visualização de música</string>
+   <string name="settings_show_lyrics_title">Mostrar letras de músicas</string>
+   <string name="settings_show_lyrics_summary">Para as músicas que tenham um arquivo srt</string>
+   <string name="settings_shake_to_play">Agite para tocar</string>
+diff --git a/res/values-pt-rPT/strings.xml b/res/values-pt-rPT/strings.xml
+index 8d3dc02..fec979b 100644
+--- a/res/values-pt-rPT/strings.xml
++++ b/res/values-pt-rPT/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Baixar capas de álbuns em falta</string>
+   <string name="settings_download_artist_images_title">Baixar imagens do artista em falta</string>
+   <string name="settings_general_category">Geral</string>
+-  <string name="settings_show_music_visualization_title">Mostrar visualização da música</string>
+   <string name="settings_show_lyrics_title">Mostrar letras das músicas</string>
+   <string name="settings_show_lyrics_summary">Para músicas que têm um ficheiro .srt</string>
+   <string name="settings_shake_to_play">Agitar para reproduzir</string>
+diff --git a/res/values-ro/strings.xml b/res/values-ro/strings.xml
+index 76ff6aa..62f1c49 100644
+--- a/res/values-ro/strings.xml
++++ b/res/values-ro/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Descărcare copertă album absentă</string>
+   <string name="settings_download_artist_images_title">Descărcare imagine artist absentă</string>
+   <string name="settings_general_category">General</string>
+-  <string name="settings_show_music_visualization_title">Arată vizualizarea muzicală</string>
+   <string name="settings_show_lyrics_title">Arată versurile</string>
+   <string name="settings_show_lyrics_summary">Pentru melodii care au un fișier srt</string>
+   <string name="settings_shake_to_play">Scuturați pentru a reda</string>
+diff --git a/res/values-ru/strings.xml b/res/values-ru/strings.xml
+index 9221495..9ec6a26 100644
+--- a/res/values-ru/strings.xml
++++ b/res/values-ru/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Загружать обложки альбомов</string>
+   <string name="settings_download_artist_images_title">Загружать фото исполнителей</string>
+   <string name="settings_general_category">Общее</string>
+-  <string name="settings_show_music_visualization_title">Показывать визуализацию музыки</string>
+   <string name="settings_show_lyrics_title">Показывать текст песни</string>
+   <string name="settings_show_lyrics_summary">Для песен, к которым имеется файл srt</string>
+   <string name="settings_shake_to_play">Перекл. треков встряхиванием</string>
+diff --git a/res/values-sk/strings.xml b/res/values-sk/strings.xml
+index 2e2508a..451f47e 100644
+--- a/res/values-sk/strings.xml
++++ b/res/values-sk/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Prevziať chýbajúce obrázky albumov</string>
+   <string name="settings_download_artist_images_title">Prevziať chýbajúce obrázky interpretov</string>
+   <string name="settings_general_category">Všeobecné</string>
+-  <string name="settings_show_music_visualization_title">Zobraziť vizualizáciu hudby</string>
+   <string name="settings_show_lyrics_title">Zobraziť texty skladieb</string>
+   <string name="settings_show_lyrics_summary">Pre skladby, ktoré majú súbor srt</string>
+   <string name="settings_shake_to_play">Prehrať zatrasením</string>
+diff --git a/res/values-sl/strings.xml b/res/values-sl/strings.xml
+index 29fd291..39ca1bd 100644
+--- a/res/values-sl/strings.xml
++++ b/res/values-sl/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Prenesi manjkajoče naslovnice</string>
+   <string name="settings_download_artist_images_title">Prenesi manjkajoče slike izvajalcev</string>
+   <string name="settings_general_category">Splošno</string>
+-  <string name="settings_show_music_visualization_title">Prikaži predočenje glasbe</string>
+   <string name="settings_show_lyrics_title">Prikaži besedilo skladbe</string>
+   <string name="settings_show_lyrics_summary">Za pesmi, ki imajo datoteko srt</string>
+   <string name="settings_shake_to_play">Stresi za predvajanje</string>
+diff --git a/res/values-sr/strings.xml b/res/values-sr/strings.xml
+index 595b202..9612cea 100644
+--- a/res/values-sr/strings.xml
++++ b/res/values-sr/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Преузми омот албума који недостаје</string>
+   <string name="settings_download_artist_images_title">Преузми слике аутора које недостају</string>
+   <string name="settings_general_category">Опште</string>
+-  <string name="settings_show_music_visualization_title">Прикажи визуализацију музике</string>
+   <string name="settings_show_lyrics_title">Прикажи текст песме</string>
+   <string name="settings_show_lyrics_summary">За песме које имају srt фајл</string>
+   <string name="settings_shake_to_play">Протреси да пустиш</string>
+diff --git a/res/values-sv/strings.xml b/res/values-sv/strings.xml
+index 84a2be3..a625c0e 100644
+--- a/res/values-sv/strings.xml
++++ b/res/values-sv/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Ladda ned saknade albumomslag</string>
+   <string name="settings_download_artist_images_title">Ladda ned saknade artistbilder</string>
+   <string name="settings_general_category">Allmänt</string>
+-  <string name="settings_show_music_visualization_title">Visa musikvisualisering</string>
+   <string name="settings_show_lyrics_title">Visa låttexter</string>
+   <string name="settings_show_lyrics_summary">För låtar som har en srt-fil</string>
+   <string name="settings_shake_to_play">Skaka för att spela</string>
+diff --git a/res/values-ta-rIN/strings.xml b/res/values-ta-rIN/strings.xml
+index 9bd2bbc..e64db2e 100644
+--- a/res/values-ta-rIN/strings.xml
++++ b/res/values-ta-rIN/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">பதிவிறக்கத்தில் ஆல்பம் கலையை காணவில்லை</string>
+   <string name="settings_download_artist_images_title">பதிவிறக்கத்தில் ஆல்பம் கலைஞர் படங்களைக் காணவில்லை</string>
+   <string name="settings_general_category">பொது</string>
+-  <string name="settings_show_music_visualization_title">இசை காட்சிப்படுத்தலை காண்பி</string>
+   <string name="settings_show_lyrics_title">பாடல் வரிகளைக் காண்பி</string>
+   <string name="settings_show_lyrics_summary">srt கோப்பு உடைய பாடல்களுக்கு</string>
+   <string name="settings_shake_to_play">இயக்க அசை</string>
+diff --git a/res/values-te-rIN/strings.xml b/res/values-te-rIN/strings.xml
+index d37195a..9770867 100644
+--- a/res/values-te-rIN/strings.xml
++++ b/res/values-te-rIN/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">కనిపించకుండా పోయిన ఆల్బమ్ ఆర్టును డౌన్లోడ్ చేయుము</string>
+   <string name="settings_download_artist_images_title">కనిపించకుండా పోయిన కళాకారుని చిత్రాలు డౌన్లోడ్ చేయుము</string>
+   <string name="settings_general_category">సాధారణం</string>
+-  <string name="settings_show_music_visualization_title">సంగీత విజువలైజేషనును చూపుము</string>
+   <string name="settings_show_lyrics_title">పాట సాహిత్యాన్ని చూపుము</string>
+   <string name="settings_show_lyrics_summary">srt ఫైల్ కలిగిన పాటల కొరకు</string>
+   <string name="settings_shake_to_play">ప్లే చేసేందుకు కదపండి</string>
+diff --git a/res/values-th/strings.xml b/res/values-th/strings.xml
+index 81a7855..8b4cc04 100644
+--- a/res/values-th/strings.xml
++++ b/res/values-th/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">ดาวน์โหลดปกอัลบั้มที่หายไป</string>
+   <string name="settings_download_artist_images_title">ดาวน์โหลดภาพศิลปินที่หายไป</string>
+   <string name="settings_general_category">ทั่วไป</string>
+-  <string name="settings_show_music_visualization_title">แสดงภาพเคลื่อนไหวประกอบเพลง</string>
+   <string name="settings_show_lyrics_title">แสดงเนื้อเพลง</string>
+   <string name="settings_show_lyrics_summary">สำหรับเพลงที่มีไฟล์ srt</string>
+   <string name="settings_shake_to_play">เขย่าเพื่อเล่น</string>
+diff --git a/res/values-tr/strings.xml b/res/values-tr/strings.xml
+index ec2834b..7ab96b6 100644
+--- a/res/values-tr/strings.xml
++++ b/res/values-tr/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Eksik albüm kapaklarını indir</string>
+   <string name="settings_download_artist_images_title">Eksik sanatçı resimlerini indir</string>
+   <string name="settings_general_category">Genel</string>
+-  <string name="settings_show_music_visualization_title">Müzik görselleştirmelerini göster</string>
+   <string name="settings_show_lyrics_title">Şarkı sözlerini göster</string>
+   <string name="settings_show_lyrics_summary">srt dosyası olan şarkılar için</string>
+   <string name="settings_shake_to_play">Oynatmak için sallayın</string>
+diff --git a/res/values-ug/strings.xml b/res/values-ug/strings.xml
+index ba679da..997de52 100644
+--- a/res/values-ug/strings.xml
++++ b/res/values-ug/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">ناخشا توپلىمىنىڭ كەم مۇقاۋىسىنى چۈشۈرۈش</string>
+   <string name="settings_download_artist_images_title">سەنئەتكارنىڭ كەم سۈرىتىنى چۈشۈرۈش</string>
+   <string name="settings_general_category">ئادەتتىكى</string>
+-  <string name="settings_show_music_visualization_title">مۇزىكىنىڭ كۆرۈنۈش ئۈنۈمىنى كۆرسىتىش</string>
+   <string name="settings_show_lyrics_title">تېكىسىت كۆرسىتىش</string>
+   <string name="settings_show_lyrics_summary">بىر srt ھۆججەت ناخشىغا ماس كىلىدۇ</string>
+   <string name="settings_shake_to_play">سىلكىپ قويۇش</string>
+diff --git a/res/values-uk/strings.xml b/res/values-uk/strings.xml
+index d6b4dca..2c63592 100644
+--- a/res/values-uk/strings.xml
++++ b/res/values-uk/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Завантажити відсутні обкладинки альбомів</string>
+   <string name="settings_download_artist_images_title">Завантажити відсутні зображення виконавців</string>
+   <string name="settings_general_category">Загальні</string>
+-  <string name="settings_show_music_visualization_title">Показати візуалізацію музики</string>
+   <string name="settings_show_lyrics_title">Показати тексти пісень</string>
+   <string name="settings_show_lyrics_summary">Для композицій що мають srt файл</string>
+   <string name="settings_shake_to_play">Струсити для програвання</string>
+diff --git a/res/values-vi/strings.xml b/res/values-vi/strings.xml
+index b6659d5..4ab8858 100644
+--- a/res/values-vi/strings.xml
++++ b/res/values-vi/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">Tải xuống ảnh bìa album còn thiếu</string>
+   <string name="settings_download_artist_images_title">Tải xuống ảnh nghệ sỹ còn thiếu</string>
+   <string name="settings_general_category">Tổng quát</string>
+-  <string name="settings_show_music_visualization_title">Hiện trực quan hoá nhạc</string>
+   <string name="settings_show_lyrics_title">Hiện lời bài hát</string>
+   <string name="settings_show_lyrics_summary">Đối với bài hát có tập tin srt</string>
+   <string name="settings_shake_to_play">Lắc để phát</string>
+diff --git a/res/values-zh-rCN/strings.xml b/res/values-zh-rCN/strings.xml
+index 3b6e47e..c7c886c 100644
+--- a/res/values-zh-rCN/strings.xml
++++ b/res/values-zh-rCN/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">下载缺失的专辑封面</string>
+   <string name="settings_download_artist_images_title">下载缺失的艺术家的图像</string>
+   <string name="settings_general_category">常规</string>
+-  <string name="settings_show_music_visualization_title">显示音乐可视化效果</string>
+   <string name="settings_show_lyrics_title">显示歌词</string>
+   <string name="settings_show_lyrics_summary">有一个 srt 文件与歌曲匹配</string>
+   <string name="settings_shake_to_play">摇动播放</string>
+diff --git a/res/values-zh-rHK/strings.xml b/res/values-zh-rHK/strings.xml
+index 2c81237..1eb38d8 100644
+--- a/res/values-zh-rHK/strings.xml
++++ b/res/values-zh-rHK/strings.xml
+@@ -117,7 +117,6 @@
+   <string name="settings_download_missing_artwork_title">下載缺少的專輯封面</string>
+   <string name="settings_download_artist_images_title">下載缺少的演出者圖像</string>
+   <string name="settings_general_category">一般</string>
+-  <string name="settings_show_music_visualization_title">顯示音樂視覺化效果</string>
+   <string name="settings_show_lyrics_title">顯示歌詞</string>
+   <string name="settings_show_lyrics_summary">針對有 srt 檔的歌曲</string>
+   <string name="settings_shake_to_play">搖動即可播放</string>
+diff --git a/res/values-zh-rTW/strings.xml b/res/values-zh-rTW/strings.xml
+index 12ece27..31d5f06 100644
+--- a/res/values-zh-rTW/strings.xml
++++ b/res/values-zh-rTW/strings.xml
+@@ -127,7 +127,6 @@
+   <string name="settings_download_missing_artwork_title">下載缺少的專輯封面</string>
+   <string name="settings_download_artist_images_title">下載缺少的演出者圖片</string>
+   <string name="settings_general_category">一般</string>
+-  <string name="settings_show_music_visualization_title">顯示音樂視覺效果</string>
+   <string name="settings_show_lyrics_title">顯示歌詞</string>
+   <string name="settings_show_lyrics_summary">有 srt 檔的樂曲</string>
+   <string name="settings_shake_to_play">搖動播放</string>
+diff --git a/res/values/colors.xml b/res/values/colors.xml
+index 2c905e6..3b2c459 100644
+--- a/res/values/colors.xml
++++ b/res/values/colors.xml
+@@ -141,9 +141,6 @@
+         <item>@color/letter_tile_brown_color_dark</item>
+     </array>
+ 
+-    <!-- Color for the visualizer bars -->
+-    <color name="visualizer_fill_color">#bffafafa</color>
+-
+     <!-- Separated and exposed values for themes -->
+     <color name="widget_background_color">@color/black</color>
+     <color name="list_base_container_background_color">@color/white</color>
+diff --git a/res/values/strings.xml b/res/values/strings.xml
+index 7e96954..4804fbd 100644
+--- a/res/values/strings.xml
++++ b/res/values/strings.xml
+@@ -138,7 +138,6 @@
+     <string name="settings_download_missing_artwork_title">Download missing album art</string>
+     <string name="settings_download_artist_images_title">Download missing artist images</string>
+     <string name="settings_general_category">General</string>
+-    <string name="settings_show_music_visualization_title">Show music visualization</string>
+     <string name="settings_show_lyrics_title">Show song lyrics</string>
+     <string name="settings_show_lyrics_summary">For songs that have an srt file</string>
+     <string name="settings_shake_to_play">Shake to Play</string>
+diff --git a/res/xml/settings.xml b/res/xml/settings.xml
+index f68f8c4..2840258 100644
+--- a/res/xml/settings.xml
++++ b/res/xml/settings.xml
+@@ -39,12 +39,6 @@
+     <!--</PreferenceCategory>-->
+     <PreferenceCategory android:title="@string/settings_general_category" >
+ 
+-        <!-- Music visualizer -->
+-        <SwitchPreference
+-            android:defaultValue="true"
+-            android:key="music_visualization"
+-            android:title="@string/settings_show_music_visualization_title" />
+-
+         <!-- Show Lyrics -->
+         <SwitchPreference
+             android:defaultValue="true"
+diff --git a/src/com/cyanogenmod/eleven/ui/activities/HomeActivity.java b/src/com/cyanogenmod/eleven/ui/activities/HomeActivity.java
+index 2e136eb..01ad0b2 100644
+--- a/src/com/cyanogenmod/eleven/ui/activities/HomeActivity.java
++++ b/src/com/cyanogenmod/eleven/ui/activities/HomeActivity.java
+@@ -201,9 +201,6 @@ protected void onSlide(float slideOffset) {
+     @Override
+     public void onWindowFocusChanged(boolean hasFocus) {
+         super.onWindowFocusChanged(hasFocus);
+-
+-        getAudioPlayerFragment().setVisualizerVisible(hasFocus
+-                && getCurrentPanel() == Panel.MusicPlayer);
+     }
+ 
+     private void updateStatusBarColor() {
+@@ -220,8 +217,6 @@ protected BitmapWithColors doInBackground(Void... params) {
+                 }
+                 @Override
+                 protected void onPostExecute(BitmapWithColors bmc) {
+-                    updateVisualizerColor(bmc != null
+-                            ? bmc.getContrastingColor() : Color.TRANSPARENT);
+                     updateStatusBarColor(bmc != null
+                             ? bmc.getVibrantDarkColor() : Color.TRANSPARENT);
+                 }
+@@ -229,18 +224,6 @@ protected void onPostExecute(BitmapWithColors bmc) {
+         }
+     }
+ 
+-    private void updateVisualizerColor(int color) {
+-        if (color == Color.TRANSPARENT) {
+-            color = getResources().getColor(R.color.visualizer_fill_color);
+-        }
+-
+-        // check for null since updatestatusBarColor is a async task
+-        AudioPlayerFragment fragment = getAudioPlayerFragment();
+-        if (fragment != null) {
+-            fragment.setVisualizerColor(color);
+-        }
+-    }
+-
+     private void updateStatusBarColor(int color) {
+         if (color == Color.TRANSPARENT) {
+             color = getResources().getColor(R.color.primary_dark);
+diff --git a/src/com/cyanogenmod/eleven/ui/activities/SlidingPanelActivity.java b/src/com/cyanogenmod/eleven/ui/activities/SlidingPanelActivity.java
+index c7b72a3..959e05d 100644
+--- a/src/com/cyanogenmod/eleven/ui/activities/SlidingPanelActivity.java
++++ b/src/com/cyanogenmod/eleven/ui/activities/SlidingPanelActivity.java
+@@ -252,8 +252,6 @@ protected void checkTargetNavigation() {
+         if (mTargetNavigatePanel == getCurrentPanel()) {
+             mTargetNavigatePanel = Panel.None;
+         }
+-
+-        getAudioPlayerFragment().setVisualizerVisible(getCurrentPanel() == Panel.MusicPlayer);
+     }
+ 
+     public Panel getCurrentPanel() {
+diff --git a/src/com/cyanogenmod/eleven/ui/fragments/AudioPlayerFragment.java b/src/com/cyanogenmod/eleven/ui/fragments/AudioPlayerFragment.java
+index e5dfde6..5db9758 100644
+--- a/src/com/cyanogenmod/eleven/ui/fragments/AudioPlayerFragment.java
++++ b/src/com/cyanogenmod/eleven/ui/fragments/AudioPlayerFragment.java
+@@ -68,7 +68,6 @@
+ import com.cyanogenmod.eleven.widgets.RepeatButton;
+ import com.cyanogenmod.eleven.widgets.RepeatingImageButton;
+ import com.cyanogenmod.eleven.widgets.ShuffleButton;
+-import com.cyanogenmod.eleven.widgets.VisualizerView;
+ 
+ import java.lang.ref.WeakReference;
+ 
+@@ -128,9 +127,6 @@
+     // Total time
+     private TextView mTotalTime;
+ 
+-    // Visualizer View
+-    private VisualizerView mVisualizerView;
+-
+     // Broadcast receiver
+     private PlaybackStatus mPlaybackStatus;
+ 
+@@ -184,10 +180,6 @@ public View onCreateView(final LayoutInflater inflater, final ViewGroup containe
+ 
+         initPlaybackControls();
+ 
+-        mVisualizerView = (VisualizerView) mRootView.findViewById(R.id.visualizerView);
+-        mVisualizerView.initialize(getActivity());
+-        updateVisualizerPowerSaveMode();
+-
+         mLyricsText = (TextView) mRootView.findViewById(R.id.audio_player_lyrics);
+ 
+         return mRootView;
+@@ -711,23 +703,6 @@ public void onLyrics(String lyrics) {
+         }
+     }
+ 
+-    public void setVisualizerVisible(boolean visible) {
+-        if (visible && PreferenceUtils.getInstance(getActivity()).getShowVisualizer()) {
+-            mVisualizerView.setVisible(true);
+-        } else {
+-            mVisualizerView.setVisible(false);
+-        }
+-    }
+-
+-    public void updateVisualizerPowerSaveMode() {
+-        PowerManager pm = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
+-        mVisualizerView.setPowerSaveMode(pm.isPowerSaveMode());
+-    }
+-
+-    public void setVisualizerColor(int color) {
+-        mVisualizerView.setColor(color);
+-    }
+-
+     /**
+      * Used to update the current time string
+      */
+@@ -788,7 +763,6 @@ public void onReceive(final Context context, final Intent intent) {
+             } else if (action.equals(MusicPlaybackService.PLAYSTATE_CHANGED)) {
+                 // Set the play and pause image
+                 audioPlayerFragment.mPlayPauseProgressButton.getPlayPauseButton().updateState();
+-                audioPlayerFragment.mVisualizerView.setPlaying(MusicUtils.isPlaying());
+             } else if (action.equals(MusicPlaybackService.REPEATMODE_CHANGED)
+                     || action.equals(MusicPlaybackService.SHUFFLEMODE_CHANGED)) {
+                 // Set the repeat image
+@@ -802,8 +776,6 @@ public void onReceive(final Context context, final Intent intent) {
+                 audioPlayerFragment.createAndSetAdapter();
+             } else if (action.equals(MusicPlaybackService.NEW_LYRICS)) {
+                 audioPlayerFragment.onLyrics(intent.getStringExtra("lyrics"));
+-            } else if (action.equals(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)) {
+-                audioPlayerFragment.updateVisualizerPowerSaveMode();
+             }
+         }
+     }
+diff --git a/src/com/cyanogenmod/eleven/utils/PreferenceUtils.java b/src/com/cyanogenmod/eleven/utils/PreferenceUtils.java
+index e3e868f..9cbdc80 100644
+--- a/src/com/cyanogenmod/eleven/utils/PreferenceUtils.java
++++ b/src/com/cyanogenmod/eleven/utils/PreferenceUtils.java
+@@ -75,9 +75,6 @@
+     // show lyrics option
+     public static final String SHOW_LYRICS = "show_lyrics";
+ 
+-    // show visualizer flag
+-    public static final String SHOW_VISUALIZER = "music_visualization";
+-
+     // shake to play flag
+     public static final String SHAKE_TO_PLAY = "shake_to_play";
+ 
+@@ -334,10 +331,6 @@ public final boolean getShowLyrics() {
+         return mPreferences.getBoolean(SHOW_LYRICS, true);
+     }
+ 
+-    public boolean getShowVisualizer() {
+-        return mPreferences.getBoolean(SHOW_VISUALIZER, true);
+-    }
+-
+     public boolean getShakeToPlay() {
+         return mPreferences.getBoolean(SHAKE_TO_PLAY, false);
+     }
+@@ -345,4 +338,4 @@ public boolean getShakeToPlay() {
+     public boolean getShowAlbumArtOnLockscreen() {
+         return mPreferences.getBoolean(SHOW_ALBUM_ART_ON_LOCKSCREEN, true);
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/src/com/cyanogenmod/eleven/widgets/VisualizerView.java b/src/com/cyanogenmod/eleven/widgets/VisualizerView.java
+deleted file mode 100644
+index 034d229..0000000
+--- a/src/com/cyanogenmod/eleven/widgets/VisualizerView.java
++++ /dev/null
+@@ -1,224 +0,0 @@
+-/*
+-* Copyright (C) 2014 The CyanogenMod Project
+-*
+-* Licensed under the Apache License, Version 2.0 (the "License");
+-* you may not use this file except in compliance with the License.
+-* You may obtain a copy of the License at
+-*
+-* http://www.apache.org/licenses/LICENSE-2.0
+-*
+-* Unless required by applicable law or agreed to in writing, software
+-* distributed under the License is distributed on an "AS IS" BASIS,
+-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-* See the License for the specific language governing permissions and
+-* limitations under the License.
+-*/
+-package com.cyanogenmod.eleven.widgets;
+-
+-import android.animation.ObjectAnimator;
+-import android.animation.ValueAnimator;
+-import android.content.Context;
+-import android.graphics.Canvas;
+-import android.graphics.Color;
+-import android.graphics.Paint;
+-import android.media.audiofx.Visualizer;
+-import android.os.AsyncTask;
+-import android.util.AttributeSet;
+-import android.view.View;
+-
+-import com.cyanogenmod.eleven.R;
+-
+-public class VisualizerView extends View {
+-    private Paint mPaint;
+-    private Visualizer mVisualizer;
+-    private ObjectAnimator mVisualizerColorAnimator;
+-
+-    private ValueAnimator[] mValueAnimators = new ValueAnimator[32];
+-    private float[] mFFTPoints = new float[128];
+-
+-    private boolean mVisible = false;
+-    private boolean mPlaying = false;
+-    private boolean mPowerSaveMode = false;
+-    private int mColor;
+-
+-    private Visualizer.OnDataCaptureListener mVisualizerListener =
+-            new Visualizer.OnDataCaptureListener() {
+-        byte rfk, ifk;
+-        int dbValue;
+-        float magnitude;
+-
+-        @Override
+-        public void onWaveFormDataCapture(Visualizer visualizer, byte[] bytes, int samplingRate) {
+-        }
+-
+-        @Override
+-        public void onFftDataCapture(Visualizer visualizer, byte[] fft, int samplingRate) {
+-            for (int i = 0; i < 32; i++) {
+-                mValueAnimators[i].cancel();
+-
+-                rfk = fft[i * 2 + 2];
+-                ifk = fft[i * 2 + 3];
+-                magnitude = rfk * rfk + ifk * ifk;
+-                dbValue = magnitude > 0 ? (int) (10 * Math.log10(magnitude)) : 0;
+-
+-                mValueAnimators[i].setFloatValues(mFFTPoints[i * 4 + 1],
+-                        mFFTPoints[3] - (dbValue * 16f));
+-                mValueAnimators[i].start();
+-            }
+-        }
+-    };
+-
+-    private final Runnable mLinkVisualizer = new Runnable() {
+-        @Override
+-        public void run() {
+-            try {
+-                mVisualizer = new Visualizer(0);
+-            } catch (Exception e) {
+-                return;
+-            }
+-
+-            mVisualizer.setEnabled(false);
+-            mVisualizer.setCaptureSize(66);
+-            mVisualizer.setDataCaptureListener(mVisualizerListener, Visualizer.getMaxCaptureRate(),
+-                    false, true);
+-            mVisualizer.setEnabled(true);
+-        }
+-    };
+-
+-    private final Runnable mUnlinkVisualizer = new Runnable() {
+-        @Override
+-        public void run() {
+-            mVisualizer.setEnabled(false);
+-            mVisualizer.release();
+-            mVisualizer = null;
+-        }
+-    };
+-
+-    public VisualizerView(Context context, AttributeSet attrs, int defStyle) {
+-        super(context, attrs, defStyle);
+-    }
+-
+-    public VisualizerView(Context context, AttributeSet attrs) {
+-        this(context, attrs, 0);
+-    }
+-
+-    public VisualizerView(Context context) {
+-        this(context, null, 0);
+-    }
+-
+-    @Override
+-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+-
+-        final int size = Math.min(getMeasuredWidth(), getMeasuredHeight());
+-        setMeasuredDimension(size, size);
+-    }
+-
+-    @Override
+-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+-        super.onSizeChanged(w, h, oldw, oldh);
+-
+-        float barUnit = w / 32f;
+-        float barWidth = barUnit * 8f / 9f;
+-        barUnit = barWidth + (barUnit - barWidth) * 32f / 31f;
+-        mPaint.setStrokeWidth(barWidth);
+-
+-        for (int i = 0; i < 32; i++) {
+-            mFFTPoints[i * 4] = mFFTPoints[i * 4 + 2] = i * barUnit + (barWidth / 2);
+-            mFFTPoints[i * 4 + 3] = h;
+-        }
+-    }
+-
+-    @Override
+-    protected void onDraw(Canvas canvas) {
+-        super.onDraw(canvas);
+-
+-        if (mVisualizer != null) {
+-            canvas.drawLines(mFFTPoints, mPaint);
+-        }
+-    }
+-
+-    public void initialize(Context context) {
+-        mColor = context.getResources().getColor(R.color.visualizer_fill_color);
+-
+-        mPaint = new Paint();
+-        mPaint.setAntiAlias(true);
+-        mPaint.setColor(mColor);
+-
+-        for (int i = 0; i < 32; i++) {
+-            final int j = i * 4 + 1;
+-            mValueAnimators[i] = new ValueAnimator();
+-            mValueAnimators[i].setDuration(128);
+-            mValueAnimators[i].addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+-                @Override
+-                public void onAnimationUpdate(ValueAnimator animation) {
+-                    mFFTPoints[j] = (float) animation.getAnimatedValue();
+-                }
+-            });
+-        }
+-
+-        mValueAnimators[31].addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+-            @Override
+-            public void onAnimationUpdate(ValueAnimator animation) {
+-                postInvalidate();
+-            }
+-        });
+-    }
+-
+-    public void setVisible(boolean visible) {
+-        if (mVisible != visible) {
+-            mVisible = visible;
+-            checkStateChanged();
+-        }
+-    }
+-
+-    public void setPlaying(boolean playing) {
+-        if (mPlaying != playing) {
+-            mPlaying = playing;
+-            checkStateChanged();
+-        }
+-    }
+-
+-    public void setPowerSaveMode(boolean powerSaveMode) {
+-        if (mPowerSaveMode != powerSaveMode) {
+-            mPowerSaveMode = powerSaveMode;
+-            checkStateChanged();
+-        }
+-    }
+-
+-    public void setColor(int color) {
+-        color = Color.argb(191, Color.red(color), Color.green(color), Color.blue(color));
+-
+-        if (mColor != color) {
+-            mColor = color;
+-
+-            if (mVisualizer != null) {
+-                if (mVisualizerColorAnimator != null) {
+-                    mVisualizerColorAnimator.cancel();
+-                }
+-
+-                mVisualizerColorAnimator = ObjectAnimator.ofArgb(mPaint, "color",
+-                        mPaint.getColor(), mColor);
+-                mVisualizerColorAnimator.setStartDelay(600);
+-                mVisualizerColorAnimator.setDuration(1200);
+-                mVisualizerColorAnimator.start();
+-            } else {
+-                mPaint.setColor(mColor);
+-            }
+-        }
+-    }
+-
+-    private void checkStateChanged() {
+-        if (mVisible && mPlaying && !mPowerSaveMode) {
+-            if (mVisualizer == null) {
+-                AsyncTask.execute(mLinkVisualizer);
+-                animate().alpha(1f).setDuration(300);
+-            }
+-        } else {
+-            if (mVisualizer != null) {
+-                animate().alpha(0f).setDuration(0);
+-                AsyncTask.execute(mUnlinkVisualizer);
+-            }
+-        }
+-    }
+-}
