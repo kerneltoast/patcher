@@ -38,7 +38,6 @@ patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SULTAN/framework
 patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SULTAN/frameworks-base3.patch
 patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SULTAN/frameworks-base4.patch
 patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SULTAN/frameworks-base5.patch
-patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SULTAN/frameworks-base6.patch
 patch -d frameworks/native			-p1 -s -N --no-backup-if-mismatch < $SULTAN/frameworks-native0.patch
 patch -d packages/apps/Eleven			-p1 -s -N --no-backup-if-mismatch < $SULTAN/packages-apps-Eleven0.patch
 patch -d packages/apps/LockClock		-p1 -s -N --no-backup-if-mismatch < $SULTAN/packages-apps-LockClock0.patch
