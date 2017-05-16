@@ -11,6 +11,8 @@ cd $ROM_TREE/frameworks/base
 git clean -f -d && git reset --hard
 cd $ROM_TREE/frameworks/native
 git clean -f -d && git reset --hard
+cd $ROM_TREE/kernel/oneplus/msm8996
+git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Eleven
 git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Gallery2
