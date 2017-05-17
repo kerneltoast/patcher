@@ -5,6 +5,7 @@
 ROM_TREE=$PWD
 PATCHER_PATH=$ROM_TREE/patcher
 SULTAN=$PATCHER_PATH/sultan
+ZX2C4=$PATCHER_PATH/zx2c4
 CUSTOM=$PATCHER_PATH/custom
 
 # Clean up first
@@ -15,6 +16,8 @@ git clean -f -d && git reset --hard
 cd $ROM_TREE/frameworks/base
 git clean -f -d && git reset --hard
 cd $ROM_TREE/frameworks/native
+git clean -f -d && git reset --hard
+cd $ROM_TREE/kernel/oneplus/msm8996
 git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Eleven
 git clean -f -d && git reset --hard
@@ -44,6 +47,10 @@ patch -d packages/apps/LockClock		-p1 -s -N --no-backup-if-mismatch < $SULTAN/pa
 patch -d system/core				-p1 -s -N --no-backup-if-mismatch < $SULTAN/system-core0.patch
 patch -d system/core				-p1 -s -N --no-backup-if-mismatch < $SULTAN/system-core1.patch
 patch -d vendor/cm				-p1 -s -N --no-backup-if-mismatch < $SULTAN/vendor-cm0.patch
+
+### zx2c4's patches
+$ZX2C4/wireguard-fetch.sh || rm -f $ZX2C4/wireguard-src.patch
+patch -d kernel/oneplus/msm8996			-p1 -s -N --no-backup-if-mismatch < $ZX2C4/wireguard-src.patch
 
 ### Custom patches
 patch -d packages/apps/Gallery2			-p1 -s -N --no-backup-if-mismatch < $CUSTOM/packages-apps-Gallery20.patch
