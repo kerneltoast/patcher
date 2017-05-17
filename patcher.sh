@@ -54,3 +54,4 @@ patch -d kernel/oneplus/msm8996			-p1 -s -N --no-backup-if-mismatch < $ZX2C4/wir
 
 ### Custom patches
 patch -d packages/apps/Gallery2			-p1 -s -N --no-backup-if-mismatch < $CUSTOM/packages-apps-Gallery20.patch
+patch -d packages/apps/Gallery2			-p1 -s -N --no-backup-if-mismatch < $CUSTOM/packages-apps-Gallery21.patch
