@@ -1,0 +1,34 @@
+From d53b6972b5791fad207ef273b0d29a303f17f85c Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Thu, 18 May 2017 15:42:31 -0700
+Subject: [PATCH] oppo-common: Don't make notification slider haptics
+ conditional
+
+Always do haptics for the notication slider instead of controlling them
+with the touchscreen gesture haptics option (which makes no sense).
+
+Also reduce the slider haptic duration to 40 ms.
+
+Change-Id: I2a76b53fe502c2b57cc97e0859b3e2b41b8483d2
+---
+ keyhandler/src/com/cyanogenmod/settings/device/KeyHandler.java | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/keyhandler/src/com/cyanogenmod/settings/device/KeyHandler.java b/keyhandler/src/com/cyanogenmod/settings/device/KeyHandler.java
+index 525a40c..1ebf41a 100644
+--- a/keyhandler/src/com/cyanogenmod/settings/device/KeyHandler.java
++++ b/keyhandler/src/com/cyanogenmod/settings/device/KeyHandler.java
+@@ -147,7 +147,9 @@ public class KeyHandler implements DeviceKeyHandler {
+ 
+         if (isSliderModeSupported) {
+             mNotificationManager.setZenMode(sSupportedSliderModes.get(scanCode), null, TAG);
+-            doHapticFeedback();
++            if (mVibrator != null) {
++                mVibrator.vibrate(40);
++            }
+         } else if (!mEventHandler.hasMessages(GESTURE_REQUEST)) {
+             Message msg = getMessageForKeyEvent(scanCode);
+             boolean defaultProximity = mContext.getResources().getBoolean(
+-- 
+2.11.0
+

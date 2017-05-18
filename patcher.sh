@@ -11,6 +11,8 @@ CUSTOM=$PATCHER_PATH/custom
 # Clean up first
 cd $ROM_TREE/build
 git clean -f -d && git reset --hard
+cd $ROM_TREE/device/oppo/common
+git clean -f -d && git reset --hard
 cd $ROM_TREE/frameworks/av
 git clean -f -d && git reset --hard
 cd $ROM_TREE/frameworks/base
@@ -34,6 +36,7 @@ cd $ROM_TREE
 
 ### Sultan's patches
 patch -d build					-p1 -s -N --no-backup-if-mismatch < $SULTAN/build0.patch
+patch -d device/oppo/common			-p1 -s -N --no-backup-if-mismatch < $SULTAN/device-oppo-common0.patch
 patch -d frameworks/av				-p1 -s -N --no-backup-if-mismatch < $SULTAN/frameworks-av0.patch
 patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SULTAN/frameworks-base0.patch
 patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SULTAN/frameworks-base1.patch
