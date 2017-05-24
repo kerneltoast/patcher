@@ -1,29 +1,31 @@
-From d1ca594271e8017d2301f8702362217e8ac136ba Mon Sep 17 00:00:00 2001
-From: Sultan <sultanxda@gmail.com>
-Date: Fri, 10 Jun 2016 11:26:25 -0700
+From b5f5ae4b4c4fc9174bbdc371b511149a5fcd9a64 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Wed, 24 May 2017 15:19:14 -0700
 Subject: [PATCH] Dynamically enable MSB AGPS at runtime for newer baseband
  versions
 
 MSB currently does not work correctly for older basebands
 (i.e. DI.3.0.c6-00241 and older), but it's still useful, so enable it at
 runtime if a newer baseband is in use.
+
+Change-Id: I21d28de3262cafe3812eb4f64e18b3d9c2196890
 ---
- .../java/com/android/server/location/GpsLocationProvider.java    | 9 +++++++++
+ .../java/com/android/server/location/GnssLocationProvider.java   | 9 +++++++++
  1 file changed, 9 insertions(+)
 
-diff --git a/services/core/java/com/android/server/location/GpsLocationProvider.java b/services/core/java/com/android/server/location/GpsLocationProvider.java
-index 42b8783..bbf0d6b 100644
---- a/services/core/java/com/android/server/location/GpsLocationProvider.java
-+++ b/services/core/java/com/android/server/location/GpsLocationProvider.java
-@@ -24,6 +24,7 @@
+diff --git a/services/core/java/com/android/server/location/GnssLocationProvider.java b/services/core/java/com/android/server/location/GnssLocationProvider.java
+index bdf1463d512..fb512bd359b 100644
+--- a/services/core/java/com/android/server/location/GnssLocationProvider.java
++++ b/services/core/java/com/android/server/location/GnssLocationProvider.java
+@@ -22,6 +22,7 @@ import com.android.internal.location.GpsNetInitiatedHandler;
+ import com.android.internal.location.GpsNetInitiatedHandler.GpsNiNotification;
+ import com.android.internal.location.ProviderProperties;
  import com.android.internal.location.ProviderRequest;
- import com.android.internal.telephony.Phone;
- import com.android.internal.telephony.PhoneConstants;
 +import com.android.internal.telephony.TelephonyProperties;
  
  import android.app.AlarmManager;
  import android.app.AppOpsManager;
-@@ -1343,6 +1344,14 @@ private void hibernate() {
+@@ -1504,6 +1505,14 @@ public class GnssLocationProvider implements LocationProviderInterface {
      }
  
      private boolean hasCapability(int capability) {
@@ -38,3 +40,6 @@ index 42b8783..bbf0d6b 100644
          return ((mEngineCapabilities & capability) != 0);
      }
  
+-- 
+2.11.0
+
