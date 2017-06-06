@@ -1,0 +1,34 @@
+From 93641d638c7f2629af0ca6f4fcaf16ac21a3a7e9 Mon Sep 17 00:00:00 2001
+From: chenneng <neil.chen@oneplus.net>
+Date: Thu, 9 Mar 2017 23:33:46 +0800
+Subject: [PATCH] [PATCH] [All][community] add cameraservice change
+
+ Plan:add caneraservuce change
+ Type:BUG
+ Test: 1. do normal camera testing;
+
+Change-Id: Ic2e6e832c52435e154f54bc2a143efc156fd7fe8
+(cherry picked from commit 59018e853657e3f74101c60957e32c470dbcddf5)
+---
+ services/camera/libcameraservice/CameraService.h | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/services/camera/libcameraservice/CameraService.h b/services/camera/libcameraservice/CameraService.h
+index 8bcb91ab7..fdd8b305f 100644
+--- a/services/camera/libcameraservice/CameraService.h
++++ b/services/camera/libcameraservice/CameraService.h
+@@ -831,6 +831,11 @@ binder::Status CameraService::connectHelper(const sp<CALLBACK>& cameraCb, const
+ 
+     int originalClientPid = 0;
+ 
++    //if the upper layer does not assign HAL version with API 1, then set HAL1 by default
++    if (effectiveApiLevel == API_1 && halVersion== CAMERA_HAL_API_VERSION_UNSPECIFIED) {
++        halVersion = CAMERA_DEVICE_API_VERSION_1_0;
++    }
++
+     ALOGI("CameraService::connect call (PID %d \"%s\", camera ID %s) for HAL version %s and "
+             "Camera API version %d", clientPid, clientName8.string(), cameraId.string(),
+             (halVersion == -1) ? "default" : std::to_string(halVersion).c_str(),
+-- 
+2.11.0
+

@@ -56,5 +56,6 @@ $ZX2C4/wireguard-fetch.sh || rm -f $ZX2C4/wireguard-src.patch
 patch -d kernel/oneplus/msm8996			-p1 -s -N --no-backup-if-mismatch < $ZX2C4/wireguard-src.patch
 
 ### Custom patches
+patch -d frameworks/av				-p1 -s -N --no-backup-if-mismatch < $CUSTOM/frameworks-av0.patch
 patch -d packages/apps/Gallery2			-p1 -s -N --no-backup-if-mismatch < $CUSTOM/packages-apps-Gallery20.patch
 patch -d packages/apps/Gallery2			-p1 -s -N --no-backup-if-mismatch < $CUSTOM/packages-apps-Gallery21.patch
