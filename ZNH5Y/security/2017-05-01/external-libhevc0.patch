@@ -1,0 +1,37 @@
+From e3f83a5ce98c6a006a45cb065849d029f734af48 Mon Sep 17 00:00:00 2001
+From: Naveen Kumar Ponnusamy <naveenkumar.p@ittiam.com>
+Date: Wed, 15 Feb 2017 13:58:22 +0530
+Subject: [PATCH] Handle error return from ref list in slice hdr parsing
+
+The error returned by ref_list function was not handled by the
+caller parse_slice_header.
+
+Bug: 34672748
+AOSP-Change-Id: I55f6cb0e651746e77f7ff3375115894ec3964203
+(cherry picked from commit 25206ffa6eeb25f32103e69f893287425ab1bd10)
+
+CVE-2017-0599
+
+Change-Id: Idab5c9503268d099c60b0d996312b0e774d61cb3
+(cherry picked from commit a1424724a00d62ac5efa0e27953eed66850d662f)
+---
+ decoder/ihevcd_parse_slice_header.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/decoder/ihevcd_parse_slice_header.c b/decoder/ihevcd_parse_slice_header.c
+index e9c3073..744484e 100644
+--- a/decoder/ihevcd_parse_slice_header.c
++++ b/decoder/ihevcd_parse_slice_header.c
+@@ -910,7 +910,11 @@ IHEVCD_ERROR_T ihevcd_parse_slice_header(codec_t *ps_codec,
+         }
+         else
+         {
+-            ihevcd_ref_list(ps_codec, ps_pps, ps_sps, ps_slice_hdr);
++            ret = ihevcd_ref_list(ps_codec, ps_pps, ps_sps, ps_slice_hdr);
++            if ((WORD32)IHEVCD_SUCCESS != ret)
++            {
++                return ret;
++            }
+ 
+         }
+ 

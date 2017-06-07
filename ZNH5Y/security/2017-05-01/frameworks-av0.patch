@@ -1,0 +1,42 @@
+From 54b384f4898e24967da8c86898aa5ab45e336bfb Mon Sep 17 00:00:00 2001
+From: Ray Essick <essick@google.com>
+Date: Mon, 13 Mar 2017 11:59:57 -0700
+Subject: [PATCH] Add bounds check in SoftAACEncoder2::onQueueFilled()
+
+Original code blindly copied some header information into the
+user-supplied buffer without checking for sufficient space.
+The code does check when it gets to filling the data -- it's
+just the header copies that weren't checked.
+
+Bug: 34617444
+Test: ran POC before/after
+AOSP-Change-Id: I6e80ec90616f6cd02bb8316cd2d6e309b7e4729d
+(cherry picked from commit 6231243626b8b9c57593b1f0ee417f2c4af4c0aa)
+
+CVE-2017-0594
+
+Change-Id: Ie431b848ffa24700e3e4d84c0e98af99bec9ae5e
+---
+ media/libstagefright/codecs/aacenc/SoftAACEncoder2.cpp | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/media/libstagefright/codecs/aacenc/SoftAACEncoder2.cpp b/media/libstagefright/codecs/aacenc/SoftAACEncoder2.cpp
+index a89b43aa0..63096f117 100644
+--- a/media/libstagefright/codecs/aacenc/SoftAACEncoder2.cpp
++++ b/media/libstagefright/codecs/aacenc/SoftAACEncoder2.cpp
+@@ -477,6 +477,15 @@ void SoftAACEncoder2::onQueueFilled(OMX_U32 /* portIndex */) {
+ 
+         BufferInfo *outInfo = *outQueue.begin();
+         OMX_BUFFERHEADERTYPE *outHeader = outInfo->mHeader;
++
++        if (outHeader->nOffset + encInfo.confSize > outHeader->nAllocLen) {
++            ALOGE("b/34617444");
++            android_errorWriteLog(0x534e4554,"34617444");
++            notify(OMX_EventError, OMX_ErrorUndefined, 0, NULL);
++            mSignalledError = true;
++            return;
++        }
++
+         outHeader->nFilledLen = encInfo.confSize;
+         outHeader->nFlags = OMX_BUFFERFLAG_CODECCONFIG;
+ 

@@ -1,0 +1,91 @@
+From a7f586deb1ea914e6797ccc8c20120442c0d9050 Mon Sep 17 00:00:00 2001
+From: Fyodor Kupolov <fkupolov@google.com>
+Date: Mon, 27 Feb 2017 17:33:18 -0800
+Subject: [PATCH] [DO NOT MERGE] Check bounds in offsetToPtr
+
+Check whether specified offset belongs to mData.
+Also added a default argument bufferSize to check the end offset.
+
+Size of the ashmem descriptor can be modified between
+ashmem_get_size_region call and mmap. createFromParcel method was updated
+to check ashmem size again immediately after memory is mapped.
+
+Test: manual - using the test app from the bug
+Bug: 34128677
+AOSP-Change-Id: I3ecd1616a870ce20941ce9b20a1843d2b4295750
+(cherry picked from commit 45e2e95c2ffeb2d978e2cce80b729ef6ada3b8d2)
+(cherry picked from commit acede24109412a4c09e6e4e93d7b96bc9b1ad440)
+
+CVE-2017-0598
+
+Change-Id: Icb8dfb99033eb9632818ee0f9b872b96d9af9caf
+---
+ include/androidfw/CursorWindow.h | 17 ++++++++++++++---
+ libs/androidfw/CursorWindow.cpp  |  5 +++++
+ 2 files changed, 19 insertions(+), 3 deletions(-)
+
+diff --git a/include/androidfw/CursorWindow.h b/include/androidfw/CursorWindow.h
+index 8a2979a3756..2eb349f5716 100644
+--- a/include/androidfw/CursorWindow.h
++++ b/include/androidfw/CursorWindow.h
+@@ -18,6 +18,7 @@
+ #define _ANDROID__DATABASE_WINDOW_H
+ 
+ #include <cutils/log.h>
++#include <inttypes.h>
+ #include <stddef.h>
+ #include <stdint.h>
+ 
+@@ -128,12 +129,13 @@ class CursorWindow {
+     inline const char* getFieldSlotValueString(FieldSlot* fieldSlot,
+             size_t* outSizeIncludingNull) {
+         *outSizeIncludingNull = fieldSlot->data.buffer.size;
+-        return static_cast<char*>(offsetToPtr(fieldSlot->data.buffer.offset));
++        return static_cast<char*>(offsetToPtr(
++                fieldSlot->data.buffer.offset, fieldSlot->data.buffer.size));
+     }
+ 
+     inline const void* getFieldSlotValueBlob(FieldSlot* fieldSlot, size_t* outSize) {
+         *outSize = fieldSlot->data.buffer.size;
+-        return offsetToPtr(fieldSlot->data.buffer.offset);
++        return offsetToPtr(fieldSlot->data.buffer.offset, fieldSlot->data.buffer.size);
+     }
+ 
+ private:
+@@ -166,7 +168,16 @@ class CursorWindow {
+     bool mReadOnly;
+     Header* mHeader;
+ 
+-    inline void* offsetToPtr(uint32_t offset) {
++    inline void* offsetToPtr(uint32_t offset, uint32_t bufferSize = 0) {
++        if (offset >= mSize) {
++            ALOGE("Offset %" PRIu32 " out of bounds, max value %zu", offset, mSize);
++            return NULL;
++        }
++        if (offset + bufferSize > mSize) {
++            ALOGE("End offset %" PRIu32 " out of bounds, max value %zu",
++                    offset + bufferSize, mSize);
++            return NULL;
++        }
+         return static_cast<uint8_t*>(mData) + offset;
+     }
+ 
+diff --git a/libs/androidfw/CursorWindow.cpp b/libs/androidfw/CursorWindow.cpp
+index 166863c0d91..5694115f61a 100644
+--- a/libs/androidfw/CursorWindow.cpp
++++ b/libs/androidfw/CursorWindow.cpp
+@@ -98,9 +98,14 @@ status_t CursorWindow::createFromParcel(Parcel* parcel, CursorWindow** outCursor
+             if (dupAshmemFd < 0) {
+                 result = -errno;
+             } else {
++                // the size of the ashmem descriptor can be modified between ashmem_get_size_region
++                // call and mmap, so we'll check again immediately after memory is mapped
+                 void* data = ::mmap(NULL, size, PROT_READ, MAP_SHARED, dupAshmemFd, 0);
+                 if (data == MAP_FAILED) {
+                     result = -errno;
++                } else if (ashmem_get_size_region(dupAshmemFd) != size) {
++                    ::munmap(data, size);
++                    result = BAD_VALUE;
+                 } else {
+                     CursorWindow* window = new CursorWindow(name, dupAshmemFd,
+                             data, size, true /*readOnly*/);

@@ -1,0 +1,34 @@
+From 0f2c17885d77692f5017e372793a407057afc45c Mon Sep 17 00:00:00 2001
+From: Harish Mahendrakar <harish.mahendrakar@ittiam.com>
+Date: Fri, 13 Jan 2017 17:22:34 +0530
+Subject: [PATCH] Return error if SPS parsing reads more bytes than the nal
+ length
+
+Bug: 35039946
+
+AOSP-Change-Id: Ia97fa8711f313d0029d2b13e6d150d5e46b2bb99
+(cherry picked from commit a6c58e18a49a1ea4929f8345b3c59f900d5813f5)
+(cherry picked from commit 232bbe1908d1dd9f10513d7b8065ecaf5c9a11a6)
+
+CVE-2017-0590
+
+Change-Id: I95f922a2c6fc96253b1b3cecb2f6a9b4acb06077
+---
+ decoder/ihevcd_parse_headers.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/decoder/ihevcd_parse_headers.c b/decoder/ihevcd_parse_headers.c
+index 3cae4e5..16b60cf 100644
+--- a/decoder/ihevcd_parse_headers.c
++++ b/decoder/ihevcd_parse_headers.c
+@@ -1460,6 +1460,10 @@ IHEVCD_ERROR_T ihevcd_parse_sps(codec_t *ps_codec)
+ 
+     BITS_PARSE("sps_extension_flag", value, ps_bitstrm, 1);
+ 
++    if((UWORD8 *)ps_bitstrm->pu4_buf > ps_bitstrm->pu1_buf_max)
++    {
++        return IHEVCD_INVALID_PARAMETER;
++    }
+ 
+     {
+         WORD32 numerator;

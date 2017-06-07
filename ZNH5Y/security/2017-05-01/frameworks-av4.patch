@@ -1,0 +1,44 @@
+From 2f8cc602a6e11f77eff79d6dda68cdb1dea5660b Mon Sep 17 00:00:00 2001
+From: Marco Nelissen <marcone@google.com>
+Date: Thu, 9 Mar 2017 15:01:55 -0800
+Subject: [PATCH] Fix integer overflow and divide-by-zero
+
+Bug: 35763994
+Test: ran CTS with and without fix
+AOSP-Change-Id: If835e97ce578d4fa567e33e349e48fb7b2559e0e
+(cherry picked from commit 8538a603ef992e75f29336499cb783f3ec19f18c)
+
+CVE-2017-0603
+
+Change-Id: I043e7c709915decc693879adafe5337189021131
+---
+ media/libstagefright/AMRExtractor.cpp     | 2 +-
+ media/libstagefright/NuMediaExtractor.cpp | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/media/libstagefright/AMRExtractor.cpp b/media/libstagefright/AMRExtractor.cpp
+index a6fb3d8dd..9c0740397 100644
+--- a/media/libstagefright/AMRExtractor.cpp
++++ b/media/libstagefright/AMRExtractor.cpp
+@@ -253,7 +253,7 @@ status_t AMRSource::read(
+ 
+     int64_t seekTimeUs;
+     ReadOptions::SeekMode mode;
+-    if (options && options->getSeekTo(&seekTimeUs, &mode)) {
++    if (mOffsetTableLength > 0 && options && options->getSeekTo(&seekTimeUs, &mode)) {
+         size_t size;
+         int64_t seekFrame = seekTimeUs / 20000ll;  // 20ms per frame.
+         mCurrentTimeUs = seekFrame * 20000ll;
+diff --git a/media/libstagefright/NuMediaExtractor.cpp b/media/libstagefright/NuMediaExtractor.cpp
+index f24cf3ad1..6de2bb3a4 100644
+--- a/media/libstagefright/NuMediaExtractor.cpp
++++ b/media/libstagefright/NuMediaExtractor.cpp
+@@ -542,7 +542,7 @@ bool NuMediaExtractor::getTotalBitrate(int64_t *bitrate) const {
+     }
+ 
+     off64_t size;
+-    if (mDurationUs >= 0 && mDataSource->getSize(&size) == OK) {
++    if (mDurationUs > 0 && mDataSource->getSize(&size) == OK) {
+         *bitrate = size * 8000000ll / mDurationUs;  // in bits/sec
+         return true;
+     }

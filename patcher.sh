@@ -12,6 +12,7 @@ SECURITY_JAN17=$SECURITY/2017-01-01
 SECURITY_FEB17=$SECURITY/2017-02-01
 SECURITY_MAR17=$SECURITY/2017-03-01
 SECURITY_APR17=$SECURITY/2017-04-01
+SECURITY_MAY17=$SECURITY/2017-05-01
 
 APN_LIST_URL=https://raw.githubusercontent.com/CyanogenMod/android_vendor_cm/cm-13.0/prebuilt/common/etc/apns-conf.xml
 
@@ -71,6 +72,8 @@ git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/UnifiedEmail
 git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/services/Telephony
+git clean -f -d && git reset --hard
+cd $ROM_TREE/system/bt
 git clean -f -d && git reset --hard
 cd $ROM_TREE/system/core
 git clean -f -d && git reset --hard
@@ -203,3 +206,22 @@ patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SECURITY_APR17/f
 patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SECURITY_APR17/frameworks-base1.patch
 patch -d frameworks/native			-p1 -s -N --no-backup-if-mismatch < $SECURITY_APR17/frameworks-native0.patch
 patch -d packages/services/Telephony		-p1 -s -N --no-backup-if-mismatch < $SECURITY_APR17/packages-services-Telephony0.patch
+
+# 2017-05-01
+patch -d build					-p1 -s -N --no-backup-if-mismatch < $SECURITY_MAY17/build0.patch
+patch -d external/giflib			-p1 -s -N --no-backup-if-mismatch < $SECURITY_MAY17/external-giflib0.patch
+patch -d external/libavc			-p1 -s -N --no-backup-if-mismatch < $SECURITY_MAY17/external-libavc0.patch
+patch -d external/libhevc			-p1 -s -N --no-backup-if-mismatch < $SECURITY_MAY17/external-libhevc0.patch
+patch -d external/libhevc			-p1 -s -N --no-backup-if-mismatch < $SECURITY_MAY17/external-libhevc1.patch
+patch -d external/libhevc			-p1 -s -N --no-backup-if-mismatch < $SECURITY_MAY17/external-libhevc2.patch
+patch -d external/libmpeg2			-p1 -s -N --no-backup-if-mismatch < $SECURITY_MAY17/external-libmpeg20.patch
+patch -d frameworks/av				-p1 -s -N --no-backup-if-mismatch < $SECURITY_MAY17/frameworks-av0.patch
+patch -d frameworks/av				-p1 -s -N --no-backup-if-mismatch < $SECURITY_MAY17/frameworks-av1.patch
+patch -d frameworks/av				-p1 -s -N --no-backup-if-mismatch < $SECURITY_MAY17/frameworks-av2.patch
+patch -d frameworks/av				-p1 -s -N --no-backup-if-mismatch < $SECURITY_MAY17/frameworks-av3.patch
+patch -d frameworks/av				-p1 -s -N --no-backup-if-mismatch < $SECURITY_MAY17/frameworks-av4.patch
+patch -d frameworks/av				-p1 -s -N --no-backup-if-mismatch < $SECURITY_MAY17/frameworks-av5.patch
+patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SECURITY_MAY17/frameworks-base0.patch
+patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SECURITY_MAY17/frameworks-base1.patch
+patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SECURITY_MAY17/frameworks-base2.patch
+patch -d system/bt				-p1 -s -N --no-backup-if-mismatch < $SECURITY_MAY17/system-bt0.patch

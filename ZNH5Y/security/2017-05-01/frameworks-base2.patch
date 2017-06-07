@@ -1,0 +1,58 @@
+From 03a6ea8f7c7ae4de34cf4a9274d3ae131517f601 Mon Sep 17 00:00:00 2001
+From: Svetoslav Ganov <svetoslavganov@google.com>
+Date: Thu, 29 Dec 2016 14:36:58 -0800
+Subject: [PATCH] [DO NOT MERGE] Don't allow permission change to runtime
+
+Prevent apps to change permission protection level to dangerous
+from any other type as this would allow a privilege escalation
+where an app adds a normal permission in other app's group and
+then redefines it as dangerous leading to the group auto-grant.
+
+Test: Added a CTS test which passes.
+
+Bug: 33860747
+
+AOSP-Change-Id: I1ccf546f78ee79ff027cb98124be81c8e5265a82
+(cherry picked from commit fe430be9f102893c95258cc81589df132b7d02b3)
+
+CVE-2017-0593
+
+Change-Id: I6878332b5c4a38225efa8fc7ffa4b868b6b2917d
+---
+ .../com/android/server/pm/PackageManagerService.java     | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/services/core/java/com/android/server/pm/PackageManagerService.java b/services/core/java/com/android/server/pm/PackageManagerService.java
+index 920a8500bea..21d3b4be1f5 100644
+--- a/services/core/java/com/android/server/pm/PackageManagerService.java
++++ b/services/core/java/com/android/server/pm/PackageManagerService.java
+@@ -415,6 +415,8 @@
+      */
+     private static final int DEFAULT_VERIFICATION_RESPONSE = PackageManager.VERIFICATION_ALLOW;
+ 
++    static final String PLATFORM_PACKAGE_NAME = "android";
++
+     static final String DEFAULT_CONTAINER_PACKAGE = "com.android.defcontainer";
+ 
+     static final ComponentName DEFAULT_CONTAINER_COMPONENT = new ComponentName(
+@@ -13467,6 +13469,20 @@ private void installPackageLI(InstallArgs args, PackageInstalledInfo res) {
+                                     + perm.info.name + "; ignoring new declaration");
+                             pkg.permissions.remove(i);
+                         }
++                    } else if (!PLATFORM_PACKAGE_NAME.equals(pkg.packageName)) {
++                        // Prevent apps to change protection level to dangerous from any other
++                        // type as this would allow a privilege escalation where an app adds a
++                        // normal/signature permission in other app's group and later redefines
++                        // it as dangerous leading to the group auto-grant.
++                        if ((perm.info.protectionLevel & PermissionInfo.PROTECTION_MASK_BASE)
++                                == PermissionInfo.PROTECTION_DANGEROUS) {
++                            if (bp != null && !bp.isRuntime()) {
++                                Slog.w(TAG, "Package " + pkg.packageName + " trying to change a "
++                                        + "non-runtime permission " + perm.info.name
++                                        + " to runtime; keeping old protection level");
++                                perm.info.protectionLevel = bp.protectionLevel;
++                            }
++                        }
+                     }
+                 }
+             }

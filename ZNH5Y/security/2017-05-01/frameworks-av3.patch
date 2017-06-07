@@ -1,0 +1,48 @@
+From abf8512afa2f61798d0fa6ab4386e8a00618d743 Mon Sep 17 00:00:00 2001
+From: Marco Nelissen <marcone@google.com>
+Date: Fri, 10 Mar 2017 11:28:44 -0800
+Subject: [PATCH] Fix out of bounds access
+
+Bug: 34618607
+AOSP-Change-Id: I84f0ef948414d0b2d54e8948b6c30b8ae4da2b36
+(cherry picked from commit d1c19c57f66d91ea8033c8fa6510a8760a6e663b)
+
+CVE-2017-0588
+
+Change-Id: I11dee84a2bf7da9d794f94696af56a78967faea6
+---
+ media/libstagefright/id3/ID3.cpp | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/media/libstagefright/id3/ID3.cpp b/media/libstagefright/id3/ID3.cpp
+index 8944d83fb..fee13eac6 100644
+--- a/media/libstagefright/id3/ID3.cpp
++++ b/media/libstagefright/id3/ID3.cpp
+@@ -379,7 +379,7 @@ bool ID3::removeUnsynchronizationV2_4(bool iTunesHack) {
+             flags &= ~1;
+         }
+ 
+-        if (flags & 2) {
++        if ((flags & 2) && (dataSize >= 2)) {
+             // This file has "unsynchronization", so we have to replace occurrences
+             // of 0xff 0x00 with just 0xff in order to get the real data.
+ 
+@@ -395,11 +395,15 @@ bool ID3::removeUnsynchronizationV2_4(bool iTunesHack) {
+                 mData[writeOffset++] = mData[readOffset++];
+             }
+             // move the remaining data following this frame
+-            memmove(&mData[writeOffset], &mData[readOffset], oldSize - readOffset);
++            if (readOffset <= oldSize) {
++                memmove(&mData[writeOffset], &mData[readOffset], oldSize - readOffset);
++            } else {
++                ALOGE("b/34618607 (%zu %zu %zu %zu)", readOffset, writeOffset, oldSize, mSize);
++                android_errorWriteLog(0x534e4554, "34618607");
++            }
+ 
+-            flags &= ~2;
+         }
+-
++        flags &= ~2;
+         if (flags != prevFlags || iTunesHack) {
+             WriteSyncsafeInteger(&mData[offset + 4], dataSize);
+             mData[offset + 8] = flags >> 8;

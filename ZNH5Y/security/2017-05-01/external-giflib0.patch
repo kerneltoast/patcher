@@ -1,0 +1,287 @@
+From 3923f809b866e06e79a3d2003c68d45be8461f1b Mon Sep 17 00:00:00 2001
+From: Leon Scroggins III <scroggo@google.com>
+Date: Mon, 13 Mar 2017 14:23:58 -0400
+Subject: [PATCH] Update GIFLIB to 5.1.4 DO NOT MERGE
+
+Bug:34697653
+
+Also include <limits.h> in openbsd-reallocarray.c, which is where
+Android defines SIZE_MAX.
+
+Preserve Android modification in egif_lib.c, which changed
+"S_IREAD | S_IWRITE" to "S_IRUSR | S_IWUSR"
+
+AOSP-Change-Id: If19d3f071fd96afa2d37fe08d196c5042856c41b
+(cherry picked from commit 7eb1d41f601998ea9be3e7c2034b262ff263b862)
+
+CVE-2015-7555
+
+Change-Id: Ie471001b442ee93a0072ba7292e425be580a4752
+---
+ Android.mk             |  1 +
+ dgif_lib.c             | 32 +++++++++++++++++++++++++-------
+ egif_lib.c             |  3 +++
+ gif_lib.h              |  2 ++
+ gifalloc.c             | 28 +++++++++++++++-------------
+ openbsd-reallocarray.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 85 insertions(+), 20 deletions(-)
+ create mode 100644 openbsd-reallocarray.c
+
+diff --git a/Android.mk b/Android.mk
+index 427c1ee..98eeb32 100644
+--- a/Android.mk
++++ b/Android.mk
+@@ -9,6 +9,7 @@ LOCAL_SRC_FILES := \
+ 	gifalloc.c \
+ 	gif_err.c \
+ 	gif_hash.c \
++        openbsd-reallocarray.c \
+ 	quantize.c
+ 
+ LOCAL_CFLAGS += -Wno-format -Wno-sign-compare -Wno-unused-parameter -DHAVE_CONFIG_H
+diff --git a/dgif_lib.c b/dgif_lib.c
+index 744a2f9..49a666a 100644
+--- a/dgif_lib.c
++++ b/dgif_lib.c
+@@ -90,7 +90,7 @@ DGifOpenFileHandle(int FileHandle, int *Error)
+     GifFile->SavedImages = NULL;
+     GifFile->SColorMap = NULL;
+ 
+-    Private = (GifFilePrivateType *)malloc(sizeof(GifFilePrivateType));
++    Private = (GifFilePrivateType *)calloc(1, sizeof(GifFilePrivateType));
+     if (Private == NULL) {
+         if (Error != NULL)
+ 	    *Error = D_GIF_ERR_NOT_ENOUGH_MEM;
+@@ -98,6 +98,9 @@ DGifOpenFileHandle(int FileHandle, int *Error)
+         free((char *)GifFile);
+         return NULL;
+     }
++
++    /*@i1@*/memset(Private, '\0', sizeof(GifFilePrivateType));
++
+ #ifdef _WIN32
+     _setmode(FileHandle, O_BINARY);    /* Make sure it is in binary mode. */
+ #endif /* _WIN32 */
+@@ -172,13 +175,14 @@ DGifOpen(void *userData, InputFunc readFunc, int *Error)
+     GifFile->SavedImages = NULL;
+     GifFile->SColorMap = NULL;
+ 
+-    Private = (GifFilePrivateType *)malloc(sizeof(GifFilePrivateType));
++    Private = (GifFilePrivateType *)calloc(1, sizeof(GifFilePrivateType));
+     if (!Private) {
+         if (Error != NULL)
+ 	    *Error = D_GIF_ERR_NOT_ENOUGH_MEM;
+         free((char *)GifFile);
+         return NULL;
+     }
++    /*@i1@*/memset(Private, '\0', sizeof(GifFilePrivateType));
+ 
+     GifFile->Private = (void *)Private;
+     Private->FileHandle = 0;
+@@ -385,9 +389,9 @@ DGifGetImageDesc(GifFileType *GifFile)
+     }
+ 
+     if (GifFile->SavedImages) {
+-        if ((GifFile->SavedImages = (SavedImage *)realloc(GifFile->SavedImages,
+-                                      sizeof(SavedImage) *
+-                                      (GifFile->ImageCount + 1))) == NULL) {
++        if ((GifFile->SavedImages = (SavedImage *)reallocarray(GifFile->SavedImages,
++                                      (GifFile->ImageCount + 1), 
++                                      sizeof(SavedImage))) == NULL) {
+             GifFile->Error = D_GIF_ERR_NOT_ENOUGH_MEM;
+             return GIF_ERROR;
+         }
+@@ -748,9 +752,18 @@ DGifSetupDecompress(GifFileType *GifFile)
+     GifPrefixType *Prefix;
+     GifFilePrivateType *Private = (GifFilePrivateType *)GifFile->Private;
+ 
+-    READ(GifFile, &CodeSize, 1);    /* Read Code size from file. */
++    /* coverity[check_return] */
++    if (READ(GifFile, &CodeSize, 1) < 1) {   /* Read Code size from file. */
++        return GIF_ERROR;    /* Failed to read Code size. */
++    }
+     BitsPerPixel = CodeSize;
+ 
++    /* this can only happen on a severely malformed GIF */
++    if (BitsPerPixel > 8) {
++	GifFile->Error = D_GIF_ERR_READ_FAILED;	/* somewhat bogus error code */
++	return GIF_ERROR;    /* Failed to read Code size. */
++    }
++
+     Private->Buf[0] = 0;    /* Input Buffer empty. */
+     Private->BitsPerPixel = BitsPerPixel;
+     Private->ClearCode = (1 << BitsPerPixel);
+@@ -1090,7 +1103,7 @@ DGifSlurp(GifFileType *GifFile)
+               if (ImageSize > (SIZE_MAX / sizeof(GifPixelType))) {
+                   return GIF_ERROR;
+               }
+-              sp->RasterBits = (unsigned char *)malloc(ImageSize *
++              sp->RasterBits = (unsigned char *)reallocarray(NULL, ImageSize,
+                       sizeof(GifPixelType));
+ 
+               if (sp->RasterBits == NULL) {
+@@ -1161,6 +1174,11 @@ DGifSlurp(GifFileType *GifFile)
+               break;
+         }
+     } while (RecordType != TERMINATE_RECORD_TYPE);
++    /* Sanity check for corrupted file */
++    if (GifFile->ImageCount == 0) {
++	GifFile->Error = D_GIF_ERR_NO_IMAG_DSCR;
++	return(GIF_ERROR);
++    }
+ 
+     return (GIF_OK);
+ }
+diff --git a/egif_lib.c b/egif_lib.c
+index 4e353ba..4b427c3 100644
+--- a/egif_lib.c
++++ b/egif_lib.c
+@@ -105,6 +105,7 @@ EGifOpenFileHandle(const int FileHandle, int *Error)
+ 	    *Error = E_GIF_ERR_NOT_ENOUGH_MEM;
+         return NULL;
+     }
++    /*@i1@*/memset(Private, '\0', sizeof(GifFilePrivateType));
+     if ((Private->HashTable = _InitHashTable()) == NULL) {
+         free(GifFile);
+         free(Private);
+@@ -123,6 +124,7 @@ EGifOpenFileHandle(const int FileHandle, int *Error)
+     Private->FileHandle = FileHandle;
+     Private->File = f;
+     Private->FileState = FILE_STATE_WRITE;
++    Private->gif89 = false;
+ 
+     Private->Write = (OutputFunc) 0;    /* No user write routine (MRB) */
+     GifFile->UserData = (void *)NULL;    /* No user write handle (MRB) */
+@@ -158,6 +160,7 @@ EGifOpen(void *userData, OutputFunc writeFunc, int *Error)
+ 	    *Error = E_GIF_ERR_NOT_ENOUGH_MEM;
+         return NULL;
+     }
++    memset(Private, '\0', sizeof(GifFilePrivateType));
+ 
+     Private->HashTable = _InitHashTable();
+     if (Private->HashTable == NULL) {
+diff --git a/gif_lib.h b/gif_lib.h
+index 23df861..3683c85 100644
+--- a/gif_lib.h
++++ b/gif_lib.h
+@@ -240,6 +240,8 @@ extern ColorMapObject *GifUnionColorMap(const ColorMapObject *ColorIn1,
+                                      const ColorMapObject *ColorIn2,
+                                      GifPixelType ColorTransIn2[]);
+ extern int GifBitSize(int n);
++extern void *
++reallocarray(void *optr, size_t nmemb, size_t size);
+ 
+ /******************************************************************************
+  Support for the in-core structures allocation (slurp mode).              
+diff --git a/gifalloc.c b/gifalloc.c
+index 4cb8cde..ffaea3f 100644
+--- a/gifalloc.c
++++ b/gifalloc.c
+@@ -187,8 +187,8 @@ GifUnionColorMap(const ColorMapObject *ColorIn1,
+ 
+         /* perhaps we can shrink the map? */
+         if (RoundUpTo < ColorUnion->ColorCount)
+-            ColorUnion->Colors = (GifColorType *)realloc(Map,
+-                                 sizeof(GifColorType) * RoundUpTo);
++            ColorUnion->Colors = (GifColorType *)reallocarray(Map,
++                                 RoundUpTo, sizeof(GifColorType));
+     }
+ 
+     ColorUnion->ColorCount = RoundUpTo;
+@@ -225,9 +225,9 @@ GifAddExtensionBlock(int *ExtensionBlockCount,
+     if (*ExtensionBlocks == NULL)
+         *ExtensionBlocks=(ExtensionBlock *)malloc(sizeof(ExtensionBlock));
+     else
+-        *ExtensionBlocks = (ExtensionBlock *)realloc(*ExtensionBlocks,
+-                                      sizeof(ExtensionBlock) *
+-                                      (*ExtensionBlockCount + 1));
++        *ExtensionBlocks = (ExtensionBlock *)reallocarray(*ExtensionBlocks,
++                                      (*ExtensionBlockCount + 1),
++                                      sizeof(ExtensionBlock));
+ 
+     if (*ExtensionBlocks == NULL)
+         return (GIF_ERROR);
+@@ -316,8 +316,8 @@ GifMakeSavedImage(GifFileType *GifFile, const SavedImage *CopyFrom)
+     if (GifFile->SavedImages == NULL)
+         GifFile->SavedImages = (SavedImage *)malloc(sizeof(SavedImage));
+     else
+-        GifFile->SavedImages = (SavedImage *)realloc(GifFile->SavedImages,
+-                               sizeof(SavedImage) * (GifFile->ImageCount + 1));
++        GifFile->SavedImages = (SavedImage *)reallocarray(GifFile->SavedImages,
++                               (GifFile->ImageCount + 1), sizeof(SavedImage));
+ 
+     if (GifFile->SavedImages == NULL)
+         return ((SavedImage *)NULL);
+@@ -346,9 +346,10 @@ GifMakeSavedImage(GifFileType *GifFile, const SavedImage *CopyFrom)
+             }
+ 
+             /* next, the raster */
+-            sp->RasterBits = (unsigned char *)malloc(sizeof(GifPixelType) *
+-                                                   CopyFrom->ImageDesc.Height *
+-                                                   CopyFrom->ImageDesc.Width);
++            sp->RasterBits = (unsigned char *)reallocarray(NULL, 
++                                                  (CopyFrom->ImageDesc.Height *
++                                                  CopyFrom->ImageDesc.Width),
++                                                 sizeof(GifPixelType));
+             if (sp->RasterBits == NULL) {
+                 FreeLastSavedImage(GifFile);
+                 return (SavedImage *)(NULL);
+@@ -359,9 +360,10 @@ GifMakeSavedImage(GifFileType *GifFile, const SavedImage *CopyFrom)
+ 
+             /* finally, the extension blocks */
+             if (sp->ExtensionBlocks != NULL) {
+-                sp->ExtensionBlocks = (ExtensionBlock *)malloc(
+-                                      sizeof(ExtensionBlock) *
+-                                      CopyFrom->ExtensionBlockCount);
++                sp->ExtensionBlocks = (ExtensionBlock *)reallocarray(NULL,
++                                      CopyFrom->ExtensionBlockCount,
++                                     sizeof(ExtensionBlock));
++
+                 if (sp->ExtensionBlocks == NULL) {
+                     FreeLastSavedImage(GifFile);
+                     return (SavedImage *)(NULL);
+diff --git a/openbsd-reallocarray.c b/openbsd-reallocarray.c
+new file mode 100644
+index 0000000..41a3326
+--- /dev/null
++++ b/openbsd-reallocarray.c
+@@ -0,0 +1,39 @@
++/*	$OpenBSD: reallocarray.c,v 1.1 2014/05/08 21:43:49 deraadt Exp $	*/
++/*
++ * Copyright (c) 2008 Otto Moerbeek <otto@drijf.net>
++ *
++ * Permission to use, copy, modify, and distribute this software for any
++ * purpose with or without fee is hereby granted, provided that the above
++ * copyright notice and this permission notice appear in all copies.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
++ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
++ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
++ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
++ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
++ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++ */
++
++#include <sys/types.h>
++#include <errno.h>
++#include <stdint.h>
++#include <stdlib.h>
++#include <limits.h>
++
++/*
++ * This is sqrt(SIZE_MAX+1), as s1*s2 <= SIZE_MAX
++ * if both s1 < MUL_NO_OVERFLOW and s2 < MUL_NO_OVERFLOW
++ */
++#define MUL_NO_OVERFLOW	((size_t)1 << (sizeof(size_t) * 4))
++
++void *
++reallocarray(void *optr, size_t nmemb, size_t size)
++{
++	if ((nmemb >= MUL_NO_OVERFLOW || size >= MUL_NO_OVERFLOW) &&
++	    nmemb > 0 && SIZE_MAX / nmemb < size) {
++		errno = ENOMEM;
++		return NULL;
++	}
++	return realloc(optr, size * nmemb);
++}

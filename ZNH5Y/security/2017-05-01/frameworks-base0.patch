@@ -1,0 +1,48 @@
+From 1ab4755f260f714e473933f887cde8cf043a8313 Mon Sep 17 00:00:00 2001
+From: Fyodor Kupolov <fkupolov@google.com>
+Date: Wed, 22 Feb 2017 14:12:50 -0800
+Subject: [PATCH] [DO NOT MERGE] Throw exception if slot has invalid offset
+
+Previously the process would crash, which is OK, but complicates testing.
+
+Test: cts-tradefed run cts --module CtsContentTestCases
+      --test android.content.cts.ContentProviderCursorWindowTest
+Bug: 34128677
+
+AOSP-Change-Id: I5b50982d77ec65c442fbb973d14c85a5c29c43c7
+(cherry picked from commit eb6de6f5f10148b9f81f9c0074d1e1f7af21bfb0)
+(cherry picked from commit 676f703f746391cfdf05bafd2289226f7a6e5255)
+
+CVE-2017-0598
+
+Change-Id: If4df1645887525e00c2762d4c702efbccf2e0b5b
+---
+ core/jni/android_database_CursorWindow.cpp | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/core/jni/android_database_CursorWindow.cpp b/core/jni/android_database_CursorWindow.cpp
+index 580ac02789c..a86e57dc024 100644
+--- a/core/jni/android_database_CursorWindow.cpp
++++ b/core/jni/android_database_CursorWindow.cpp
+@@ -182,6 +182,10 @@ static jbyteArray nativeGetBlob(JNIEnv* env, jclass clazz, jlong windowPtr,
+     if (type == CursorWindow::FIELD_TYPE_BLOB || type == CursorWindow::FIELD_TYPE_STRING) {
+         size_t size;
+         const void* value = window->getFieldSlotValueBlob(fieldSlot, &size);
++        if (!value) {
++            throw_sqlite3_exception(env, "Native could not read blob slot");
++            return NULL;
++        }
+         jbyteArray byteArray = env->NewByteArray(size);
+         if (!byteArray) {
+             env->ExceptionClear();
+@@ -217,6 +221,10 @@ static jstring nativeGetString(JNIEnv* env, jclass clazz, jlong windowPtr,
+     if (type == CursorWindow::FIELD_TYPE_STRING) {
+         size_t sizeIncludingNull;
+         const char* value = window->getFieldSlotValueString(fieldSlot, &sizeIncludingNull);
++        if (!value) {
++            throw_sqlite3_exception(env, "Native could not read string slot");
++            return NULL;
++        }
+         if (sizeIncludingNull <= 1) {
+             return gEmptyString;
+         }

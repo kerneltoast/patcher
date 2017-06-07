@@ -1,0 +1,72 @@
+From bc7c42b6c6bca3cd4a1b6e1ee7b9cf4a5fcff91c Mon Sep 17 00:00:00 2001
+From: Harish Mahendrakar <harish.mahendrakar@ittiam.com>
+Date: Wed, 1 Jun 2016 15:37:18 +0530
+Subject: [PATCH] Fix in handling header decode errors
+
+If header decode was unsuccessful, do not try decoding a frame
+
+Also, initialize pic_wd, pic_ht for reinitialization when
+decoder is created with smaller dimensions
+
+Bug: 28886651
+Bug: 35219737
+AOSP-Change-Id: I8c06d9052910e47fce2e6fe25ad318d4c83d2c50
+(cherry picked from commit 2b9fa9ace2dbedfbac026fc9b6ab6cdac7f68c27)
+(cherry picked from commit c2395cd7cc0c286a66de674032dd2ed26500aef4)
+
+CVE-2017-0587
+Change-Id: I86bf7208f238598a0ffe87b51ffb035044beaf2e
+---
+ decoder/impeg2d_api_main.c | 3 ++-
+ decoder/impeg2d_dec_hdr.c  | 4 +++-
+ decoder/impeg2d_decoder.c  | 7 +++++++
+ 3 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/decoder/impeg2d_api_main.c b/decoder/impeg2d_api_main.c
+index 1bae457..31d1357 100644
+--- a/decoder/impeg2d_api_main.c
++++ b/decoder/impeg2d_api_main.c
+@@ -3052,7 +3052,8 @@ IV_API_CALL_STATUS_T impeg2d_api_entity(iv_obj_t *ps_dechdl,
+         bytes_remaining -= ps_dec_op->s_ivd_video_decode_op_t.u4_num_bytes_consumed;
+     }
+ 
+-    if((1 != ps_dec_state->u2_decode_header) && ((bytes_remaining > 0) || ps_dec_state->u1_flushfrm))
++    if((1 != ps_dec_state->u2_decode_header) &&
++        (((bytes_remaining > 0) && (1 == ps_dec_state->u2_header_done)) || ps_dec_state->u1_flushfrm))
+     {
+         if(ps_dec_state->u1_flushfrm)
+         {
+diff --git a/decoder/impeg2d_dec_hdr.c b/decoder/impeg2d_dec_hdr.c
+index 747d4b5..2c2f24b 100644
+--- a/decoder/impeg2d_dec_hdr.c
++++ b/decoder/impeg2d_dec_hdr.c
+@@ -189,7 +189,9 @@ IMPEG2D_ERROR_CODES_T impeg2d_dec_seq_hdr(dec_state_t *ps_dec)
+                     || (ps_dec->u2_vertical_size > ps_dec->u2_create_max_height))
+     {
+         IMPEG2D_ERROR_CODES_T e_error = IMPEG2D_UNSUPPORTED_DIMENSIONS;
+-        return SET_IVD_FATAL_ERROR(e_error);
++        ps_dec->u2_reinit_max_height   = ps_dec->u2_vertical_size;
++        ps_dec->u2_reinit_max_width    = ps_dec->u2_horizontal_size;
++        return e_error;
+     }
+ 
+ 
+diff --git a/decoder/impeg2d_decoder.c b/decoder/impeg2d_decoder.c
+index 7bc3253..e9b31a0 100644
+--- a/decoder/impeg2d_decoder.c
++++ b/decoder/impeg2d_decoder.c
+@@ -123,7 +123,14 @@ void impeg2d_dec_hdr(void *pv_dec,impeg2d_video_decode_ip_t *ps_ip,
+                 if(ps_op->s_ivd_video_decode_op_t.u4_error_code == 0)
+                     ps_op->s_ivd_video_decode_op_t.u4_error_code = e_error;
+ 
++                if (IMPEG2D_UNSUPPORTED_DIMENSIONS == e_error)
++                {
++                    ps_op->s_ivd_video_decode_op_t.u4_num_bytes_consumed = 0;
++                    ps_dec->u2_header_done = 0;
+ 
++                    ps_op->s_ivd_video_decode_op_t.u4_pic_ht = ps_dec->u2_reinit_max_height;
++                    ps_op->s_ivd_video_decode_op_t.u4_pic_wd = ps_dec->u2_reinit_max_width;
++                }
+                 impeg2d_next_code(ps_dec, SEQUENCE_HEADER_CODE);
+                 return;
+             }

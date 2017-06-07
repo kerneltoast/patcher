@@ -59,6 +59,8 @@ cd $ROM_TREE/packages/apps/UnifiedEmail
 git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/services/Telephony
 git clean -f -d && git reset --hard
+cd $ROM_TREE/system/bt
+git clean -f -d && git reset --hard
 cd $ROM_TREE/system/core
 git clean -f -d && git reset --hard
 cd $ROM_TREE/vendor/cm

@@ -1,0 +1,48 @@
+From 72816ee6c055c152222e6b67ffafbf3613d32e66 Mon Sep 17 00:00:00 2001
+From: Andy Hung <hunga@google.com>
+Date: Mon, 13 Feb 2017 18:48:39 -0800
+Subject: [PATCH] AudioFlinger: Check framecount overflow when creating track
+
+Test: Native POC
+Bug: 34749571
+AOSP-Change-Id: I7529658e52ac7e64d162eb5338f10fb25eaa8fe7
+(cherry picked from commit 1883f69de5f2c4e71df58d5b71d7c39f9779b50c)
+(cherry picked from commit eaa3969f757291f151efedde17ec529b8659024d)
+
+CVE-2017-0597
+
+Change-Id: I2a9338daba9a6aae882daa176cf4c8445de316e6
+---
+ services/audioflinger/Tracks.cpp | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/services/audioflinger/Tracks.cpp b/services/audioflinger/Tracks.cpp
+index f3b537526..77a929a05 100644
+--- a/services/audioflinger/Tracks.cpp
++++ b/services/audioflinger/Tracks.cpp
+@@ -114,9 +114,24 @@ AudioFlinger::ThreadBase::TrackBase::TrackBase(
+     mUid = clientUid;
+ 
+     // ALOGD("Creating track with %d buffers @ %d bytes", bufferCount, bufferSize);
++
++    size_t bufferSize = buffer == NULL ? roundup(frameCount) : frameCount;
++    // check overflow when computing bufferSize due to multiplication by mFrameSize.
++    if (bufferSize < frameCount  // roundup rounds down for values above UINT_MAX / 2
++            || mFrameSize == 0   // format needs to be correct
++            || bufferSize > SIZE_MAX / mFrameSize) {
++        android_errorWriteLog(0x534e4554, "34749571");
++        return;
++    }
++    bufferSize *= mFrameSize;
++
+     size_t size = sizeof(audio_track_cblk_t);
+-    size_t bufferSize = (buffer == NULL ? roundup(frameCount) : frameCount) * mFrameSize;
+     if (buffer == NULL && alloc == ALLOC_CBLK) {
++        // check overflow when computing allocation size for streaming tracks.
++        if (size > SIZE_MAX - bufferSize) {
++            android_errorWriteLog(0x534e4554, "34749571");
++            return;
++        }
+         size += bufferSize;
+     }
+ 
