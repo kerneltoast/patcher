@@ -1,0 +1,44 @@
+From 292de4231bcd1683aab4682c58a6ac44fde33af0 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Tue, 13 Jun 2017 12:37:13 -0700
+Subject: [PATCH] Revert "hwc: Handle DOZE_SUSPEND properly"
+
+Kernel does not support this. See https://github.com/sultanxda/android_kernel_oneplus_msm8974/commit/51677c8360069816942629f1f5461dc434c03f05
+for more info.
+
+This reverts commit fa21b1389890bc2fff874e5b6a97a1c1ad951e64.
+---
+ libhwcomposer/hwc.cpp | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
+
+diff --git a/libhwcomposer/hwc.cpp b/libhwcomposer/hwc.cpp
+index e62171d34..424b93dba 100644
+--- a/libhwcomposer/hwc.cpp
++++ b/libhwcomposer/hwc.cpp
+@@ -428,13 +428,7 @@ static int hwc_setPowerMode(struct hwc_composer_device_1* dev, int dpy,
+             value = FB_BLANK_POWERDOWN;
+             break;
+         case HWC_POWER_MODE_DOZE:
+-            // FB_BLANK_NORMAL is being used here to map to doze mode
+-            // This definition is specific to our fbdev implementation
+-            value = FB_BLANK_NORMAL;
+-            break;
+         case HWC_POWER_MODE_DOZE_SUSPEND:
+-            // FB_BLANK_VSYNC_SUSPEND is being used here to map to doze_suspend
+-            // This definition is specific to our fbdev implementation
+             value = FB_BLANK_VSYNC_SUSPEND;
+             break;
+         case HWC_POWER_MODE_NORMAL:
+@@ -472,8 +466,7 @@ static int hwc_setPowerMode(struct hwc_composer_device_1* dev, int dpy,
+             ctx->mHPDEnabled = true;
+         }
+ 
+-        ctx->dpyAttr[dpy].isActive = not(mode == HWC_POWER_MODE_OFF ||
+-                mode == HWC_POWER_MODE_DOZE_SUSPEND);
++        ctx->dpyAttr[dpy].isActive =  not(mode == HWC_POWER_MODE_OFF);
+ 
+         if(ctx->mVirtualonExtActive) {
+             /* if mVirtualonExtActive is true, display hal will
+-- 
+2.11.0
+
