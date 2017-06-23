@@ -1,0 +1,37 @@
+From 7e7655466ff63827bb7bc296311695f9bcda4359 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Fri, 23 Jun 2017 16:42:29 -0700
+Subject: [PATCH] Dialer: Fix missing location permission prompt for forward
+ lookup
+
+Forward lookup requires location permissions in order to work. It's enabled
+by default, so prompt the user to grant location permissions when the app
+opens.
+
+Change-Id: Ide828b70120ad9b56202764cebd1631364a15bf4
+---
+ src/com/android/dialer/DialtactsActivity.java | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/com/android/dialer/DialtactsActivity.java b/src/com/android/dialer/DialtactsActivity.java
+index 2ae567f62..b66017429 100644
+--- a/src/com/android/dialer/DialtactsActivity.java
++++ b/src/com/android/dialer/DialtactsActivity.java
+@@ -550,6 +550,14 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
+                 showVideoCallWelcomeDialog();
+             }
+         }
++
++        if (ActivityCompat.checkSelfPermission(DialtactsActivity.this,
++                    Manifest.permission.ACCESS_COARSE_LOCATION) !=
++                    PackageManager.PERMISSION_GRANTED) {
++                requestPermissions(
++                        new String[] {Manifest.permission.ACCESS_COARSE_LOCATION},
++                        PERMISSION_REQUEST_CODE_LOCATION);
++        }
+     }
+     @Override
+     protected void onResume() {
+-- 
+2.11.0
+
