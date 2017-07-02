@@ -48,6 +48,7 @@ patch -d packages/apps/Eleven			-p1 -s -N --no-backup-if-mismatch < $SULTAN/pack
 patch -d packages/apps/LockClock		-p1 -s -N --no-backup-if-mismatch < $SULTAN/packages-apps-LockClock0.patch
 patch -d system/core				-p1 -s -N --no-backup-if-mismatch < $SULTAN/system-core0.patch
 patch -d system/core				-p1 -s -N --no-backup-if-mismatch < $SULTAN/system-core1.patch
+patch -d system/core				-p1 -s -N --no-backup-if-mismatch < $SULTAN/system-core2.patch
 patch -d vendor/cm				-p1 -s -N --no-backup-if-mismatch < $SULTAN/vendor-cm0.patch
 
 ### zx2c4's patches
