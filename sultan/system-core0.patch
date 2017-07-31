@@ -1,6 +1,6 @@
 From 405b38c2260eb9501b0722a5c3cd08256e597500 Mon Sep 17 00:00:00 2001
 From: Sultanxda <sultanxda@gmail.com>
-Date: Tue, 11 Apr 2017 12:32:15 -0700
+Date: Mon, 31 Jul 2017 11:07:12 -0700
 Subject: [PATCH] liblog: Silence spammy logs from camera blobs
 
 Log messages under these tags are spammed very hard, destroying logs, and
@@ -9,14 +9,14 @@ introducing a lot of unneeded system load, so kill them.
 
 Change-Id: I63407f12278c2ad1b22beb2d6f85a5cfd0e9b3e4
 ---
- liblog/logprint.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ liblog/logprint.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/liblog/logprint.c b/liblog/logprint.c
-index c8457f4..1aad2b2 100644
+index c8457f4bf..a6cf46482 100644
 --- a/liblog/logprint.c
 +++ b/liblog/logprint.c
-@@ -189,7 +189,14 @@ LIBLOG_ABI_PUBLIC int android_log_shouldPrintLine (
+@@ -189,7 +189,15 @@ LIBLOG_ABI_PUBLIC int android_log_shouldPrintLine (
          const char *tag,
          android_LogPriority pri)
  {
@@ -25,6 +25,7 @@ index c8457f4..1aad2b2 100644
 +            !strcmp(tag, "AEC_PORT") ||
 +            !strcmp(tag, "mm-camera") ||
 +            !strcmp(tag, "mm-3a-core") ||
++            !strcmp(tag, "motiondetect") ||
 +            strstr(tag, "VSTAB"))
 +        return 0;
 +    else
@@ -33,4 +34,4 @@ index c8457f4..1aad2b2 100644
  
  LIBLOG_ABI_PUBLIC AndroidLogFormat *android_log_format_new()
 -- 
-2.9.3
+2.11.0
