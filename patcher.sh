@@ -23,6 +23,8 @@ cd $ROM_TREE/kernel/oneplus/msm8996
 git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Eleven
 git clean -f -d && git reset --hard
+cd $ROM_TREE/packages/apps/Gallery2
+git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/LockClock
 git clean -f -d && git reset --hard
 cd $ROM_TREE/system/core
@@ -55,3 +57,4 @@ patch -d kernel/oneplus/msm8996			-p1 -s -N --no-backup-if-mismatch < $ZX2C4/wir
 
 ### Custom patches
 patch -d frameworks/av				-p1 -s -N --no-backup-if-mismatch < $CUSTOM/frameworks-av0.patch
+patch -d packages/apps/Gallery2			-p1 -s -N --no-backup-if-mismatch < $CUSTOM/packages-apps-Gallery20.patch
