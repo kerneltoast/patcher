@@ -1,0 +1,48 @@
+From 7b9799ce4a0f2f6b3cbf3d4c63933fbaa67ec30d Mon Sep 17 00:00:00 2001
+From: Gabriele M <moto.falcon.git@gmail.com>
+Date: Thu, 11 May 2017 21:56:13 +0200
+Subject: [PATCH] Increase the size of the tiles when decoding images
+
+BitmapRegionDecoder was refactored in Android N [1] and bigger tiles
+are now better to render images, so increase the size of each tile.
+
+[1] https://issuetracker.google.com/issues/37136991#comment11
+
+BUGBASH-188
+BUGBASH-299
+
+Change-Id: Ie9c282fc5a98c9da6bb8ae3bcfe869b8b422a84b
+---
+ src/com/android/gallery3d/ui/TileImageView.java      | 4 ++--
+ src/com/android/photos/views/TiledImageRenderer.java | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/com/android/gallery3d/ui/TileImageView.java b/src/com/android/gallery3d/ui/TileImageView.java
+index 05bc9af..aee33ef 100644
+--- a/src/com/android/gallery3d/ui/TileImageView.java
++++ b/src/com/android/gallery3d/ui/TileImageView.java
+@@ -154,9 +154,9 @@ public TileImageView(GalleryContext context) {
+         mTileDecoder = mThreadPool.submit(new TileDecoder());
+         if (sTileSize == 0) {
+             if (isHighResolution(context.getAndroidContext())) {
+-                sTileSize = 512 ;
++                sTileSize = 2048;
+             } else {
+-                sTileSize = 256;
++                sTileSize = 1024;
+             }
+         }
+     }
+diff --git a/src/com/android/photos/views/TiledImageRenderer.java b/src/com/android/photos/views/TiledImageRenderer.java
+index c4e493b..58bfdbb 100644
+--- a/src/com/android/photos/views/TiledImageRenderer.java
++++ b/src/com/android/photos/views/TiledImageRenderer.java
+@@ -159,7 +159,7 @@
+     }
+ 
+     public static int suggestedTileSize(Context context) {
+-        return isHighResolution(context) ? 512 : 256;
++        return isHighResolution(context) ? 2048 : 1024;
+     }
+ 
+     private static boolean isHighResolution(Context context) {
