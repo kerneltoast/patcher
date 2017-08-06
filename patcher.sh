@@ -20,6 +20,8 @@ cd $ROM_TREE/packages/apps/Dialer
 git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Eleven
 git clean -f -d && git reset --hard
+cd $ROM_TREE/packages/apps/Gallery2
+git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/LockClock
 git clean -f -d && git reset --hard
 cd $ROM_TREE/system/core
@@ -46,3 +48,6 @@ patch -d system/core				-p1 -s -N --no-backup-if-mismatch < $SULTAN/system-core0
 patch -d system/core				-p1 -s -N --no-backup-if-mismatch < $SULTAN/system-core1.patch
 patch -d vendor/cm				-p1 -s -N --no-backup-if-mismatch < $SULTAN/vendor-cm0.patch
 patch -d vendor/cm				-p1 -s -N --no-backup-if-mismatch < $SULTAN/vendor-cm1.patch
+
+### Custom patches
+patch -d packages/apps/Gallery2			-p1 -s -N --no-backup-if-mismatch < $CUSTOM/packages-apps-Gallery20.patch
