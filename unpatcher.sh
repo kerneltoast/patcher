@@ -13,8 +13,6 @@ cd $ROM_TREE/hardware/qcom/display-caf/msm8974
 git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Dialer
 git clean -f -d && git reset --hard
-cd $ROM_TREE/packages/apps/Eleven
-git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/Gallery2
 git clean -f -d && git reset --hard
 cd $ROM_TREE/packages/apps/LockClock
