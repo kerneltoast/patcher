@@ -1,0 +1,225 @@
+From 64aac9e0ed287c0a681971c1fdbcaf6f59cff70d Mon Sep 17 00:00:00 2001
+From: Kedi Xu <kedix@codeaurora.org>
+Date: Fri, 2 Sep 2016 08:48:26 +0800
+Subject: [PATCH] SnapdragonGallery: Fix anr in PotoPage
+
+When lock and unlock the screen in PotoPage, Gallery
+will anr because of dead lock.
+
+Change-Id: I3bdda0d69d7dcd7ee2317a9bdd5c2c4ad14b1034
+CRs-Fixed: 1059897
+---
+ src/com/android/gallery3d/app/PhotoPage.java | 15 -------
+ src/com/android/gallery3d/ui/GLRoot.java     |  2 -
+ src/com/android/gallery3d/ui/GLRootView.java | 58 ----------------------------
+ src/com/android/gallery3d/ui/PhotoView.java  |  4 --
+ 4 files changed, 79 deletions(-)
+ mode change 100644 => 100755 src/com/android/gallery3d/ui/GLRoot.java
+ mode change 100644 => 100755 src/com/android/gallery3d/ui/GLRootView.java
+
+diff --git a/src/com/android/gallery3d/app/PhotoPage.java b/src/com/android/gallery3d/app/PhotoPage.java
+index dd27f2689..ebf7b886d 100755
+--- a/src/com/android/gallery3d/app/PhotoPage.java
++++ b/src/com/android/gallery3d/app/PhotoPage.java
+@@ -87,7 +87,6 @@ public abstract class PhotoPage extends ActivityState implements
+     private static final int MSG_HIDE_BARS = 1;
+     private static final int MSG_ON_FULL_SCREEN_CHANGED = 4;
+     private static final int MSG_UPDATE_ACTION_BAR = 5;
+-    private static final int MSG_UNFREEZE_GLROOT = 6;
+     private static final int MSG_WANT_BARS = 7;
+     private static final int MSG_REFRESH_BOTTOM_CONTROLS = 8;
+     private static final int MSG_ON_CAMERA_CENTER = 9;
+@@ -99,7 +98,6 @@ public abstract class PhotoPage extends ActivityState implements
+     private static final int MSG_UPDATE_PANORAMA_UI = 16;
+ 
+     private static final int HIDE_BARS_TIMEOUT = 3500;
+-    private static final int UNFREEZE_GLROOT_TIMEOUT = 250;
+ 
+     private static final int REQUEST_SLIDESHOW = 1;
+     private static final int REQUEST_CROP = 2;
+@@ -309,10 +307,6 @@ public abstract class PhotoPage extends ActivityState implements
+                         wantBars();
+                         break;
+                     }
+-                    case MSG_UNFREEZE_GLROOT: {
+-                        mActivity.getGLRoot().unfreeze();
+-                        break;
+-                    }
+                     case MSG_UPDATE_DEFERRED: {
+                         long nextUpdate = mDeferUpdateUntil - SystemClock.uptimeMillis();
+                         if (nextUpdate <= 0) {
+@@ -1372,9 +1366,6 @@ public abstract class PhotoPage extends ActivityState implements
+         super.onPause();
+         mIsActive = false;
+ 
+-        mActivity.getGLRoot().unfreeze();
+-        mHandler.removeMessages(MSG_UNFREEZE_GLROOT);
+-
+         DetailsHelper.pause();
+         // Hide the detail dialog on exit
+         if (mShowDetails) hideDetails();
+@@ -1394,10 +1385,6 @@ public abstract class PhotoPage extends ActivityState implements
+         if (mMediaSet != null) mMediaSet.clearDeletion();
+     }
+ 
+-    @Override
+-    public void onCurrentImageUpdated() {
+-        mActivity.getGLRoot().unfreeze();
+-    }
+ 
+     @Override
+     public void onFilmModeChanged(boolean enabled) {
+@@ -1478,7 +1465,6 @@ public abstract class PhotoPage extends ActivityState implements
+         }
+         transitionFromAlbumPageIfNeeded();
+ 
+-        mActivity.getGLRoot().freeze();
+         mIsActive = true;
+         setContentPane(mRootPane);
+ 
+@@ -1503,7 +1489,6 @@ public abstract class PhotoPage extends ActivityState implements
+         }
+ 
+         mRecenterCameraOnResume = true;
+-        mHandler.sendEmptyMessageDelayed(MSG_UNFREEZE_GLROOT, UNFREEZE_GLROOT_TIMEOUT);
+     }
+ 
+     @Override
+diff --git a/src/com/android/gallery3d/ui/GLRoot.java b/src/com/android/gallery3d/ui/GLRoot.java
+old mode 100644
+new mode 100755
+index 33a82eaf7..991c581a5
+--- a/src/com/android/gallery3d/ui/GLRoot.java
++++ b/src/com/android/gallery3d/ui/GLRoot.java
+@@ -45,8 +45,6 @@ public interface GLRoot {
+     public int getDisplayRotation();
+     public int getCompensation();
+     public Matrix getCompensationMatrix();
+-    public void freeze();
+-    public void unfreeze();
+     public void setLightsOutMode(boolean enabled);
+ 
+     public Context getContext();
+diff --git a/src/com/android/gallery3d/ui/GLRootView.java b/src/com/android/gallery3d/ui/GLRootView.java
+old mode 100644
+new mode 100755
+index dc898d83d..90119f504
+--- a/src/com/android/gallery3d/ui/GLRootView.java
++++ b/src/com/android/gallery3d/ui/GLRootView.java
+@@ -103,9 +103,6 @@ public class GLRootView extends GLSurfaceView
+     private final IdleRunner mIdleRunner = new IdleRunner();
+ 
+     private final ReentrantLock mRenderLock = new ReentrantLock();
+-    private final Condition mFreezeCondition =
+-            mRenderLock.newCondition();
+-    private boolean mFreeze;
+ 
+     private long mLastDrawFinishTime;
+     private boolean mInDownState = false;
+@@ -347,10 +344,6 @@ public class GLRootView extends GLSurfaceView
+         }
+         mRenderLock.lock();
+ 
+-        while (mFreeze) {
+-            mFreezeCondition.awaitUninterruptibly();
+-        }
+-
+         try {
+             onDrawFrameLocked(gl);
+         } finally {
+@@ -531,7 +524,6 @@ public class GLRootView extends GLSurfaceView
+ 
+     @Override
+     public void onPause() {
+-        unfreeze();
+         super.onPause();
+         if (DEBUG_PROFILE) {
+             Log.d(TAG, "Stop profiling");
+@@ -561,20 +553,6 @@ public class GLRootView extends GLSurfaceView
+         return mCompensationMatrix;
+     }
+ 
+-    @Override
+-    public void freeze() {
+-        mRenderLock.lock();
+-        mFreeze = true;
+-        mRenderLock.unlock();
+-    }
+-
+-    @Override
+-    public void unfreeze() {
+-        mRenderLock.lock();
+-        mFreeze = false;
+-        mFreezeCondition.signalAll();
+-        mRenderLock.unlock();
+-    }
+ 
+     @Override
+     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+@@ -591,40 +569,4 @@ public class GLRootView extends GLSurfaceView
+         setSystemUiVisibility(flags);
+     }
+ 
+-    // We need to unfreeze in the following methods and in onPause().
+-    // These methods will wait on GLThread. If we have freezed the GLRootView,
+-    // the GLThread will wait on main thread to call unfreeze and cause dead
+-    // lock.
+-    @Override
+-    public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+-        unfreeze();
+-        super.surfaceChanged(holder, format, w, h);
+-    }
+-
+-    @Override
+-    public void surfaceCreated(SurfaceHolder holder) {
+-        unfreeze();
+-        super.surfaceCreated(holder);
+-    }
+-
+-    @Override
+-    public void surfaceDestroyed(SurfaceHolder holder) {
+-        unfreeze();
+-        super.surfaceDestroyed(holder);
+-    }
+-
+-    @Override
+-    protected void onDetachedFromWindow() {
+-        unfreeze();
+-        super.onDetachedFromWindow();
+-    }
+-
+-    @Override
+-    protected void finalize() throws Throwable {
+-        try {
+-            unfreeze();
+-        } finally {
+-            super.finalize();
+-        }
+-    }
+ }
+diff --git a/src/com/android/gallery3d/ui/PhotoView.java b/src/com/android/gallery3d/ui/PhotoView.java
+index 347d4b3af..f17eeb513 100755
+--- a/src/com/android/gallery3d/ui/PhotoView.java
++++ b/src/com/android/gallery3d/ui/PhotoView.java
+@@ -127,7 +127,6 @@ public class PhotoView extends GLView {
+         public void onFullScreenChanged(boolean full);
+         public void onActionBarAllowed(boolean allowed);
+         public void onActionBarWanted();
+-        public void onCurrentImageUpdated();
+         public void onDeleteImage(Path path, int offset);
+         public void onUndoDeleteImage();
+         public void onCommitDeleteImage();
+@@ -463,9 +462,6 @@ public class PhotoView extends GLView {
+     }
+ 
+     public void notifyImageChange(int index) {
+-        if (index == 0) {
+-            mListener.onCurrentImageUpdated();
+-        }
+         mPictures.get(index).reload();
+         setPictureSize(index);
+         invalidate();
+-- 
+2.11.0
+
+
