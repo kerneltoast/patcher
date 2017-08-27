@@ -47,7 +47,6 @@ patch -d system/core				-p1 -s -N --no-backup-if-mismatch < $SULTAN/system-core0
 patch -d system/core				-p1 -s -N --no-backup-if-mismatch < $SULTAN/system-core1.patch
 patch -d vendor/cm				-p1 -s -N --no-backup-if-mismatch < $SULTAN/vendor-cm0.patch
 patch -d vendor/cm				-p1 -s -N --no-backup-if-mismatch < $SULTAN/vendor-cm1.patch
-patch -d vendor/cm				-p1 -s -N --no-backup-if-mismatch < $SULTAN/vendor-cm2.patch
 
 ### Custom patches
 patch -d packages/apps/Gallery2			-p1 -s -N --no-backup-if-mismatch < $CUSTOM/packages-apps-Gallery20.patch

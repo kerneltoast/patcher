@@ -1,26 +1,27 @@
-From c32045e4a52723c3ccfd59266bd35fab6a4c0468 Mon Sep 17 00:00:00 2001
+From 3bc549f78d877a267e7c718ec90beb1d65657d63 Mon Sep 17 00:00:00 2001
 From: Sultanxda <sultanxda@gmail.com>
-Date: Sat, 9 Apr 2016 21:13:32 -0700
-Subject: [PATCH] apns: Fix protocol for T-Mobile US
+Date: Sat, 6 May 2017 14:48:28 -0700
+Subject: [PATCH] init: Disable bugreport button combo
 
-Using IPv6 on T-Mobile at all causes data connectivity with Qualcomm's RIL,
-so set the protocol to IPv4 by default instead.
+This just gets triggered accidentally all the time.
+
+Change-Id: I3d848cb525859f05fbd6f0103afb025daaa33cb3
 ---
- prebuilt/common/etc/apns-conf.xml | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ prebuilt/common/etc/init.local.rc | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/prebuilt/common/etc/apns-conf.xml b/prebuilt/common/etc/apns-conf.xml
-index 03d27c3..c9f9e46 100644
---- a/prebuilt/common/etc/apns-conf.xml
-+++ b/prebuilt/common/etc/apns-conf.xml
-@@ -1397,8 +1397,8 @@
-   <apn carrier="WCW Internet" mcc="310" mnc="180" apn="internet.wcc.net" user="3257630000" password="mmsc" type="default,supl" authtype="0" />
-   <apn carrier="WCW-MMS" mcc="310" mnc="180" apn="mms.wcc.net" proxy="209.55.70.246" port="80" mmsc="http://mms.wcc.net" mmsproxy="209.55.70.246" mmsport="80" user="13257630000" password="mmsc" type="mms" authtype="3" />
-   <apn carrier="WCW-MMS only" mcc="310" mnc="180" apn="mms.wcc.net" proxy="209.55.70.244" port="80" mmsc="http://mms.wcc.net" mmsproxy="209.55.70.246" mmsport="80" user="3257630000" password="mmsc" type="default,mms" authtype="3" />
--  <apn carrier="T-Mobile US LTE" mcc="310" mnc="260" apn="fast.t-mobile.com" type="default,supl,ia" protocol="IPV4V6" roaming_protocol="IP" mtu="1440" />
--  <apn carrier="T-Mobile MMS" mcc="310" mnc="260" apn="TMUS" mmsc="http://mms.msg.eng.t-mobile.com/mms/wapenc" type="mms" protocol="IPV4V6" roaming_protocol="IP" />
-+  <apn carrier="T-Mobile US LTE" mcc="310" mnc="260" apn="fast.t-mobile.com" type="default,supl,ia" roaming_protocol="IP" mtu="1440" />
-+  <apn carrier="T-Mobile MMS" mcc="310" mnc="260" apn="TMUS" mmsc="http://mms.msg.eng.t-mobile.com/mms/wapenc" type="mms" roaming_protocol="IP" />
-   <apn carrier="Project Fi - T" mcc="310" mnc="260" apn="h2g2" type="ia" protocol="IPV4V6" roaming_protocol="IPV4V6" mvno_match_data="31026097" mvno_type="IMSI" />
-   <apn carrier="Project Fi - T" mcc="310" mnc="260" apn="h2g2" user="none" server="*" password="none" mmsc="http://mmsc1.g-mms.com/mms/wapenc" protocol="IPV6" roaming_protocol="IP" mvno_match_data="31026097" mvno_type="IMSI" />
-   <apn carrier="T-Mobile IMS" mcc="310" mnc="260" apn="ims" type="ims" modem_cognitive="true" protocol="IPV6" />
+diff --git a/prebuilt/common/etc/init.local.rc b/prebuilt/common/etc/init.local.rc
+index 101280e1..5c01bee7 100644
+--- a/prebuilt/common/etc/init.local.rc
++++ b/prebuilt/common/etc/init.local.rc
+@@ -159,7 +159,6 @@ service bugreport /system/bin/dumpstate -d -p -B -z \
+         -o /data/user_de/0/com.android.shell/files/bugreports/bugreport
+     oneshot
+     disabled
+-    keycodes 114 115 116
+ 
+ # adb over network
+ on property:adb.network.port=*
+-- 
+2.11.0
+

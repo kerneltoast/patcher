@@ -1,27 +1,52 @@
-From 3bc549f78d877a267e7c718ec90beb1d65657d63 Mon Sep 17 00:00:00 2001
+From f32287e40d52aceefcbf46d4fdcc1eda1da44de5 Mon Sep 17 00:00:00 2001
 From: Sultanxda <sultanxda@gmail.com>
-Date: Sat, 6 May 2017 14:48:28 -0700
-Subject: [PATCH] init: Disable bugreport button combo
+Date: Sat, 26 Aug 2017 17:35:03 -0700
+Subject: [PATCH] Revert "Replace CMUpdater with Updater"
 
-This just gets triggered accidentally all the time.
-
-Change-Id: I3d848cb525859f05fbd6f0103afb025daaa33cb3
+This reverts commit 25202f301a5bee63d286114e959947ea975dac19.
 ---
- prebuilt/common/etc/init.local.rc | 1 -
- 1 file changed, 1 deletion(-)
+ config/common.mk             | 2 +-
+ sepolicy/mac_permissions.xml | 7 +++++++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/prebuilt/common/etc/init.local.rc b/prebuilt/common/etc/init.local.rc
-index 101280e1..5c01bee7 100644
---- a/prebuilt/common/etc/init.local.rc
-+++ b/prebuilt/common/etc/init.local.rc
-@@ -159,7 +159,6 @@ service bugreport /system/bin/dumpstate -d -p -B -z \
-         -o /data/user_de/0/com.android.shell/files/bugreports/bugreport
-     oneshot
-     disabled
--    keycodes 114 115 116
+diff --git a/config/common.mk b/config/common.mk
+index d1812284..dea0f07d 100644
+--- a/config/common.mk
++++ b/config/common.mk
+@@ -126,6 +126,7 @@ PRODUCT_PACKAGES += \
+ PRODUCT_PACKAGES += \
+     AudioFX \
+     CMSettingsProvider \
++    CMUpdater \
+     LineageSetupWizard \
+     Eleven \
+     ExactCalculator \
+@@ -133,7 +134,6 @@ PRODUCT_PACKAGES += \
+     LiveLockScreenService \
+     LockClock \
+     Trebuchet \
+-    Updater \
+     WallpaperPicker \
+     WeatherProvider
  
- # adb over network
- on property:adb.network.port=*
+diff --git a/sepolicy/mac_permissions.xml b/sepolicy/mac_permissions.xml
+index ee782d7a..f70b7225 100644
+--- a/sepolicy/mac_permissions.xml
++++ b/sepolicy/mac_permissions.xml
+@@ -15,6 +15,13 @@
+     <seinfo value="release" />
+   </signer>
+ 
++  <!-- CMUpdater -->
++  <signer signature="@RELEASE" >
++    <package name="com.cyanogenmod.updater" >
++      <seinfo value="cmupdater" />
++    </package>
++  </signer>
++
+   <!-- ThemeManagerService -->
+   <signer signature="@RELEASE" >
+     <package name="org.cyanogenmod.themeservice" >
 -- 
 2.11.0
 
