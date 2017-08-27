@@ -1,0 +1,26 @@
+From 2f71eb1e79dfe31c10302040396a18fc1db08a81 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Sat, 26 Aug 2017 17:28:51 -0700
+Subject: [PATCH] Revert "Settings: Change Updater package name"
+
+This reverts commit 6d4bee5a9eca87ef1ad11a436869615095bb3498.
+---
+ res/xml/device_info_settings.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/res/xml/device_info_settings.xml b/res/xml/device_info_settings.xml
+index d59486cc9e..b366d9d86d 100644
+--- a/res/xml/device_info_settings.xml
++++ b/res/xml/device_info_settings.xml
+@@ -42,7 +42,7 @@
+                 cm:requiresPackage="org.lineageos.updater">
+             <intent android:action="android.intent.action.MAIN"
+                     android:targetPackage="org.lineageos.updater"
+-                    android:targetClass="org.lineageos.updater.UpdatesActivity" />
++                    android:targetClass="com.cyanogenmod.updater.UpdatesActivity" />
+         </cyanogenmod.preference.SelfRemovingPreference>
+ 
+         <!-- Device status - launches activity -->
+-- 
+2.11.0
+
