@@ -1,0 +1,29 @@
+From 74675369464fb49dd3cd0b6af62e4812ff8d9d97 Mon Sep 17 00:00:00 2001
+From: Gabriele M <moto.falcon.git@gmail.com>
+Date: Thu, 31 Aug 2017 00:25:21 +0200
+Subject: [PATCH] Don't disable the GPS prematurely
+
+Since commit b2b4489760230258d23f72f8f8dd643b09cd5b04
+("Use SystemClock.elapsedRealtime() to calc TTFF") mLastFixTime
+stores the time since boot rather than the current real time.
+
+REGRESSION-1032
+
+Change-Id: I39474a66c6d7dbd9ca0ff50a5a1b9c06007725c4
+---
+ .../core/java/com/android/server/location/GnssLocationProvider.java     | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/services/core/java/com/android/server/location/GnssLocationProvider.java b/services/core/java/com/android/server/location/GnssLocationProvider.java
+index c6deeea32ac..2228b3fe72c 100644
+--- a/services/core/java/com/android/server/location/GnssLocationProvider.java
++++ b/services/core/java/com/android/server/location/GnssLocationProvider.java
+@@ -1672,7 +1672,7 @@ private void reportSvStatus() {
+         updateStatus(mStatus, usedInFixCount);
+ 
+         if (mNavigating && mStatus == LocationProvider.AVAILABLE && mLastFixTime > 0 &&
+-            System.currentTimeMillis() - mLastFixTime > RECENT_FIX_TIMEOUT) {
++            SystemClock.elapsedRealtime() - mLastFixTime > RECENT_FIX_TIMEOUT) {
+             // send an intent to notify that the GPS is no longer receiving fixes.
+             Intent intent = new Intent(LocationManager.GPS_FIX_CHANGE_ACTION);
+             intent.putExtra(LocationManager.EXTRA_GPS_ENABLED, false);
