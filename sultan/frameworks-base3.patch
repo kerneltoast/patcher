@@ -1,45 +1,30 @@
-From b5f5ae4b4c4fc9174bbdc371b511149a5fcd9a64 Mon Sep 17 00:00:00 2001
+From fa4e9d54fbe10e0114be01f617ebbb090b79a5e4 Mon Sep 17 00:00:00 2001
 From: Sultanxda <sultanxda@gmail.com>
-Date: Wed, 24 May 2017 15:19:14 -0700
-Subject: [PATCH] Dynamically enable MSB AGPS at runtime for newer baseband
- versions
+Date: Sun, 7 Aug 2016 10:07:44 -0700
+Subject: [PATCH] display: Don't animate screen brightness when turning the
+ screen on
 
-MSB currently does not work correctly for older basebands
-(i.e. DI.3.0.c6-00241 and older), but it's still useful, so enable it at
-runtime if a newer baseband is in use.
+Make the display wake from sleep faster by going directly to the target
+brightness instead of ramping up to it.
 
-Change-Id: I21d28de3262cafe3812eb4f64e18b3d9c2196890
+Change-Id: Ieba90f4efec31cbce9fb3209562321d4f169365e
 ---
- .../java/com/android/server/location/GnssLocationProvider.java   | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ services/core/java/com/android/server/display/RampAnimator.java | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/services/core/java/com/android/server/location/GnssLocationProvider.java b/services/core/java/com/android/server/location/GnssLocationProvider.java
-index bdf1463d512..fb512bd359b 100644
---- a/services/core/java/com/android/server/location/GnssLocationProvider.java
-+++ b/services/core/java/com/android/server/location/GnssLocationProvider.java
-@@ -22,6 +22,7 @@ import com.android.internal.location.GpsNetInitiatedHandler;
- import com.android.internal.location.GpsNetInitiatedHandler.GpsNiNotification;
- import com.android.internal.location.ProviderProperties;
- import com.android.internal.location.ProviderRequest;
-+import com.android.internal.telephony.TelephonyProperties;
- 
- import android.app.AlarmManager;
- import android.app.AppOpsManager;
-@@ -1504,6 +1505,14 @@ public class GnssLocationProvider implements LocationProviderInterface {
-     }
- 
-     private boolean hasCapability(int capability) {
-+        if (((capability & GPS_CAPABILITY_MSB) != 0) &&
-+            ((mEngineCapabilities & capability) == 0)) {
-+            String baseband =
-+                SystemProperties.get(TelephonyProperties.PROPERTY_BASEBAND_VERSION, null);
-+            if (baseband != null && baseband.matches("(.*)4\\.0\\.1(.*)")) {
-+                mEngineCapabilities |= GPS_CAPABILITY_MSB;
-+            }
-+        }
-         return ((mEngineCapabilities & capability) != 0);
-     }
- 
+diff --git a/services/core/java/com/android/server/display/RampAnimator.java b/services/core/java/com/android/server/display/RampAnimator.java
+index d71269f..5625e34 100644
+--- a/services/core/java/com/android/server/display/RampAnimator.java
++++ b/services/core/java/com/android/server/display/RampAnimator.java
+@@ -59,7 +59,7 @@ final class RampAnimator<T> {
+      */
+     public boolean animateTo(int target, int rate) {
+         // Immediately jump to the target the first time.
+-        if (mFirstTime || rate <= 0) {
++        if (mFirstTime || rate <= 0 || mCurrentValue == 0) {
+             if (mFirstTime || target != mCurrentValue) {
+                 mFirstTime = false;
+                 mRate = 0;
 -- 
-2.11.0
+2.7.4
 
