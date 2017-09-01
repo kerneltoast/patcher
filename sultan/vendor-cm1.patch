@@ -13,7 +13,7 @@ diff --git a/config/common.mk b/config/common.mk
 index d1812284..dea0f07d 100644
 --- a/config/common.mk
 +++ b/config/common.mk
-@@ -126,6 +126,7 @@ PRODUCT_PACKAGES += \
+@@ -123,13 +123,13 @@ PRODUCT_PACKAGES += \
  PRODUCT_PACKAGES += \
      AudioFX \
      CMSettingsProvider \
@@ -21,8 +21,7 @@ index d1812284..dea0f07d 100644
      LineageSetupWizard \
      Eleven \
      ExactCalculator \
-@@ -133,7 +134,6 @@ PRODUCT_PACKAGES += \
-     LiveLockScreenService \
+     Jelly \
      LockClock \
      Trebuchet \
 -    Updater \
@@ -30,23 +29,21 @@ index d1812284..dea0f07d 100644
      WeatherProvider
  
 diff --git a/sepolicy/mac_permissions.xml b/sepolicy/mac_permissions.xml
-index ee782d7a..f70b7225 100644
+index e91c6f41..184e3568 100644
 --- a/sepolicy/mac_permissions.xml
 +++ b/sepolicy/mac_permissions.xml
-@@ -15,6 +15,13 @@
+@@ -14,4 +14,11 @@
+     <allow-all />
      <seinfo value="release" />
    </signer>
- 
++
 +  <!-- CMUpdater -->
 +  <signer signature="@RELEASE" >
 +    <package name="com.cyanogenmod.updater" >
 +      <seinfo value="cmupdater" />
 +    </package>
 +  </signer>
-+
-   <!-- ThemeManagerService -->
-   <signer signature="@RELEASE" >
-     <package name="org.cyanogenmod.themeservice" >
+ </policy>
 -- 
 2.11.0
 
