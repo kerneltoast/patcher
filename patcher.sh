@@ -38,7 +38,6 @@ patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SULTAN/framework
 patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SULTAN/frameworks-base1.patch
 patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SULTAN/frameworks-base2.patch
 patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SULTAN/frameworks-base3.patch
-patch -d frameworks/base			-p1 -s -N --no-backup-if-mismatch < $SULTAN/frameworks-base4.patch
 patch -d hardware/qcom/display-caf/msm8974	-p1 -s -N --no-backup-if-mismatch < $SULTAN/hardware-qcom-display-caf-msm89740.patch
 patch -d packages/apps/Dialer			-p1 -s -N --no-backup-if-mismatch < $SULTAN/packages-apps-Dialer0.patch
 patch -d packages/apps/LockClock		-p1 -s -N --no-backup-if-mismatch < $SULTAN/packages-apps-LockClock0.patch
