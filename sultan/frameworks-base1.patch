@@ -75,4 +75,4 @@ index f10b982..57bea43 100644
 +
          // Our own stack trace to append
          StringWriter sw = new StringWriter();
-         PrintWriter pw = new FastPrintWriter(sw, false, 256);
+         sw.append("# via Binder call with stack:\n");
