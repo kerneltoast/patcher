@@ -1,27 +1,25 @@
 #!/bin/sh
 
-ROM_TREE=$PWD
-
 # Clean up
-cd $ROM_TREE/build
-git clean -f -d && git reset --hard
-cd $ROM_TREE/frameworks/av
-git clean -f -d && git reset --hard
-cd $ROM_TREE/frameworks/base
-git clean -f -d && git reset --hard
-cd $ROM_TREE/frameworks/native
-git clean -f -d && git reset --hard
-cd $ROM_TREE/kernel/oneplus/msm8996
-git clean -f -d && git reset --hard
-cd $ROM_TREE/packages/apps/Gallery2
-git clean -f -d && git reset --hard
-cd $ROM_TREE/packages/apps/LockClock
-git clean -f -d && git reset --hard
-cd $ROM_TREE/packages/apps/Settings
-git clean -f -d && git reset --hard
-cd $ROM_TREE/system/core
-git clean -f -d && git reset --hard
-cd $ROM_TREE/vendor/cm
-git clean -f -d && git reset --hard
-
-cd $ROM_TREE
+git -C build				clean -dfqx
+git -C build				reset -q --hard
+git -C device/oppo/common		clean -dfqx
+git -C device/oppo/common		reset -q --hard
+git -C frameworks/av			clean -dfqx
+git -C frameworks/av			reset -q --hard
+git -C frameworks/base			clean -dfqx
+git -C frameworks/base			reset -q --hard
+git -C frameworks/native		clean -dfqx
+git -C frameworks/native		reset -q --hard
+git -C kernel/oneplus/msm8996		clean -dfqx
+git -C kernel/oneplus/msm8996		reset -q --hard
+git -C packages/apps/Gallery2		clean -dfqx
+git -C packages/apps/Gallery2		reset -q --hard
+git -C packages/apps/LockClock		clean -dfqx
+git -C packages/apps/LockClock		reset -q --hard
+git -C packages/apps/Settings		clean -dfqx
+git -C packages/apps/Settings		reset -q --hard
+git -C system/core			clean -dfqx
+git -C system/core			reset -q --hard
+git -C vendor/cm			clean -dfqx
+git -C vendor/cm			reset -q --hard
