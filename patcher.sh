@@ -3,7 +3,6 @@
 # Apply these patches before compilation:
 CUSTOM=$PWD/patcher/custom
 SULTAN=$PWD/patcher/sultan
-ZX2C4=$PWD/patcher/zx2c4
 
 # Clean up first
 git -C build				clean -dfqx
@@ -46,10 +45,6 @@ git -C system/core			apply $SULTAN/system-core1.patch
 git -C system/core			apply $SULTAN/system-core2.patch
 git -C vendor/cm			apply $SULTAN/vendor-cm0.patch
 git -C vendor/cm			apply $SULTAN/vendor-cm1.patch
-
-### zx2c4's patches
-$ZX2C4/wireguard-fetch.sh || rm -f $ZX2C4/wireguard-src.patch
-git -C kernel/oneplus/msm8996		apply $ZX2C4/wireguard-src.patch
 
 ### Custom patches
 git -C frameworks/av			apply $CUSTOM/frameworks-av0.patch
