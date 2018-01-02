@@ -15,8 +15,6 @@ git -C frameworks/base			clean -dfqx
 git -C frameworks/base			reset -q --hard
 git -C frameworks/native		clean -dfqx
 git -C frameworks/native		reset -q --hard
-git -C kernel/oneplus/msm8996		clean -dfqx
-git -C kernel/oneplus/msm8996		reset -q --hard
 git -C packages/apps/Gallery2		clean -dfqx
 git -C packages/apps/Gallery2		reset -q --hard
 git -C packages/apps/LockClock		clean -dfqx
