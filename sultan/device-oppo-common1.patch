@@ -1,0 +1,30 @@
+From e2799a6d2e41e08d4ca91ad5fd5c3e70a753fcb4 Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Sun, 4 Feb 2018 22:43:04 +0100
+Subject: [PATCH] Remove Swap Buttons option entirely
+
+Change-Id: I3c0900a1dba71ffd207ae238284535f4a4a8d715
+---
+ configpanel/res/xml/button_panel.xml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configpanel/res/xml/button_panel.xml b/configpanel/res/xml/button_panel.xml
+index 32b5cae..a7a0a4a 100644
+--- a/configpanel/res/xml/button_panel.xml
++++ b/configpanel/res/xml/button_panel.xml
+@@ -16,10 +16,10 @@
+ -->
+ <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+ 
+-    <SwitchPreference
++    <!--SwitchPreference
+         android:key="button_swap"
+         android:title="@string/button_swap_title"
+-        android:summary="@string/button_swap_summary" />
++        android:summary="@string/button_swap_summary" /-->
+ 
+     <PreferenceCategory
+         android:title="@string/notification_slider_category_title">
+-- 
+2.16.1
+

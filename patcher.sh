@@ -29,6 +29,7 @@ git -C vendor/cm			reset -q --hard
 ### Sultan's patches
 git -C build				apply $SULTAN/build0.patch
 git -C device/oppo/common		apply $SULTAN/device-oppo-common0.patch
+git -C device/oppo/common		apply $SULTAN/device-oppo-common1.patch
 git -C frameworks/av			apply $SULTAN/frameworks-av0.patch
 git -C frameworks/base			apply $SULTAN/frameworks-base0.patch
 git -C frameworks/base			apply $SULTAN/frameworks-base1.patch
