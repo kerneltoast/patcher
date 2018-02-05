@@ -38,6 +38,7 @@ git -C frameworks/base			apply $SULTAN/frameworks-base1.patch
 git -C frameworks/base			apply $SULTAN/frameworks-base2.patch
 git -C frameworks/base			apply $SULTAN/frameworks-base3.patch
 git -C frameworks/base			apply $SULTAN/frameworks-base4.patch
+git -C frameworks/base			apply $SULTAN/frameworks-base5.patch
 git -C frameworks/native		apply $SULTAN/frameworks-native0.patch
 git -C frameworks/opt/net/wifi		apply $SULTAN/frameworks-opt-net-wifi0.patch
 git -C packages/apps/LockClock		apply $SULTAN/packages-apps-LockClock0.patch

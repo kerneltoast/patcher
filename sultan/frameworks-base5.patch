@@ -1,0 +1,28 @@
+From 6996e5fcb73ccbbc604adfbc6104f79977183aa8 Mon Sep 17 00:00:00 2001
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Mon, 5 Feb 2018 23:08:14 +0100
+Subject: [PATCH] Never force camera sounds
+
+Change-Id: Ieedabefb4f92591bc3b5c5de0aff06cb5f20ab83
+---
+ services/core/java/com/android/server/audio/AudioService.java | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/services/core/java/com/android/server/audio/AudioService.java b/services/core/java/com/android/server/audio/AudioService.java
+index c717107d9c0..370880373d6 100644
+--- a/services/core/java/com/android/server/audio/AudioService.java
++++ b/services/core/java/com/android/server/audio/AudioService.java
+@@ -5848,9 +5848,7 @@ public class AudioService extends IAudioService.Stub {
+     }
+ 
+     private boolean readCameraSoundForced() {
+-        return SystemProperties.getBoolean("audio.camerasound.force", false) ||
+-                mContext.getResources().getBoolean(
+-                        com.android.internal.R.bool.config_camera_sound_forced);
++        return false;
+     }
+ 
+     //==========================================================================================
+-- 
+2.16.1
+
