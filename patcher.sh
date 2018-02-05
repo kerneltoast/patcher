@@ -1,57 +1,21 @@
-#!/bin/sh
+#!/bin/bash
+# SPDX-License-Identifier: GPL-2.0
+#
+# Copyright (C) 2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+#
 
-# Apply these patches before compilation:
-CUSTOM=$PWD/patcher/custom
-SULTAN=$PWD/patcher/sultan
+set -e
+shopt -s nullglob
 
-# Clean up first
-git -C build				clean -dfqx
-git -C build				reset -q --hard
-git -C device/oppo/common		clean -dfqx
-git -C device/oppo/common		reset -q --hard
-git -C frameworks/av			clean -dfqx
-git -C frameworks/av			reset -q --hard
-git -C frameworks/base			clean -dfqx
-git -C frameworks/base			reset -q --hard
-git -C frameworks/native		clean -dfqx
-git -C frameworks/native		reset -q --hard
-git -C frameworks/opt/net/wifi		clean -dfqx
-git -C frameworks/opt/net/wifi		reset -q --hard
-git -C packages/apps/Gallery2		clean -dfqx
-git -C packages/apps/Gallery2		reset -q --hard
-git -C packages/apps/LockClock		clean -dfqx
-git -C packages/apps/LockClock		reset -q --hard
-git -C packages/apps/Settings		clean -dfqx
-git -C packages/apps/Settings		reset -q --hard
-git -C system/core			clean -dfqx
-git -C system/core			reset -q --hard
-git -C vendor/cm			clean -dfqx
-git -C vendor/cm			reset -q --hard
+SELF="$(readlink -f "${BASH_SOURCE[0]}")"
+PATCH_ROOT="${SELF%/*}/patches"
+SOURCE_ROOT="${SELF%/*}/.."
 
-### Sultan's patches
-git -C build				apply $SULTAN/build0.patch
-git -C device/oppo/common		apply $SULTAN/device-oppo-common0.patch
-git -C device/oppo/common		apply $SULTAN/device-oppo-common1.patch
-git -C frameworks/av			apply $SULTAN/frameworks-av0.patch
-git -C frameworks/base			apply $SULTAN/frameworks-base0.patch
-git -C frameworks/base			apply $SULTAN/frameworks-base1.patch
-git -C frameworks/base			apply $SULTAN/frameworks-base2.patch
-git -C frameworks/base			apply $SULTAN/frameworks-base3.patch
-git -C frameworks/base			apply $SULTAN/frameworks-base4.patch
-git -C frameworks/base			apply $SULTAN/frameworks-base5.patch
-git -C frameworks/native		apply $SULTAN/frameworks-native0.patch
-git -C frameworks/opt/net/wifi		apply $SULTAN/frameworks-opt-net-wifi0.patch
-git -C packages/apps/LockClock		apply $SULTAN/packages-apps-LockClock0.patch
-git -C packages/apps/Settings		apply $SULTAN/packages-apps-Settings0.patch
-git -C packages/apps/Settings		apply $SULTAN/packages-apps-Settings1.patch
-git -C system/core			apply $SULTAN/system-core0.patch
-git -C system/core			apply $SULTAN/system-core1.patch
-git -C system/core			apply $SULTAN/system-core2.patch
-git -C vendor/cm			apply $SULTAN/vendor-cm0.patch
-git -C vendor/cm			apply $SULTAN/vendor-cm1.patch
-
-### Custom patches
-git -C frameworks/av			apply $CUSTOM/frameworks-av0.patch
-git -C packages/apps/Gallery2		apply $CUSTOM/packages-apps-Gallery20.patch
-git -C packages/apps/Gallery2		apply $CUSTOM/packages-apps-Gallery21.patch
-git -C packages/apps/Gallery2		apply $CUSTOM/packages-apps-Gallery22.patch
+while read -r PATCH_DIR; do
+	[[ -n $PATCH_DIR && -d $PATCH_DIR/.git ]] || continue
+	git -C "$PATCH_DIR" clean -dfqx
+	git -C "$PATCH_DIR" reset -q --hard
+	for PATCH in "$PATCH_ROOT/$PATCH_DIR"/*.patch; do
+		git -C "$SOURCE_ROOT/$PATCH_DIR" apply "$PATCH"
+	done
+done < <(find "$PATCH_ROOT" -type d -printf '%P\n')

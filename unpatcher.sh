@@ -1,25 +1,15 @@
-#!/bin/sh
+#!/bin/bash
+# SPDX-License-Identifier: GPL-2.0
+#
+# Copyright (C) 2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+#
 
-# Clean up
-git -C build				clean -dfqx
-git -C build				reset -q --hard
-git -C device/oppo/common		clean -dfqx
-git -C device/oppo/common		reset -q --hard
-git -C frameworks/av			clean -dfqx
-git -C frameworks/av			reset -q --hard
-git -C frameworks/base			clean -dfqx
-git -C frameworks/base			reset -q --hard
-git -C frameworks/native		clean -dfqx
-git -C frameworks/native		reset -q --hard
-git -C frameworks/opt/net/wifi		clean -dfqx
-git -C frameworks/opt/net/wifi		reset -q --hard
-git -C packages/apps/Gallery2		clean -dfqx
-git -C packages/apps/Gallery2		reset -q --hard
-git -C packages/apps/LockClock		clean -dfqx
-git -C packages/apps/LockClock		reset -q --hard
-git -C packages/apps/Settings		clean -dfqx
-git -C packages/apps/Settings		reset -q --hard
-git -C system/core			clean -dfqx
-git -C system/core			reset -q --hard
-git -C vendor/cm			clean -dfqx
-git -C vendor/cm			reset -q --hard
+SELF="$(readlink -f "${BASH_SOURCE[0]}")"
+PATCH_ROOT="${SELF%/*}/patches"
+SOURCE_ROOT="${SELF%/*}/.."
+
+while read -r PATCH_DIR; do
+	[[ -n $PATCH_DIR && -d $PATCH_DIR/.git ]] || continue
+	git -C "$PATCH_DIR" clean -dfqx
+	git -C "$PATCH_DIR" reset -q --hard
+done < <(find "$PATCH_ROOT" -type d -printf '%P\n')
