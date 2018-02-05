@@ -15,6 +15,8 @@ git -C frameworks/base			clean -dfqx
 git -C frameworks/base			reset -q --hard
 git -C frameworks/native		clean -dfqx
 git -C frameworks/native		reset -q --hard
+git -C frameworks/opt/net/wifi		clean -dfqx
+git -C frameworks/opt/net/wifi		reset -q --hard
 git -C packages/apps/Gallery2		clean -dfqx
 git -C packages/apps/Gallery2		reset -q --hard
 git -C packages/apps/LockClock		clean -dfqx
@@ -37,8 +39,10 @@ git -C frameworks/base			apply $SULTAN/frameworks-base2.patch
 git -C frameworks/base			apply $SULTAN/frameworks-base3.patch
 git -C frameworks/base			apply $SULTAN/frameworks-base4.patch
 git -C frameworks/native		apply $SULTAN/frameworks-native0.patch
+git -C frameworks/opt/net/wifi		apply $SULTAN/frameworks-opt-net-wifi0.patch
 git -C packages/apps/LockClock		apply $SULTAN/packages-apps-LockClock0.patch
 git -C packages/apps/Settings		apply $SULTAN/packages-apps-Settings0.patch
+git -C packages/apps/Settings		apply $SULTAN/packages-apps-Settings1.patch
 git -C system/core			apply $SULTAN/system-core0.patch
 git -C system/core			apply $SULTAN/system-core1.patch
 git -C system/core			apply $SULTAN/system-core2.patch

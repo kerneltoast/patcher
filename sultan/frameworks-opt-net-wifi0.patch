@@ -1,0 +1,44 @@
+From 2aff742ea6b731d375e62923ef155b099162166d Mon Sep 17 00:00:00 2001
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Mon, 5 Feb 2018 22:46:04 +0100
+Subject: [PATCH] Always allow 5Ghz
+
+Change-Id: I530580e96f5fd59eea88eea2b23d9182c685c36a
+---
+ service/java/com/android/server/wifi/SoftApManager.java     | 1 -
+ service/java/com/android/server/wifi/util/ApConfigUtil.java | 7 -------
+ 2 files changed, 8 deletions(-)
+
+diff --git a/service/java/com/android/server/wifi/SoftApManager.java b/service/java/com/android/server/wifi/SoftApManager.java
+index 98dad2be..10d80a01 100644
+--- a/service/java/com/android/server/wifi/SoftApManager.java
++++ b/service/java/com/android/server/wifi/SoftApManager.java
+@@ -162,7 +162,6 @@ public class SoftApManager {
+                     && config.apBand == WifiConfiguration.AP_BAND_5GHZ) {
+                 Log.e(TAG, "Failed to set country code, required for setting up "
+                         + "soft ap in 5GHz");
+-                return ERROR_GENERIC;
+             }
+         }
+ 
+diff --git a/service/java/com/android/server/wifi/util/ApConfigUtil.java b/service/java/com/android/server/wifi/util/ApConfigUtil.java
+index 7bbbc036..30eccc09 100644
+--- a/service/java/com/android/server/wifi/util/ApConfigUtil.java
++++ b/service/java/com/android/server/wifi/util/ApConfigUtil.java
+@@ -120,13 +120,6 @@ public class ApConfigUtil {
+             return SUCCESS;
+         }
+ 
+-        /* Country code is mandatory for 5GHz band. */
+-        if (config.apBand == WifiConfiguration.AP_BAND_5GHZ
+-                && countryCode == null) {
+-            Log.e(TAG, "5GHz band is not allowed without country code");
+-            return ERROR_GENERIC;
+-        }
+-
+         /* Select a channel if it is not specified. */
+         if (config.apChannel == 0) {
+             config.apChannel = chooseApChannel(
+-- 
+2.16.1
+

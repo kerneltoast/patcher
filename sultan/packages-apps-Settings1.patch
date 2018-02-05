@@ -1,0 +1,27 @@
+From 4256c297aaddaff925a17425e22e1256246d784a Mon Sep 17 00:00:00 2001
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Mon, 5 Feb 2018 22:45:17 +0100
+Subject: [PATCH] Always show 5Ghz
+
+Change-Id: I5ccac23cca97cf5d842c093829a17ae4c9fd632f
+---
+ src/com/android/settings/wifi/WifiApDialog.java | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/com/android/settings/wifi/WifiApDialog.java b/src/com/android/settings/wifi/WifiApDialog.java
+index 3633a4a60b..36efab89a8 100644
+--- a/src/com/android/settings/wifi/WifiApDialog.java
++++ b/src/com/android/settings/wifi/WifiApDialog.java
+@@ -135,8 +135,7 @@ public class WifiApDialog extends AlertDialog implements View.OnClickListener,
+ 
+         ArrayAdapter <CharSequence> channelAdapter;
+         String countryCode = mWifiManager.getCountryCode();
+-        if (!mWifiManager.isDualBandSupported() || (countryCode == null)
+-                                              || (countryCode.length() == 0)) {
++        if (!mWifiManager.isDualBandSupported()) {
+             //If no country code, 5GHz AP is forbidden
+             Log.i(TAG,(!mWifiManager.isDualBandSupported() ? "Device do not support 5GHz " :"") 
+                     + (countryCode == null ? " NO country code" :"") +  " forbid 5GHz");
+-- 
+2.16.1
+
