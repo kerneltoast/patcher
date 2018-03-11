@@ -40,7 +40,6 @@ git -C packages/apps/LockClock		apply $SULTAN/packages-apps-LockClock0.patch
 git -C packages/apps/Settings		apply $SULTAN/packages-apps-Settings0.patch
 git -C system/core			apply $SULTAN/system-core0.patch
 git -C system/core			apply $SULTAN/system-core1.patch
-git -C system/core			apply $SULTAN/system-core2.patch
 git -C vendor/cm			apply $SULTAN/vendor-cm0.patch
 git -C vendor/cm			apply $SULTAN/vendor-cm1.patch
 
