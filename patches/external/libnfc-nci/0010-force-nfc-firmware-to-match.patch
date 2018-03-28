@@ -1,0 +1,59 @@
+From 8ca1b70be50ef5ecf7be59008dcc5cfd25feb0ce Mon Sep 17 00:00:00 2001
+From: Sultanxda <sultanxda@gmail.com>
+Date: Wed, 28 Mar 2018 11:56:27 -0700
+Subject: [PATCH] Force device firmware version to always match the system
+ version
+
+If the version of the firmware in the firmware library doesn't match the
+device's firmware exactly, then force a firmware download.
+
+Change-Id: I563d23b57b5f6f1f96e272463a25b0b902b02e87
+---
+ halimpl/pn54x/hal/phNxpNciHal.c | 13 +------------
+ 1 file changed, 1 insertion(+), 12 deletions(-)
+
+diff --git a/halimpl/pn54x/hal/phNxpNciHal.c b/halimpl/pn54x/hal/phNxpNciHal.c
+index 3baf817..abe824c 100644
+--- a/halimpl/pn54x/hal/phNxpNciHal.c
++++ b/halimpl/pn54x/hal/phNxpNciHal.c
+@@ -599,16 +599,11 @@ init_retry:
+     status = phDnldNfc_InitImgInfo();
+     NXPLOG_NCIHAL_D ("FW version for FW file = 0x%x", wFwVer);
+     NXPLOG_NCIHAL_D ("FW version from device = 0x%x", wFwVerRsp);
+-    if ((wFwVerRsp & 0x0000FFFF) == wFwVer)
++    if (wFwVerRsp == wFwVer)
+     {
+         NXPLOG_NCIHAL_D ("FW uptodate not required");
+         phDnldNfc_ReSetHwDevHandle();
+     }
+-    else if (wFwVer != 0 && (wFwVerRsp & 0x0000FFFF) > wFwVer)
+-    {
+-        NXPLOG_NCIHAL_D ("FW image older than device's, skip update");
+-        phDnldNfc_ReSetHwDevHandle();
+-    }
+     else
+     {
+ force_download:
+@@ -616,7 +611,6 @@ force_download:
+         {
+             phDnldNfc_InitImgInfo();
+         }
+-        if (NFCSTATUS_SUCCESS == phNxpNciHal_CheckValidFwVersion())
+         {
+             NXPLOG_NCIHAL_D ("FW update required");
+             fw_download_success = 0;
+@@ -655,11 +649,6 @@ force_download:
+                 }
+             }
+         }
+-        else
+-        {
+-            if (wFwVerRsp == 0)
+-               phDnldNfc_ReSetHwDevHandle();
+-        }
+     }
+     /* Call open complete */
+     phNxpNciHal_open_complete(wConfigStatus);
+-- 
+2.14.1
+
